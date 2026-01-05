@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextGeometricTransform
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.ANNOTATED_STRING_ON_CLICK_KEY
 import com.dangerfield.libraries.ui.ANNOTATED_STRING_URL_KEY
@@ -255,7 +255,7 @@ private fun ClickableTextCatalogPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ClickableText(
-                text = "Visit https://merizo.app/support or https://status.merizo.app for updates.",
+                text = "Visit https://goodtimes.app/support or https://status.goodtimes.app for updates.",
                 onClickUrl = {}
             )
 
@@ -272,12 +272,12 @@ private fun ClickableTextCatalogPreview() {
             ClickableText(text = builderSubtle, textAlign = TextAlign.Start)
 
             ClickableText(
-                text = "Auto-linking disabled even though https://merizo.app/docs is present.",
+                text = "Auto-linking disabled even though https://goodtimes.app/docs is present.",
                 autoLinkUrls = false
             )
 
             ClickableText(
-                text = "Custom auto link style https://merizo.app/pricing",
+                text = "Custom auto link style https://goodtimes.app/pricing",
                 autoLinkAppearance = ClickableTextDefaults.subtleLinkAppearance(),
                 onClickUrl = {}
             )

@@ -42,10 +42,10 @@ import com.dangerfield.libraries.ui.components.icon.Outlined
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.system.color.animateColorResourceAsState
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD1600
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD1600
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 sealed class BottomBarItem(

@@ -1,6 +1,6 @@
 
 plugins {
-    id("merizo.compose.multiplatform")
+    id("goodtimes.compose.multiplatform")
 }
 
 android {
@@ -17,8 +17,8 @@ kotlin {
 
         commonMain.dependencies {
             implementation(projects.libraries.core)
-            // TODO honestly the merizo library should expose the component that require merizo domain
-            implementation(projects.libraries.merizo)
+            // TODO honestly the goodtimes library should expose the component that require goodtimes domain
+            implementation(projects.libraries.goodtimes)
 
             api(compose.ui)
             api(compose.uiUtil)

@@ -12,9 +12,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.color.ProvideContentColor
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.color.ProvideContentColor
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.components.button.Button

@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber", "VariableNaming")
 
-package com.dangerfield.merizo.system.typography
+package com.dangerfield.goodtimes.system.typography
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dangerfield.libraries.ui.PreviewContent
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.LineHeightRatio
-import com.dangerfield.merizo.system.lineHeight
-import com.dangerfield.merizo.system.sp
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.LineHeightRatio
+import com.dangerfield.goodtimes.system.lineHeight
+import com.dangerfield.goodtimes.system.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -183,12 +183,24 @@ data class TypographyResource internal constructor(
 }
 
 interface Typography {
+    val Brand: BrandTypography
     val Display: DisplayTypography
     val Heading: HeadingTypography
     val Body: BodyTypography
     val Label: LabelTypography
     val Caption: CaptionTypography
     val Default: TypographyResource
+}
+
+interface BrandTypography {
+    val B1500: TypographyResource
+    val B1400: TypographyResource
+    val B1300: TypographyResource
+    val B1200: TypographyResource
+    val B1100: TypographyResource
+    val B1000: TypographyResource
+    val B900: TypographyResource
+    val B800: TypographyResource
 }
 
 interface DisplayTypography {
@@ -241,20 +253,25 @@ interface CaptionTypography {
 fun rememberTypography(): Typography {
     val serifFontFamily = SerifFontFamily
     val sansSerifFontFamily = SansSerifFontFamily
+    val brandFontFamily = BrandFontFamily
 
-    return remember(serifFontFamily, sansSerifFontFamily) {
+    return remember(serifFontFamily, sansSerifFontFamily, brandFontFamily) {
         DefaultTypography(
             serifFontFamily = serifFontFamily,
-            sansSerifFontFamily = sansSerifFontFamily
+            sansSerifFontFamily = sansSerifFontFamily,
+            brandFontFamily = brandFontFamily
         )
     }
 }
 
 class DefaultTypography(
     serifFontFamily: FontFamily,
-    sansSerifFontFamily: FontFamily
+    sansSerifFontFamily: FontFamily,
+    brandFontFamily: FontFamily
 ) : Typography {
     override val Display: DisplayTypography = DisplayTypographyImpl(serifFontFamily)
+
+    override val Brand: BrandTypography = BrandTypographyImpl(brandFontFamily)
 
     override val Heading: HeadingTypography = HeadingTypographyImpl(sansSerifFontFamily)
 
@@ -265,7 +282,6 @@ class DefaultTypography(
     override val Default: TypographyResource = Body.B600
 }
 
-
 class DisplayTypographyImpl(
     private val fontFamily: FontFamily
 ) : DisplayTypography {
@@ -275,7 +291,7 @@ class DisplayTypographyImpl(
         fontFamily = fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1500.sp(),
-        lineHeight = Dimension.D1500.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1500.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1500"
     )
@@ -284,7 +300,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1400.sp(),
-        lineHeight = Dimension.D1400.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1400.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1400"
     )
@@ -293,7 +309,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1300.sp(),
-        lineHeight = Dimension.D1300.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1300.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1300"
     )
@@ -302,7 +318,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1200.sp(),
-        lineHeight = Dimension.D1200.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1200.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1200"
     )
@@ -311,7 +327,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1100.sp(),
-        lineHeight = Dimension.D1100.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1100.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1100"
     )
@@ -320,7 +336,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D1000.sp(),
-        lineHeight = Dimension.D1000.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D1000.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-1000"
     )
@@ -329,7 +345,7 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D900.sp(),
-        lineHeight = Dimension.D900.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D900.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-900"
     )
@@ -338,9 +354,87 @@ class DisplayTypographyImpl(
         fontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = Dimension.D800.sp(),
-        lineHeight = Dimension.D800.lineHeight(com.dangerfield.merizo.system.LineHeightRatio.TIGHT),
+        lineHeight = Dimension.D800.lineHeight(com.dangerfield.goodtimes.system.LineHeightRatio.TIGHT),
         lineBreak = LineBreak.Heading,
         identifier = "display-800"
+    )
+}
+
+class BrandTypographyImpl(
+    private val fontFamily: FontFamily
+) : BrandTypography {
+
+    // Brand typography uses tight line-height for visual impact
+    override val B1500 = TypographyResource(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1500.sp(),
+        lineHeight = Dimension.D1500.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1500"
+    )
+
+    override val B1400 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1400.sp(),
+        lineHeight = Dimension.D1400.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1400"
+    )
+
+    override val B1300 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1300.sp(),
+        lineHeight = Dimension.D1300.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1300"
+    )
+
+    override val B1200 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1200.sp(),
+        lineHeight = Dimension.D1200.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1200"
+    )
+
+    override val B1100 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1100.sp(),
+        lineHeight = Dimension.D1100.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1100"
+    )
+
+    override val B1000 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D1000.sp(),
+        lineHeight = Dimension.D1000.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-1000"
+    )
+
+    override val B900 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D900.sp(),
+        lineHeight = Dimension.D900.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-900"
+    )
+
+    override val B800 = TypographyResource(
+        fontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = Dimension.D800.sp(),
+        lineHeight = Dimension.D800.lineHeight(LineHeightRatio.TIGHT),
+        lineBreak = LineBreak.Heading,
+        identifier = "brand-800"
     )
 }
 
@@ -619,6 +713,99 @@ private fun TypographySpecItem(
             modifier = Modifier.padding(top = Dimension.D600),
             color = Color(0xFFEEEEEE)
         )
+    }
+}
+
+@Preview(widthDp = 800, heightDp = 2400)
+@Composable
+private fun PreviewBrandTypography() {
+    PreviewContent {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(Dimension.D800)
+        ) {
+            item {
+                Text(
+                    text = "Brand Typography",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF000000),
+                    modifier = Modifier.padding(bottom = Dimension.D500)
+                )
+                Text(
+                    text = "Lust Script font for brand identity, logos, and decorative headlines",
+                    fontSize = 14.sp,
+                    color = Color(0xFF666666),
+                    modifier = Modifier.padding(bottom = Dimension.D1000)
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1500",
+                    typographyResource = AppTheme.typography.Brand.B1500,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1400",
+                    typographyResource = AppTheme.typography.Brand.B1400,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1300",
+                    typographyResource = AppTheme.typography.Brand.B1300,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1200",
+                    typographyResource = AppTheme.typography.Brand.B1200,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1100",
+                    typographyResource = AppTheme.typography.Brand.B1100,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 1000",
+                    typographyResource = AppTheme.typography.Brand.B1000,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 900",
+                    typographyResource = AppTheme.typography.Brand.B900,
+                    exampleText = "The App of Good Times"
+                )
+            }
+
+            item {
+                TypographySpecItem(
+                    name = "Brand 800",
+                    typographyResource = AppTheme.typography.Brand.B800,
+                    exampleText = "The App of Good Times"
+                )
+            }
+        }
     }
 }
 

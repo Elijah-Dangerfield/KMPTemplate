@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.flowroutines
+package com.dangerfield.goodtimes.libraries.flowroutines
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope

@@ -87,8 +87,8 @@ import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.system.color.animateColorResourceAsState
 import com.dangerfield.libraries.ui.components.icon.IconResource
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.components.PodawanSnackbarVisuals
 import com.dangerfield.libraries.ui.components.Snackbar
 import com.dangerfield.libraries.ui.components.snackBarData
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.core.logOnFailure
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.core.logOnFailure
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

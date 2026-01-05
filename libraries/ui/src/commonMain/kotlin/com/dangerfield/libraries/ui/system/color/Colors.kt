@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.system.color
+package com.dangerfield.goodtimes.system.color
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,8 +26,8 @@ import com.dangerfield.libraries.ui.system.LocalContentColor
 import com.dangerfield.libraries.ui.system.color.ColorCard
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.system.color.toHexString
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Immutable
@@ -38,12 +38,6 @@ interface Colors {
     val onAccentPrimary: ColorResource
     val accentSecondary: ColorResource
     val onAccentSecondary: ColorResource
-
-    @Deprecated("Use accentPrimary instead", ReplaceWith("accentPrimary"))
-    val accent: ColorResource get() = accentPrimary
-
-    @Deprecated("Use onAccentPrimary instead", ReplaceWith("onAccentPrimary"))
-    val onAccent: ColorResource get() = onAccentPrimary
 
     /* Backgrounds */
     val shadow: ColorResource
@@ -83,35 +77,40 @@ interface StatusColor {
 }
 
 val defaultColors = object : Colors {
-    override val accentPrimary = ColorResource.Lumen500
-    override val onAccentPrimary = ColorResource.Frost50
-    override val accentSecondary = ColorResource.Catalyst400
-    override val onAccentSecondary = ColorResource.Obsidian950
+    // Warm leather brown as primary accent - like a classic book binding
+    override val accentPrimary = ColorResource.Leather500
+    override val onAccentPrimary = ColorResource.Parchment50
+    // Rich mahogany as secondary - adds depth and warmth
+    override val accentSecondary = ColorResource.Mahogany500
+    override val onAccentSecondary = ColorResource.Parchment50
 
-    override val shadow = ColorResource.Black900_A_70
-    override val textDisabled = ColorResource.Frost400
-    override val danger = ColorResource.Red500
-    override val surfacePrimary = ColorResource.Slate600
-    override val surfaceDisabled = ColorResource.Slate200
-    override val onSurfacePrimary = ColorResource.Frost50
-    override val surfaceSecondary = ColorResource.Graphite600
-    override val onSurfaceSecondary = ColorResource.Frost100
-    override val surfaceTertiary = ColorResource.Aurora400
-    override val onSurfaceTertiary = ColorResource.Frost200
-    override val onSurfaceDisabled = ColorResource.Frost400
-    override val background = ColorResource.Obsidian900
-    override val onBackground = ColorResource.Frost50
-    override val border = ColorResource.Graphite500
-    override val borderSecondary = ColorResource.Graphite400
-    override val borderDisabled = ColorResource.Slate100
-    override val text = ColorResource.Frost50
-    override val backgroundOverlay = ColorResource.Obsidian900_A_80
-    override val textSecondary = ColorResource.Frost200
+    override val shadow = ColorResource.Black900_A_30
+    override val textDisabled = ColorResource.Ink400
+    override val danger = ColorResource.Mahogany600
+    // Cream/parchment surfaces for that aged paper feel
+    override val surfacePrimary = ColorResource.Parchment100
+    override val surfaceDisabled = ColorResource.Parchment300
+    override val onSurfacePrimary = ColorResource.Ink900
+    override val surfaceSecondary = ColorResource.Parchment200
+    override val onSurfaceSecondary = ColorResource.Ink800
+    override val surfaceTertiary = ColorResource.Parchment300
+    override val onSurfaceTertiary = ColorResource.Ink700
+    override val onSurfaceDisabled = ColorResource.Ink400
+    // Light cream background like book pages
+    override val background = ColorResource.Parchment100
+    override val onBackground = ColorResource.Ink900
+    override val border = ColorResource.Parchment400
+    override val borderSecondary = ColorResource.Sepia400
+    override val borderDisabled = ColorResource.Parchment300
+    // Dark ink text on light backgrounds
+    override val text = ColorResource.Ink900
+    override val backgroundOverlay = ColorResource.Sepia600.withAlpha(0.85f)
+    override val textSecondary = ColorResource.Ink600
 
     override val status = object : StatusColor {
-        override val okay = ColorResource.Green500
-        override val warning = ColorResource.Gold500
-        override val bad = ColorResource.Red500
+        override val okay = ColorResource.Forest500
+        override val warning = ColorResource.Gold600
+        override val bad = ColorResource.Mahogany600
     }
 }
 
@@ -137,7 +136,7 @@ private fun HeroPanel(colors: Colors) {
             .padding(Dimension.D700)
     ) {
         Text(
-            text = "Virtu palette",
+            text = "Color palette",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = colors.onSurfacePrimary.color

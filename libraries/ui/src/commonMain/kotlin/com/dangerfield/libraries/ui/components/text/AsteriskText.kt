@@ -3,8 +3,8 @@ package com.dangerfield.libraries.ui.components.text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.HorizontalSpacerD200
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.HorizontalSpacerD200
 import com.dangerfield.libraries.ui.system.color.ColorResource
 
 @Composable

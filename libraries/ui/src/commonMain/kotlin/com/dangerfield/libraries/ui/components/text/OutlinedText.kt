@@ -22,9 +22,9 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.semantics.hideFromAccessibility
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

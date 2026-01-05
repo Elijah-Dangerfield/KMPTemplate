@@ -21,7 +21,7 @@ struct iOSApp: App {
         WindowGroup {
             RootComposeView(
                 appComponent: iOSAppComponent,
-                nativeViewFactory: nativeViewFactory,
+                nativeViewFactory: nativeViewFactory
             )
         }
     }

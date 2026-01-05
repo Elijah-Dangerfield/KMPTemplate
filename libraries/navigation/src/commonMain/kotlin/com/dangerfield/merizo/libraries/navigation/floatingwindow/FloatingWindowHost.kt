@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.navigation.floatingwindow
+package com.dangerfield.goodtimes.libraries.navigation.floatingwindow
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

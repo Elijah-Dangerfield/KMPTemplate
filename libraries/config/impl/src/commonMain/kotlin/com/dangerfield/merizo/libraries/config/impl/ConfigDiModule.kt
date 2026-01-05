@@ -1,8 +1,8 @@
-package com.dangerfield.merizo.libraries.config.impl
+package com.dangerfield.goodtimes.libraries.config.impl
 
-import com.dangerfield.merizo.libraries.config.AppConfigFlow
-import com.dangerfield.merizo.libraries.config.AppConfigMap
-import com.dangerfield.merizo.libraries.config.AppConfigRepository
+import com.dangerfield.goodtimes.libraries.config.AppConfigFlow
+import com.dangerfield.goodtimes.libraries.config.AppConfigMap
+import com.dangerfield.goodtimes.libraries.config.AppConfigRepository
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope

@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD100
-import com.dangerfield.merizo.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD100
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 
 /**
  * Standardized section surface used across screens for grouped content blocks.

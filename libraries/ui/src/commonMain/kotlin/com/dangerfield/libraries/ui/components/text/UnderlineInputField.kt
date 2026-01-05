@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.VisualTransformation
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.VerticalSpacerD100
-import com.dangerfield.merizo.system.VerticalSpacerD300
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.VerticalSpacerD100
+import com.dangerfield.goodtimes.system.VerticalSpacerD300
 import com.dangerfield.libraries.ui.FieldState
 import com.dangerfield.libraries.ui.FieldState.Error
 import com.dangerfield.libraries.ui.FieldState.Invalid

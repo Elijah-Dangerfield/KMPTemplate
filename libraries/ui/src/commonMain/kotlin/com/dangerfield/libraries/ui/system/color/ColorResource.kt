@@ -28,9 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD100
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD100
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.roundToInt
 
@@ -40,141 +40,57 @@ import kotlin.math.roundToInt
 sealed class ColorResource(val color: Color, val designSystemName: String) {
     object Unspecified : ColorResource(Color.Unspecified, "unspecified")
 
-    // Lumen - Primary Accent Ramp (purposeful blurple)
-    object Lumen700 : ColorResource(Color(0xFF1A114D), "lumen-700")
-    object Lumen600 : ColorResource(Color(0xFF2F1F83), "lumen-600")
-    object Lumen500 : ColorResource(Color(0xFF624CFF), "lumen-500")
-    object Lumen400 : ColorResource(Color(0xFF8D7FFF), "lumen-400")
-    object Lumen300 : ColorResource(Color(0xFFB9ACFF), "lumen-300")
+    // Parchment - Warm background ramp (book-like)
+    object Parchment50 : ColorResource(Color(0xFFFFFBF5), "parchment-50")
+    object Parchment100 : ColorResource(Color(0xFFFAF6EF), "parchment-100")
+    object Parchment200 : ColorResource(Color(0xFFF5EDE0), "parchment-200")
+    object Parchment300 : ColorResource(Color(0xFFE8DCC8), "parchment-300")
+    object Parchment400 : ColorResource(Color(0xFFD9C9A8), "parchment-400")
+    object Parchment500 : ColorResource(Color(0xFFC4B48E), "parchment-500")
 
-    // Catalyst - Secondary Accent (accountability ember)
-    object Catalyst600 : ColorResource(Color(0xFF9E2A00), "catalyst-600")
-    object Catalyst500 : ColorResource(Color(0xFFEA4B1D), "catalyst-500")
-    object Catalyst400 : ColorResource(Color(0xFFFF7A4F), "catalyst-400")
-    object Catalyst300 : ColorResource(Color(0xFFFFA68A), "catalyst-300")
+    // Sepia - Warm accent tones
+    object Sepia600 : ColorResource(Color(0xFF5C4A32), "sepia-600")
+    object Sepia500 : ColorResource(Color(0xFF8B7355), "sepia-500")
+    object Sepia400 : ColorResource(Color(0xFFA68B5B), "sepia-400")
+    object Sepia300 : ColorResource(Color(0xFFC4A574), "sepia-300")
 
-    object Ice500 : ColorResource(Color(0xFF2E70CB), "ice-500")
+    // Leather - Rich brown accent (bookbinding)
+    object Leather700 : ColorResource(Color(0xFF3D2817), "leather-700")
+    object Leather600 : ColorResource(Color(0xFF5D3A1A), "leather-600")
+    object Leather500 : ColorResource(Color(0xFF8B5A2B), "leather-500")
+    object Leather400 : ColorResource(Color(0xFFAA7744), "leather-400")
 
-    // Obsidian - Deep background ramp
-    object Obsidian950 : ColorResource(Color(0xFF03050A), "obsidian-950")
-    object Obsidian900 : ColorResource(Color(0xFF050812), "obsidian-900")
-    object Obsidian850 : ColorResource(Color(0xFF070E1C), "obsidian-850")
-    object Obsidian800 : ColorResource(Color(0xFF0B1526), "obsidian-800")
-    object Obsidian700 : ColorResource(Color(0xFF111D34), "obsidian-700")
-    object Obsidian900_A_70 :
-        ColorResource(Color(0xFF050812).copy(alpha = 0.7f), "obsidian-900-a-70")
+    // Mahogany - Deep accent (classic book covers)
+    object Mahogany700 : ColorResource(Color(0xFF4A1C1C), "mahogany-700")
+    object Mahogany600 : ColorResource(Color(0xFF6B2D2D), "mahogany-600")
+    object Mahogany500 : ColorResource(Color(0xFF8B4545), "mahogany-500")
+    object Mahogany400 : ColorResource(Color(0xFFA65D5D), "mahogany-400")
 
-    object Obsidian900_A_80 :
-        ColorResource(Color(0xFF050812).copy(alpha = 0.8f), "obsidian-900-a-80")
+    // Ink - Dark text colors
+    object Ink900 : ColorResource(Color(0xFF1A1A18), "ink-900")
+    object Ink800 : ColorResource(Color(0xFF2D2D2A), "ink-800")
+    object Ink700 : ColorResource(Color(0xFF3D3D38), "ink-700")
+    object Ink600 : ColorResource(Color(0xFF4D4D47), "ink-600")
+    object Ink500 : ColorResource(Color(0xFF6B6B62), "ink-500")
+    object Ink400 : ColorResource(Color(0xFF8A8A7F), "ink-400")
 
-    // Slate - Structured surface ramp
-    object Slate600 : ColorResource(Color(0xFF151D29), "slate-600")
-    object Slate500 : ColorResource(Color(0xFF1C2635), "slate-500")
-    object Slate400 : ColorResource(Color(0xFF263040), "slate-400")
-    object Slate300 : ColorResource(Color(0xFF303B4C), "slate-300")
-    object Slate200 : ColorResource(Color(0xFF3D4858), "slate-200")
-    object Slate100 : ColorResource(Color(0xFF4B5768), "slate-100")
+    // Forest - Secondary accent (nature/vintage)
+    object Forest600 : ColorResource(Color(0xFF2D4A3E), "forest-600")
+    object Forest500 : ColorResource(Color(0xFF3D6B54), "forest-500")
+    object Forest400 : ColorResource(Color(0xFF5A8F72), "forest-400")
 
-    // Frost - Quiet text ramp
-    object Frost50 : ColorResource(Color(0xFFF5F7FF), "frost-50")
-    object Frost100 : ColorResource(Color(0xFFE6EBFF), "frost-100")
-    object Frost200 : ColorResource(Color(0xFFCBD5F6), "frost-200")
-    object Frost300 : ColorResource(Color(0xFFAEB8DA), "frost-300")
-    object Frost400 : ColorResource(Color(0xFF8892AE), "frost-400")
-    object Frost500 : ColorResource(Color(0xFF69718A), "frost-500")
-
-    // Legacy Aurora ramp retained for compatibility
-    object Aurora700 : ColorResource(Color(0xFF1A1447), "aurora-700")
-    object Aurora600 : ColorResource(Color(0xFF2B1D69), "aurora-600")
-    object Aurora500 : ColorResource(Color(0xFF48319B), "aurora-500")
-    object Aurora400 : ColorResource(Color(0xFF6244D4), "aurora-400")
-    object Aurora300 : ColorResource(Color(0xFF8A6BFF), "aurora-300")
-    object Aurora200 : ColorResource(Color(0xFFB19BFF), "aurora-200")
-    object Aurora100 : ColorResource(Color(0xFFE0DAFF), "aurora-100")
-
-    // Legacy Pulse ramp retained for compatibility
-    object Pulse600 : ColorResource(Color(0xFF6F1F16), "pulse-600")
-    object Pulse500 : ColorResource(Color(0xFFD2542D), "pulse-500")
-    object Pulse400 : ColorResource(Color(0xFFFFA364), "pulse-400")
-
-    // Legacy Midnight ramp retained for compatibility
-    object Midnight950 : ColorResource(Color(0xFF04030C), "midnight-950")
-    object Midnight900 : ColorResource(Color(0xFF070617), "midnight-900")
-    object Midnight800 : ColorResource(Color(0xFF0B0B22), "midnight-800")
-    object Midnight700 : ColorResource(Color(0xFF111030), "midnight-700")
-    object Midnight600 : ColorResource(Color(0xFF19183F), "midnight-600")
-    object Midnight900_A_80 :
-        ColorResource(Color(0xFF070617).copy(alpha = 0.82f), "midnight-900-a-80")
-
-    // Legacy Mist ramp retained for compatibility
-    object Mist50 : ColorResource(Color(0xFFF9F7FF), "mist-50")
-    object Mist100 : ColorResource(Color(0xFFEFE9FF), "mist-100")
-    object Mist200 : ColorResource(Color(0xFFDFD6FF), "mist-200")
-
-    // Legacy Graphite ramp retained for compatibility
-    object Graphite800 : ColorResource(Color(0xFF21232B), "graphite-800")
-    object Graphite700 : ColorResource(Color(0xFF27283A), "graphite-700")
-    object Graphite600 : ColorResource(Color(0xFF343651), "graphite-600")
-    object Graphite500 : ColorResource(Color(0xFF4A4C68), "graphite-500")
-    object Graphite400 : ColorResource(Color(0xFF626482), "graphite-400")
-    object Graphite300 : ColorResource(Color(0xFF8688A8), "graphite-300")
-    object Graphite200 : ColorResource(Color(0xFFB2B4CB), "graphite-200")
-    object Graphite100 : ColorResource(Color(0xFFE0E1EF), "graphite-100")
-
-    // Legacy palettes retained for compatibility
-    //  Green - Primary Brand Color
-    object Green700 : ColorResource(Color(0xFF46A302), "green-700")
-    object Green600 : ColorResource(Color(0xFF50B003), "green-600")
-    object Green500 : ColorResource(Color(0xFF58CC02), "green-500")
-    object Green400 : ColorResource(Color(0xFF73E005), "green-400")
-    object Green300 : ColorResource(Color(0xFF8EF308), "green-300")
-    object Green200 : ColorResource(Color(0xFFB0FF66), "green-200")
-    object Green100 : ColorResource(Color(0xFFD7FFB8), "green-100")
-
-    //  Blue/Cyan - Secondary
-    object Cyan500 : ColorResource(Color(0xFF1CB0F6), "cyan-500")
-    object Cyan400 : ColorResource(Color(0xFF4FC3F7), "cyan-400")
-    object Cyan300 : ColorResource(Color(0xFF88D5FA), "cyan-300")
-
-    //  Navy/Dark Blue - Backgrounds
-    object NavyGray900 : ColorResource(Color(0xFF1A1E26), "navy-900")
-
-    object Navy900 : ColorResource(Color(0xFF0A1628), "navy-900")
-    object Navy800 : ColorResource(Color(0xFF131F33), "navy-800")
-    object Navy700 : ColorResource(Color(0xFF1C2938), "navy-700")
-    object Navy600 : ColorResource(Color(0xFF2E3F54), "navy-600")
-    object Navy900_A_85 : ColorResource(Color(0xFF0A1628).copy(alpha = 0.85f), "navy-900-a-85")
-
-    //  Red - Error/Warning
-    object Red600 : ColorResource(Color(0xFFE2445C), "red-600")
+    // Red - Error states (used in AsteriskText)
     object Red500 : ColorResource(Color(0xFFFF5C7C), "red-500")
-    object Red400 : ColorResource(Color(0xFFFF8BA0), "red-400")
 
-    //  Yellow/Gold - Accents
+    // Gold - Warning status
     object Gold600 : ColorResource(Color(0xFFE5A000), "gold-600")
-    object Gold500 : ColorResource(Color(0xFFFFC800), "gold-500")
-    object Gold400 : ColorResource(Color(0xFFFFD633), "gold-400")
 
-    //  Orange - Secondary Accent
-    object Orange500 : ColorResource(Color(0xFFFF9600), "orange-500")
-    object Orange400 : ColorResource(Color(0xFFFFA533), "orange-400")
-
-    // Grays
-    object Gray700 : ColorResource(Color(0xFF3C3C3C), "gray-700")
-    object Gray600 : ColorResource(Color(0xFF555555), "gray-600")
-    object Gray500 : ColorResource(Color(0xFF777777), "gray-500")
-    object Gray400 : ColorResource(Color(0xFF999999), "gray-400")
-    object Gray300 : ColorResource(Color(0xFFBBBBBB), "gray-300")
-    object Gray200 : ColorResource(Color(0xFFDDDDDD), "gray-200")
-    object Gray100 : ColorResource(Color(0xFFF0F0F0), "gray-100")
-
-    // Keep legacy colors for backwards compatibility
+    // Utility colors
     object Black900 : ColorResource(Color(0xFF000000), "black-900")
     object Black900_A_70 :
         ColorResource(Color(0xFF000000).copy(alpha = 0.7f), "black-900-a-70")
     object Black900_A_30 :
         ColorResource(Color(0xFF000000).copy(alpha = 0.3f), "black-900-a-30")
-    object Black500 : ColorResource(Color(0xFFAAAAAA), "black-500")
 
     object White900 : ColorResource(Color(0xFFFFFFFF), "white-900")
 
@@ -217,92 +133,45 @@ fun animateColorResourceAsState(
 }
 
 private val colors = listOf(
-    ColorResource.Lumen700,
-    ColorResource.Lumen600,
-    ColorResource.Lumen500,
-    ColorResource.Lumen400,
-    ColorResource.Lumen300,
-    ColorResource.Catalyst600,
-    ColorResource.Catalyst500,
-    ColorResource.Catalyst400,
-    ColorResource.Catalyst300,
-    ColorResource.Obsidian950,
-    ColorResource.Obsidian900,
-    ColorResource.Obsidian850,
-    ColorResource.Obsidian800,
-    ColorResource.Obsidian700,
-    ColorResource.Obsidian900_A_70,
-    ColorResource.Obsidian900_A_80,
-    ColorResource.Slate600,
-    ColorResource.Slate500,
-    ColorResource.Slate400,
-    ColorResource.Slate300,
-    ColorResource.Slate200,
-    ColorResource.Slate100,
-    ColorResource.Frost50,
-    ColorResource.Frost100,
-    ColorResource.Frost200,
-    ColorResource.Frost300,
-    ColorResource.Frost400,
-    ColorResource.Frost500,
-    ColorResource.Aurora700,
-    ColorResource.Aurora600,
-    ColorResource.Aurora500,
-    ColorResource.Aurora400,
-    ColorResource.Aurora300,
-    ColorResource.Aurora200,
-    ColorResource.Aurora100,
-    ColorResource.Pulse600,
-    ColorResource.Pulse500,
-    ColorResource.Pulse400,
-    ColorResource.Midnight950,
-    ColorResource.Midnight900,
-    ColorResource.Midnight800,
-    ColorResource.Midnight700,
-    ColorResource.Midnight600,
-    ColorResource.Midnight900_A_80,
-    ColorResource.Mist50,
-    ColorResource.Mist100,
-    ColorResource.Mist200,
-    ColorResource.Graphite800,
-    ColorResource.Graphite700,
-    ColorResource.Graphite600,
-    ColorResource.Graphite500,
-    ColorResource.Graphite400,
-    ColorResource.Graphite300,
-    ColorResource.Graphite200,
-    ColorResource.Graphite100,
-    ColorResource.Green700,
-    ColorResource.Green600,
-    ColorResource.Green500,
-    ColorResource.Green400,
-    ColorResource.Green300,
-    ColorResource.Green200,
-    ColorResource.Green100,
-    ColorResource.Cyan500,
-    ColorResource.Cyan400,
-    ColorResource.Cyan300,
-    ColorResource.Navy900,
-    ColorResource.Navy800,
-    ColorResource.Navy700,
-    ColorResource.Navy600,
-    ColorResource.Red600,
+    // Parchment (warm backgrounds)
+    ColorResource.Parchment50,
+    ColorResource.Parchment100,
+    ColorResource.Parchment200,
+    ColorResource.Parchment300,
+    ColorResource.Parchment400,
+    ColorResource.Parchment500,
+    // Sepia (warm accents)
+    ColorResource.Sepia600,
+    ColorResource.Sepia500,
+    ColorResource.Sepia400,
+    ColorResource.Sepia300,
+    // Leather (rich brown)
+    ColorResource.Leather700,
+    ColorResource.Leather600,
+    ColorResource.Leather500,
+    ColorResource.Leather400,
+    // Mahogany (deep accent)
+    ColorResource.Mahogany700,
+    ColorResource.Mahogany600,
+    ColorResource.Mahogany500,
+    ColorResource.Mahogany400,
+    // Ink (dark text)
+    ColorResource.Ink900,
+    ColorResource.Ink800,
+    ColorResource.Ink700,
+    ColorResource.Ink600,
+    ColorResource.Ink500,
+    ColorResource.Ink400,
+    // Forest (secondary accent)
+    ColorResource.Forest600,
+    ColorResource.Forest500,
+    ColorResource.Forest400,
+    // Status colors
     ColorResource.Red500,
-    ColorResource.Red400,
     ColorResource.Gold600,
-    ColorResource.Gold500,
-    ColorResource.Gold400,
-    ColorResource.Orange500,
-    ColorResource.Orange400,
-    ColorResource.Gray700,
-    ColorResource.Gray600,
-    ColorResource.Gray500,
-    ColorResource.Gray400,
-    ColorResource.Gray300,
-    ColorResource.Gray200,
-    ColorResource.Gray100,
-    ColorResource.White900,
-    ColorResource.Ice500
+    // Utilities
+    ColorResource.Black900,
+    ColorResource.White900
 )
 
 @Preview(widthDp = 2000, heightDp = 10000, showBackground = false)

@@ -31,13 +31,13 @@ import com.dangerfield.libraries.ui.components.icon.Icons
 import com.dangerfield.libraries.ui.components.text.ProvideTextConfig
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.HorizontalSpacerD500
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD200
-import com.dangerfield.merizo.system.thenIf
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.HorizontalSpacerD500
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD200
+import com.dangerfield.goodtimes.system.thenIf
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

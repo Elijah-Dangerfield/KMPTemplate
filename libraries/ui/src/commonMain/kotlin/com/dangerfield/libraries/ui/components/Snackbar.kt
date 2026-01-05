@@ -23,13 +23,13 @@ import com.dangerfield.libraries.ui.components.icon.IconResource
 import com.dangerfield.libraries.ui.components.icon.Icons
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.HorizontalSpacerD600
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD500
-import com.dangerfield.merizo.system.VerticalSpacerD800
-import com.dangerfield.merizo.system.color.ProvideContentColor
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.HorizontalSpacerD600
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.VerticalSpacerD800
+import com.dangerfield.goodtimes.system.color.ProvideContentColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.random.Random
 import androidx.compose.material3.SnackbarData as MaterialSnackbarData

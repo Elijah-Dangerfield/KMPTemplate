@@ -16,7 +16,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Merizo"
+rootProject.name = "Goodtimes"
 
 dependencyResolutionManagement {
     repositories {
@@ -33,6 +33,7 @@ dependencyResolutionManagement {
 }
 
 // Apps
+include(":apps")
 include(":apps:compose")
 include(":apps:server")
 // Note: iOS app is not a Gradle module - it's an Xcode project in apps/ios/
@@ -41,6 +42,8 @@ include(":apps:server")
 // Features
 include(":features:home")
 include(":features:home:impl")
+include(":features:onboarding")
+include(":features:onboarding:impl")
 
 
 // Libraries
@@ -53,7 +56,7 @@ include(":libraries:navigation:impl")
 include(":libraries:resources")
 include(":libraries:storage")
 include(":libraries:storage:impl")
-include(":libraries:merizo")
-include(":libraries:merizo:impl")
-include(":libraries:merizo:storage")
+include(":libraries:goodtimes")
+include(":libraries:goodtimes:impl")
+include(":libraries:goodtimes:storage")
 include(":libraries:ui")

@@ -3,7 +3,7 @@ package com.dangerfield.libraries.ui.debug
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import com.dangerfield.merizo.libraries.core.logging.KLog
+import com.dangerfield.goodtimes.libraries.core.logging.KLog
 import io.ktor.util.date.getTimeMillis
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

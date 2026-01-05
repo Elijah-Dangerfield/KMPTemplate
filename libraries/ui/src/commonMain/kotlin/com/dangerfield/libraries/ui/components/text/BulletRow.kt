@@ -3,7 +3,7 @@ package com.dangerfield.libraries.ui.components.text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.dangerfield.merizo.system.HorizontalSpacerD800
+import com.dangerfield.goodtimes.system.HorizontalSpacerD800
 
 @Composable
 fun BulletRow(

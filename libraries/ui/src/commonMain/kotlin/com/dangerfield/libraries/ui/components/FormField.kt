@@ -16,8 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 import com.dangerfield.libraries.ui.FieldState
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.text.Text

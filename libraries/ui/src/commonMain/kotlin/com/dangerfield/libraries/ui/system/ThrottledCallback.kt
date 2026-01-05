@@ -2,7 +2,7 @@ package com.dangerfield.libraries.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.dangerfield.merizo.libraries.core.RateLimiter
+import com.dangerfield.goodtimes.libraries.core.RateLimiter
 
 
 /**

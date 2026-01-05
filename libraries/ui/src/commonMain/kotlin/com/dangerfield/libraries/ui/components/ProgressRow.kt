@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.Constraints
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.dangerfield.libraries.ui.components.text.ProvideTextConfig
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.libraries.ui.PreviewContent
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.VerticalSpacerD100
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.VerticalSpacerD100
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import com.dangerfield.merizo.system.Radii
+import com.dangerfield.libraries.ui.system.color.ColorResource
+import com.dangerfield.goodtimes.system.Radii
 import kotlin.math.roundToInt
 
 enum class IndicatorAlignment {
@@ -45,6 +46,8 @@ fun ProgressRow(
     animationSpec: AnimationSpec<Float> = tween(durationMillis = 300, easing = FastOutSlowInEasing),
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
+    backgroundColor: ColorResource = AppTheme.colors.surfaceDisabled,
+    progressColor: ColorResource = AppTheme.colors.accentPrimary,
     indicatorAlignment: IndicatorAlignment = IndicatorAlignment.Center,
     indicator: (@Composable () -> Unit)? = null,
     content: (@Composable () -> Unit) = {}
@@ -101,7 +104,7 @@ fun ProgressRow(
             Box(
                 modifier = Modifier
                     .clip(shape)
-                    .background(AppTheme.colors.surfaceDisabled.color)
+                    .background(backgroundColor.color)
             )
         }.first().measure(
             constraints.copy(
@@ -116,7 +119,7 @@ fun ProgressRow(
             Box(
                 modifier = Modifier
                     .clip(shape)
-                    .background(AppTheme.colors.accentPrimary.color)
+                    .background(progressColor.color)
             )
         }.first().measure(
             constraints.copy(

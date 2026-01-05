@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.Radius
-import com.dangerfield.merizo.system.VerticalSpacerD1600
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.Radius
+import com.dangerfield.goodtimes.system.VerticalSpacerD1600
 import com.dangerfield.libraries.ui.Elevation
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.BadgeTokens.LargeLabelTextStyle
@@ -195,7 +195,7 @@ fun Badge(
 @ExperimentalMaterial3Api
 object BadgeDefaults {
     /** Default container color for a badge. */
-    val containerColor: Color @Composable get() = AppTheme.colors.accent.color
+    val containerColor: Color @Composable get() = AppTheme.colors.accentPrimary.color
 }
 
 internal val BadgeWithContentHorizontalPadding = 4.dp
@@ -238,7 +238,7 @@ private fun PreviewBadgedBox() {
                 content = {
                     Surface(
                         radius = radius,
-                        color = AppTheme.colors.accent,
+                        color = AppTheme.colors.accentPrimary,
                         contentColor = AppTheme.colors.onBackground,
                         contentPadding = PaddingValues(Dimension.D800),
                     ) {
@@ -263,7 +263,7 @@ private fun PreviewBadgedBox() {
                 badgeTranslation = DpOffset(x = (-8).dp, y = 4.dp),
                 content = {
                     Surface(
-                        color = AppTheme.colors.accent,
+                        color = AppTheme.colors.accentPrimary,
                         contentColor = AppTheme.colors.onBackground,
                         contentPadding = PaddingValues(Dimension.D800),
                     ) {
@@ -298,7 +298,7 @@ private fun PreviewBadgedBoxTranslations() {
             ) {
                 Surface(
                     radius = radius,
-                    color = AppTheme.colors.accent,
+                    color = AppTheme.colors.accentPrimary,
                     contentColor = AppTheme.colors.onBackground,
                     contentPadding = PaddingValues(Dimension.D800),
                 ) {
@@ -317,7 +317,7 @@ private fun PreviewBadgedBoxTranslations() {
             ) {
                 Surface(
                     radius = radius,
-                    color = AppTheme.colors.accent,
+                    color = AppTheme.colors.accentPrimary,
                     contentColor = AppTheme.colors.onBackground,
                     contentPadding = PaddingValues(Dimension.D800),
                 ) {

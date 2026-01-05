@@ -21,9 +21,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.PreviewContent
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -52,7 +52,7 @@ fun OutlinedTextField(
     minLines: Int = 1,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    cursorBrush: Brush = SolidColor(AppTheme.colors.accent.color)
+    cursorBrush: Brush = SolidColor(AppTheme.colors.accentPrimary.color)
 ) {
     BasicTextField(
         value = value,

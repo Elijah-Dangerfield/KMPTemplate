@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import com.dangerfield.merizo.system.Dimension
+import com.dangerfield.goodtimes.system.Dimension
 
 operator fun PaddingValues.plus(other: PaddingValues): PaddingValues = object : PaddingValues {
 

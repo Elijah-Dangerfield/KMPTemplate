@@ -14,9 +14,9 @@ import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.libraries.core.throwIfDebug
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.VerticalSpacerD800
+import com.dangerfield.goodtimes.libraries.core.throwIfDebug
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.VerticalSpacerD800
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 const val ANNOTATED_STRING_URL_KEY = "URL"

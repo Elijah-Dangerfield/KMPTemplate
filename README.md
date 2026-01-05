@@ -1,4 +1,4 @@
-# Merizo
+# The App of Good Times
 
 A Kotlin Multiplatform project with a clean, modular architecture.
 

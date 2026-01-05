@@ -1,4 +1,4 @@
-package com.dangerfield.merizo
+package com.dangerfield.goodtimes
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

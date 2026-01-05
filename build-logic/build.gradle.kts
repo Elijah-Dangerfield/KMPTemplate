@@ -5,7 +5,7 @@ plugins {
     `java-gradle-plugin`
 }
 
-group = "com.dangerfield.merizo.buildlogic"
+group = "com.dangerfield.goodtimes.buildlogic"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -37,20 +37,20 @@ dependencies {
 gradlePlugin {
     plugins {
         register("kotlinMultiplatform") {
-            id = "merizo.kotlin.multiplatform"
-            implementationClass = "com.dangerfield.merizo.plugin.KotlinMultiplatformConventionPlugin"
+            id = "goodtimes.kotlin.multiplatform"
+            implementationClass = "com.dangerfield.goodtimes.plugin.KotlinMultiplatformConventionPlugin"
         }
         register("composeMultiplatform") {
-            id = "merizo.compose.multiplatform"
-            implementationClass = "com.dangerfield.merizo.plugin.ComposeMultiplatformConventionPlugin"
+            id = "goodtimes.compose.multiplatform"
+            implementationClass = "com.dangerfield.goodtimes.plugin.ComposeMultiplatformConventionPlugin"
         }
         register("feature") {
-            id = "merizo.feature"
-            implementationClass = "com.dangerfield.merizo.plugin.FeatureConventionPlugin"
+            id = "goodtimes.feature"
+            implementationClass = "com.dangerfield.goodtimes.plugin.FeatureConventionPlugin"
         }
         register("application") {
-            id = "merizo.application"
-            implementationClass = "com.dangerfield.merizo.plugin.ApplicationConventionPlugin"
+            id = "goodtimes.application"
+            implementationClass = "com.dangerfield.goodtimes.plugin.ApplicationConventionPlugin"
         }
     }
 }

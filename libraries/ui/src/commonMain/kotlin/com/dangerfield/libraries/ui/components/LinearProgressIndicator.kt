@@ -11,7 +11,7 @@ import com.dangerfield.libraries.ui.system.LocalColors
 fun LinearProgressIndicator(
     modifier: Modifier = Modifier,
     progress: Float,
-    color: Color = LocalColors.current.accent.color,
+    color: Color = LocalColors.current.accentPrimary.color,
     trackColor: Color = ProgressIndicatorDefaults.circularTrackColor,
     strokeCap: StrokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap,
 ) {

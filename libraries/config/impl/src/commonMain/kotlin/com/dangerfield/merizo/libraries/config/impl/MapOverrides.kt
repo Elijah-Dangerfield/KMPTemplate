@@ -1,9 +1,9 @@
-package com.dangerfield.merizo.libraries.config.impl
+package com.dangerfield.goodtimes.libraries.config.impl
 
-import com.dangerfield.merizo.libraries.core.logging.KLog
-import com.dangerfield.merizo.libraries.config.AppConfigMap
-import com.dangerfield.merizo.libraries.config.ConfigOverride
-import com.dangerfield.merizo.libraries.config.impl.model.BasicMapAppConfig
+import com.dangerfield.goodtimes.libraries.core.logging.KLog
+import com.dangerfield.goodtimes.libraries.config.AppConfigMap
+import com.dangerfield.goodtimes.libraries.config.ConfigOverride
+import com.dangerfield.goodtimes.libraries.config.impl.model.BasicMapAppConfig
 
 internal fun AppConfigMap.applyOverrides(overrides: List<ConfigOverride<Any>>): AppConfigMap {
     if (overrides.isEmpty()) return this

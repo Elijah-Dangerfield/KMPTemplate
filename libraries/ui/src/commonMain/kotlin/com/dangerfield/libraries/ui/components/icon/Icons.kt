@@ -13,12 +13,15 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CallSplit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronLeft
@@ -26,9 +29,14 @@ import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.LocationCity
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PhotoLibrary
+import androidx.compose.material.icons.rounded.Pin
 import androidx.compose.material.icons.rounded.QuestionMark
+import androidx.compose.material.icons.rounded.Receipt
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.ThumbDown
@@ -45,9 +53,9 @@ import com.dangerfield.libraries.ui.components.icon.icons.App_shortcut
 import com.dangerfield.libraries.ui.components.icon.icons.HomeFilled
 import com.dangerfield.libraries.ui.components.icon.icons.TipJarIcon
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.HorizontalSpacerD800
+import com.dangerfield.goodtimes.system.HorizontalSpacerD800
 import com.dangerfield.libraries.ui.system.LocalBuildInfo
-import com.dangerfield.merizo.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -108,6 +116,10 @@ enum class Icons(
         default = androidx.compose.material.icons.Icons.Rounded.Refresh,
     ),
 
+    Receipt(
+        default = androidx.compose.material.icons.Icons.Rounded.Receipt,
+    ),
+
     Warning(
         default = androidx.compose.material.icons.Icons.Default.Warning,
     ),
@@ -116,8 +128,16 @@ enum class Icons(
         default = TipJarIcon,
     ),
 
+    Delete(
+        default = androidx.compose.material.icons.Icons.Default.Delete,
+    ),
+
     Charity(
         default = androidx.compose.material.icons.Icons.Rounded.VolunteerActivism,
+    ),
+
+    Location(
+        default = androidx.compose.material.icons.Icons.Rounded.LocationOn,
     ),
 
     Lock(
@@ -181,6 +201,26 @@ enum class Icons(
 
     ArrowBack(
         default = androidx.compose.material.icons.Icons.AutoMirrored.Default.ArrowBack,
+    ),
+
+    Camera(
+        default = androidx.compose.material.icons.Icons.Rounded.CameraAlt,
+    ),
+
+    PhotoLibrary(
+        default = androidx.compose.material.icons.Icons.Rounded.PhotoLibrary,
+    ),
+
+    Split(
+        default = androidx.compose.material.icons.Icons.Filled.CallSplit,
+    ),
+
+    Add(
+        default = androidx.compose.material.icons.Icons.Default.Add,
+    ),
+
+    Close(
+        default = androidx.compose.material.icons.Icons.Rounded.Close,
     )
 
     ;

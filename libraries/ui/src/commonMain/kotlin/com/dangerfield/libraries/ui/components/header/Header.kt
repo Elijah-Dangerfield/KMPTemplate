@@ -20,9 +20,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.thenIf
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.thenIf
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.Elevation
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.icon.IconButton

@@ -1,11 +1,11 @@
 plugins {
-    id("merizo.application")
+    id("goodtimes.application")
     id("co.touchlab.skie") version "0.10.8"
 
 }
 
 android {
-    namespace = "com.dangerfield.merizo"
+    namespace = "com.dangerfield.goodtimes"
 }
 
 kotlin {
@@ -21,8 +21,8 @@ kotlin {
             // Project dependencies
             api(projects.libraries.core)
             implementation(projects.libraries.ui)
-            implementation(projects.libraries.merizo)
-            implementation(projects.libraries.merizo.impl)
+            implementation(projects.libraries.goodtimes)
+            implementation(projects.libraries.goodtimes.impl)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.navigation.impl)
@@ -30,13 +30,15 @@ kotlin {
 
             implementation(projects.libraries.storage)
             implementation(projects.libraries.storage.impl)
-            implementation(projects.libraries.merizo.storage)
+            implementation(projects.libraries.goodtimes.storage)
             implementation(projects.libraries.config)
             implementation(projects.libraries.config.impl)
-            implementation(projects.libraries.merizo.storage)
+            implementation(projects.libraries.goodtimes.storage)
 
             implementation(projects.features.home)
             implementation(projects.features.home.impl)
+            implementation(projects.features.onboarding)
+            implementation(projects.features.onboarding.impl)
             
             implementation(compose.runtime)
             implementation(compose.foundation)

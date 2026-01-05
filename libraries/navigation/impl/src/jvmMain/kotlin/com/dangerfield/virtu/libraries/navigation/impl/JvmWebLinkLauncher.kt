@@ -1,8 +1,8 @@
-package com.dangerfield.merizo.libraries.navigation.impl
+package com.dangerfield.goodtimes.libraries.navigation.impl
 
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.core.failure
-import com.dangerfield.merizo.libraries.navigation.WebLinkLauncher
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.core.failure
+import com.dangerfield.goodtimes.libraries.navigation.WebLinkLauncher
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding

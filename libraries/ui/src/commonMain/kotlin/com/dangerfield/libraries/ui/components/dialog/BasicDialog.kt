@@ -14,7 +14,7 @@ import com.dangerfield.libraries.ui.components.button.Button
 import com.dangerfield.libraries.ui.components.button.ButtonSize
 import com.dangerfield.libraries.ui.components.button.ButtonType
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.Dimension
+import com.dangerfield.goodtimes.system.Dimension
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

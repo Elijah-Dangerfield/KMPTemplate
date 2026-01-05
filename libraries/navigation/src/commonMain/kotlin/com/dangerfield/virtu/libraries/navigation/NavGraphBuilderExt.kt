@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.navigation
+package com.dangerfield.goodtimes.libraries.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -15,10 +15,10 @@ import androidx.navigation.compose.ComposeNavigatorDestinationBuilder
 import androidx.navigation.get
 import com.dangerfield.libraries.ui.components.dialog.DialogState
 import com.dangerfield.libraries.ui.components.dialog.bottomsheet.BottomSheetState
-import com.dangerfield.merizo.libraries.navigation.floatingwindow.DialogDestination
-import com.dangerfield.merizo.libraries.navigation.floatingwindow.FloatingWindowNavDestinationBuilder
-import com.dangerfield.merizo.libraries.navigation.floatingwindow.FloatingWindowNavigator
-import com.dangerfield.merizo.libraries.navigation.floatingwindow.BottomSheetDestination
+import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.DialogDestination
+import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.FloatingWindowNavDestinationBuilder
+import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.FloatingWindowNavigator
+import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.BottomSheetDestination
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf

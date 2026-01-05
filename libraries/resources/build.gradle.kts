@@ -1,9 +1,9 @@
 plugins {
-    id("merizo.compose.multiplatform")
+    id("goodtimes.compose.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.resources"
+    namespace = "com.dangerfield.goodtimes.libraries.resources"
 }
 
 compose.resources {

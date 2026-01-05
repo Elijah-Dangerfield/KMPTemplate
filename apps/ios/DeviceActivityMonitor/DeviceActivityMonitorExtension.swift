@@ -4,7 +4,7 @@ import OSLog
 
 /// Converts DeviceActivity callbacks into UsageEventRecords that the host app ingests later.
 final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
-    private let logger = Logger(subsystem: "com.dangerfield.merizo.monitor", category: "ActivityMonitor")
+    private let logger = Logger(subsystem: "com.dangerfield.goodtimes.monitor", category: "ActivityMonitor")
     private lazy var configurationStore = try? DeviceActivityConfigurationStore()
     private lazy var logWriter = try? UsageLogWriter()
     private let intervalTracker = IntervalTracker()

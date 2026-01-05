@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.core
+package com.dangerfield.goodtimes.libraries.core
 
 class JVMPlatform: Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"

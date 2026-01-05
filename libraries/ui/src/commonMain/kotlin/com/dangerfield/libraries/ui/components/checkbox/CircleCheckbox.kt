@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.dangerfield.libraries.ui.bounceClick
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.libraries.ui.PreviewContent
 
 @Composable

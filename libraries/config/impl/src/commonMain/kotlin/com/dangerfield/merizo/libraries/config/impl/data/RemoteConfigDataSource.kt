@@ -1,7 +1,7 @@
-package com.dangerfield.merizo.libraries.config.impl.data
+package com.dangerfield.goodtimes.libraries.config.impl.data
 
-import com.dangerfield.merizo.libraries.config.AppConfigMap
-import com.dangerfield.merizo.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.config.AppConfigMap
+import com.dangerfield.goodtimes.libraries.core.Catching
 
 interface RemoteConfigDataSource {
     suspend fun getConfig(): Catching<AppConfigMap>

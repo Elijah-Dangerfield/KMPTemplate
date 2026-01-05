@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.flowroutines
+package com.dangerfield.goodtimes.libraries.flowroutines
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

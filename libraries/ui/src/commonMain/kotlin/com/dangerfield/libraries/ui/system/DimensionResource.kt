@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.system
+package com.dangerfield.goodtimes.system
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit

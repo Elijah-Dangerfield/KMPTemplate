@@ -1,5 +1,5 @@
 plugins {
-    id("merizo.compose.multiplatform")
+    id("goodtimes.compose.multiplatform")
 }
 
 moduleConfig {
@@ -7,7 +7,7 @@ moduleConfig {
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.flowroutines"
+    namespace = "com.dangerfield.goodtimes.libraries.flowroutines"
 }
 
 kotlin {

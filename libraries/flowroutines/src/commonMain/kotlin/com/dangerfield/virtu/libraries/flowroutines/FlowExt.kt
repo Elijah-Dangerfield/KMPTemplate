@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.flowroutines
+package com.dangerfield.goodtimes.libraries.flowroutines
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State

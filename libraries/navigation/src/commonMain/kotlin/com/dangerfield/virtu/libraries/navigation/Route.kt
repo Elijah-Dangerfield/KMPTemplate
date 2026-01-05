@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.navigation
+package com.dangerfield.goodtimes.libraries.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -17,8 +17,8 @@ import androidx.navigation.toRoute
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.core.logOnFailure
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.core.logOnFailure
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -92,8 +92,6 @@ open class Route(
     val exit: AnimationType = AnimationType.SlideOutToLeft,
     val popExit: AnimationType = AnimationType.SlideOutToRight,
 )  {
-    val shouldHideBottomBar: Boolean = true
-
     fun getEnterTransition(): EnterTransition = enter.toEnterTransition()
     fun getExitTransition(): ExitTransition = exit.toExitTransition()
 
@@ -101,10 +99,6 @@ open class Route(
 
     companion object
 }
-
-@Serializable
-open class BottomTabRoute(): Route()
-
 inline fun <reified T> NavBackStackEntry.toRouteOrNull(): T? = Catching<T> { toRoute(T::class) }
     .logOnFailure()
     .getOrNull()

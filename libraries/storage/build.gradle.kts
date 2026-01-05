@@ -1,10 +1,10 @@
 plugins {
-    id("merizo.kotlin.multiplatform")
+    id("goodtimes.kotlin.multiplatform")
     alias(libs.plugins.androidxRoom)
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.storage"
+    namespace = "com.dangerfield.goodtimes.libraries.storage"
 }
 
 room {

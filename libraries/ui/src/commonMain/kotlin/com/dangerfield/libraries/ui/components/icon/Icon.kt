@@ -12,15 +12,15 @@ import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension.D1000
-import com.dangerfield.merizo.system.Dimension.D1200
-import com.dangerfield.merizo.system.Dimension.D1300
-import com.dangerfield.merizo.system.Dimension.D600
-import com.dangerfield.merizo.system.Dimension.D800
-import com.dangerfield.merizo.system.Dimension.D850
-import com.dangerfield.merizo.system.Dimension.D900
-import com.dangerfield.merizo.system.DimensionResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension.D1000
+import com.dangerfield.goodtimes.system.Dimension.D1200
+import com.dangerfield.goodtimes.system.Dimension.D1300
+import com.dangerfield.goodtimes.system.Dimension.D600
+import com.dangerfield.goodtimes.system.Dimension.D800
+import com.dangerfield.goodtimes.system.Dimension.D850
+import com.dangerfield.goodtimes.system.Dimension.D900
+import com.dangerfield.goodtimes.system.DimensionResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

@@ -1,9 +1,9 @@
 plugins {
-    id("merizo.feature")
+    id("goodtimes.feature")
 }
 
 android {
-    namespace = "com.dangerfield.merizo.features.home.impl"
+    namespace = "com.dangerfield.goodtimes.features.home.impl"
 }
 
 kotlin {
@@ -15,9 +15,9 @@ kotlin {
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.ui)
-            implementation(projects.libraries.merizo)
+            implementation(projects.libraries.goodtimes)
 
-            // Compose dependencies (navigation and lifecycle provided by merizo.feature plugin)
+            // Compose dependencies (navigation and lifecycle provided by goodtimes.feature plugin)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

@@ -1,11 +1,11 @@
-package com.dangerfield.merizo.libraries.flowroutines
+package com.dangerfield.goodtimes.libraries.flowroutines
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import com.dangerfield.merizo.libraries.flowroutines.SEAViewModel
+import com.dangerfield.goodtimes.libraries.flowroutines.SEAViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

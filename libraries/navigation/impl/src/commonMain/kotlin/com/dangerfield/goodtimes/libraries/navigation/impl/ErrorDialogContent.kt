@@ -1,0 +1,100 @@
+package com.dangerfield.goodtimes.libraries.navigation.impl
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.dangerfield.libraries.ui.PreviewContent
+import com.dangerfield.libraries.ui.components.button.Button
+import com.dangerfield.libraries.ui.components.button.ButtonSize
+import com.dangerfield.libraries.ui.components.button.ButtonType
+import com.dangerfield.libraries.ui.components.dialog.BasicDialog
+import com.dangerfield.libraries.ui.components.dialog.DialogState
+import com.dangerfield.libraries.ui.components.dialog.rememberDialogState
+import com.dangerfield.libraries.ui.components.text.Text
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.VerticalSpacerD1000
+import org.jetbrains.compose.ui.tooling.preview.Preview
+
+@Composable
+internal fun ErrorDialog(
+    state: DialogState,
+    title: String,
+    subtitle: String,
+    actionTitle: String,
+    errorCode: Int?,
+    onDismissRequest: () -> Unit,
+    onAction: () -> Unit,
+    onReportToDeveloper: (() -> Unit)? = null,
+    reportActionTitle: String = "Report to developers",
+) {
+    val showReportButton = onReportToDeveloper != null
+
+    BasicDialog(
+        state = state,
+        onDismissRequest = onDismissRequest,
+        topContent = {
+            Column(verticalArrangement = Arrangement.spacedBy(Dimension.D200)) {
+                Text(text = title)
+            }
+        },
+        content = {
+            Column {
+                Text(text = subtitle)
+
+                errorCode?.let {
+                    VerticalSpacerD1000()
+                    Text(
+                        text = "Error code: $it",
+                        typography = AppTheme.typography.Body.B500.Bold,
+                        color = AppTheme.colors.textSecondary,
+                    )
+                }
+
+            }
+        },
+        bottomContent = {
+            Column {
+                Button(
+                    size = ButtonSize.Medium,
+                    onClick = onAction,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = actionTitle)
+                }
+                if (showReportButton) {
+                    Spacer(modifier = Modifier.height(Dimension.D600))
+                    Button(
+                        size = ButtonSize.Medium,
+                        type = ButtonType.Tertiary,
+                        onClick = { onReportToDeveloper?.invoke() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = reportActionTitle)
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Preview
+@Composable
+private fun ErrorDialogContentPreview() {
+    PreviewContent {
+        ErrorDialog(
+            state = rememberDialogState(),
+            title = "Yikes.",
+            subtitle = "We hit a snag while loading. Please try again in a sec.",
+            actionTitle = "Okay",
+            errorCode = 1003,
+            onDismissRequest = {},
+            onAction = {},
+            onReportToDeveloper = {}
+        )
+    }
+}

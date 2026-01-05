@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.navigation
+package com.dangerfield.goodtimes.libraries.navigation
 
 import androidx.navigation.NavGraphBuilder
 

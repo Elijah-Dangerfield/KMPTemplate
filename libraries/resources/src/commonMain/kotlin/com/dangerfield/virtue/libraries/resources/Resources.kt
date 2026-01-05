@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.resources
+package com.dangerfield.goodtimes.libraries.resources
 
 /**
  * Resources library module

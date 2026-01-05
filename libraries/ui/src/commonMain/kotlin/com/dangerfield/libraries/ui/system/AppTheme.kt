@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.system
+package com.dangerfield.goodtimes.system
 
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -13,9 +13,9 @@ import androidx.compose.ui.text.TextStyle
 import com.dangerfield.libraries.ui.system.LocalColors
 import com.dangerfield.libraries.ui.system.LocalContentColor
 import com.dangerfield.libraries.ui.system.LocalTypography
-import com.dangerfield.merizo.system.color.Colors
-import com.dangerfield.merizo.system.color.defaultColors
-import com.dangerfield.merizo.system.typography.rememberTypography
+import com.dangerfield.goodtimes.system.color.Colors
+import com.dangerfield.goodtimes.system.color.defaultColors
+import com.dangerfield.goodtimes.system.typography.rememberTypography
 
 object AppTheme {
     val colors: Colors
@@ -37,8 +37,8 @@ fun AppThemeProvider(
     val colors = defaultColors
 
     val textSelectionColors = TextSelectionColors(
-        handleColor = colors.accent.color,
-        backgroundColor = colors.accent.color.copy(alpha = 0.4F)
+        handleColor = colors.accentPrimary.color,
+        backgroundColor = colors.accentPrimary.color.copy(alpha = 0.4F)
     )
 
     val typography = rememberTypography()

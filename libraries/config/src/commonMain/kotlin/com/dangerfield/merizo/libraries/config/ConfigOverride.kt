@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.config
+package com.dangerfield.goodtimes.libraries.config
 
 /**
  * Represents a locally persisted override for a fully qualified config [path].

@@ -1,7 +1,7 @@
-package com.dangerfield.merizo.libraries.navigation.impl
+package com.dangerfield.goodtimes.libraries.navigation.impl
 
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.navigation.WebLinkLauncher
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.navigation.WebLinkLauncher
 import me.tatarka.inject.annotations.Inject
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication

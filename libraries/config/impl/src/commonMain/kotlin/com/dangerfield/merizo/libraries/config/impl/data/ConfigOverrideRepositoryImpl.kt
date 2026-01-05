@@ -1,10 +1,10 @@
-package com.dangerfield.merizo.libraries.config.impl.data
+package com.dangerfield.goodtimes.libraries.config.impl.data
 
-import com.dangerfield.merizo.libraries.core.logging.KLog
-import com.dangerfield.merizo.libraries.config.ConfigOverride
-import com.dangerfield.merizo.libraries.config.ConfigOverrideRepository
-import com.dangerfield.merizo.libraries.config.impl.serialization.ConfigJsonConverter
-import com.dangerfield.merizo.libraries.flowroutines.AppCoroutineScope
+import com.dangerfield.goodtimes.libraries.core.logging.KLog
+import com.dangerfield.goodtimes.libraries.config.ConfigOverride
+import com.dangerfield.goodtimes.libraries.config.ConfigOverrideRepository
+import com.dangerfield.goodtimes.libraries.config.impl.serialization.ConfigJsonConverter
+import com.dangerfield.goodtimes.libraries.flowroutines.AppCoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

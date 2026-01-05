@@ -1,9 +1,9 @@
 plugins {
-    id("merizo.kotlin.multiplatform")
+    id("goodtimes.kotlin.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.config"
+    namespace = "com.dangerfield.goodtimes.libraries.config"
 }
 
 

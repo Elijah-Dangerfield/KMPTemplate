@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import kotlin.math.max
 

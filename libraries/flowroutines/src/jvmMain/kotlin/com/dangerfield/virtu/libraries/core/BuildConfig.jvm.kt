@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.core
+package com.dangerfield.goodtimes.libraries.core
 
 actual object BuildInfo {
     actual val isDebug: Boolean

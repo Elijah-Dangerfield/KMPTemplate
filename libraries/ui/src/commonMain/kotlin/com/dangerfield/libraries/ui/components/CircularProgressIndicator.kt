@@ -12,7 +12,7 @@ import androidx.compose.material3.CircularProgressIndicator as MaterialCircularP
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = LocalColors.current.accent.color,
+    color: Color = LocalColors.current.accentPrimary.color,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
     trackColor: Color = ProgressIndicatorDefaults.circularTrackColor,
     strokeCap: StrokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap,

@@ -18,10 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.libraries.ui.system.LocalContentColor
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -246,7 +246,7 @@ private fun TextPreviewProvided() {
                     .copy(
                         fontWeight = FontWeight.ExtraLight
                     ),
-                color = AppTheme.colors.accent,
+                color = AppTheme.colors.accentPrimary,
                 textDecoration = TextDecoration.Underline,
                 textAlign = TextAlign.Start,
                 maxLines = 1,

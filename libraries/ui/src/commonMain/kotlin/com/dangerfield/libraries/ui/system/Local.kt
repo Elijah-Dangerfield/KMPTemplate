@@ -3,10 +3,10 @@ package com.dangerfield.libraries.ui.system
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.libraries.core.AppState
-import com.dangerfield.merizo.libraries.core.BuildInfo
-import com.dangerfield.merizo.system.color.Colors
-import com.dangerfield.merizo.system.typography.Typography
+import com.dangerfield.goodtimes.libraries.core.AppState
+import com.dangerfield.goodtimes.libraries.core.BuildInfo
+import com.dangerfield.goodtimes.system.color.Colors
+import com.dangerfield.goodtimes.system.typography.Typography
 import kotlin.time.Clock
 
 val LocalColors = compositionLocalOf<Colors> {

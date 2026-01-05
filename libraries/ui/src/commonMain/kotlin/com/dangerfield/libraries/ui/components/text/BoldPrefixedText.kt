@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.makeBold
 import org.jetbrains.compose.ui.tooling.preview.Preview

@@ -1,10 +1,10 @@
 plugins {
-    id("merizo.compose.multiplatform")
+    id("goodtimes.compose.multiplatform")
     alias(libs.plugins.kotlinSerialization)
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.navigation.impl"
+    namespace = "com.dangerfield.goodtimes.libraries.navigation.impl"
 }
 
 kotlin {

@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.config
+package com.dangerfield.goodtimes.libraries.config
 
 /**
  * Describes a single strongly typed value that can be read from [AppConfigMap].

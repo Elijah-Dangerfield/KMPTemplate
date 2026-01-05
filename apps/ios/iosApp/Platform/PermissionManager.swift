@@ -9,8 +9,10 @@ import ComposeApp
 import FamilyControls
 import Foundation
 import UserNotifications
+import AVFoundation
+import Photos
 
-class IOSPermissionManager: MerizoPermissionManager {
+class IOSPermissionManager: GoodtimesPermissionManager {
 
     private let authorizationCenter = AuthorizationCenter.shared
     private let logger = KLog.shared
@@ -29,7 +31,7 @@ class IOSPermissionManager: MerizoPermissionManager {
         authorizationStatusCancellable?.cancel()
     }
     
-    func __ensurePermission(permission: MerizoPermission) async throws -> MerizoPermissionResult {
+    func __ensurePermission(permission: GoodtimesPermission) async throws -> GoodtimesPermissionResult {
         let currentStatus = checkPermissionStatus(permission: permission)
         
         if currentStatus == .granted {
@@ -39,27 +41,35 @@ class IOSPermissionManager: MerizoPermissionManager {
         return try await __requestPermission(permission: permission)
     }
     
-    func __requestPermission(permission: MerizoPermission) async throws -> MerizoPermissionResult {
+    func __requestPermission(permission: GoodtimesPermission) async throws -> GoodtimesPermissionResult {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return await requestFamilyControlsPermission()
         case .notifications:
             return await requestNotificationsPermission()
+        case .camera:
+            return await requestCameraPermission()
+        case .photoLibrary:
+            return await requestPhotoLibraryPermission()
         }
     }
     
-    func checkPermissionStatus(permission: MerizoPermission) -> MerizoPermissionStatus {
+    func checkPermissionStatus(permission: GoodtimesPermission) -> GoodtimesPermissionStatus {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return checkFamilyControlsStatus()
         case .notifications:
             return checkNotificationsStatus()
+        case .camera:
+            return checkCameraStatus()
+        case .photoLibrary:
+            return checkPhotoLibraryStatus()
         }
     }
     
     // MARK: - Family Controls
     
-    private func checkFamilyControlsStatus() -> MerizoPermissionStatus {
+    private func checkFamilyControlsStatus() -> GoodtimesPermissionStatus {
         let status = authorizationCenter.authorizationStatus
         logFamilyStatusIfNeeded(status)
         switch status {
@@ -74,7 +84,7 @@ class IOSPermissionManager: MerizoPermissionManager {
         }
     }
     
-    private func requestFamilyControlsPermission() async -> MerizoPermissionResult {
+    private func requestFamilyControlsPermission() async -> GoodtimesPermissionResult {
         do {
             let preStatus = authorizationCenter.authorizationStatus
             
@@ -157,8 +167,8 @@ class IOSPermissionManager: MerizoPermissionManager {
     
     // MARK: - Notifications
     
-    private func checkNotificationsStatus() -> MerizoPermissionStatus {
-        var status: MerizoPermissionStatus = .notDetermined
+    private func checkNotificationsStatus() -> GoodtimesPermissionStatus {
+        var status: GoodtimesPermissionStatus = .notDetermined
         let semaphore = DispatchSemaphore(value: 0)
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -179,7 +189,7 @@ class IOSPermissionManager: MerizoPermissionManager {
         return status
     }
     
-    private func requestNotificationsPermission() async -> MerizoPermissionResult {
+    private func requestNotificationsPermission() async -> GoodtimesPermissionResult {
         do {
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .badge, .sound])
@@ -187,13 +197,68 @@ class IOSPermissionManager: MerizoPermissionManager {
             if granted {
                 return .Granted.shared
             } else {
-                // User denied - check if they can request again
                 let settings = await UNUserNotificationCenter.current().notificationSettings()
                 let canRequestAgain = settings.authorizationStatus == .notDetermined
                 return .Denied(canRequestAgain: canRequestAgain)
             }
         } catch {
-            // Error during request - user can try again
+            return .Denied(canRequestAgain: true)
+        }
+    }
+    
+    // MARK: - Camera
+    
+    private func checkCameraStatus() -> GoodtimesPermissionStatus {
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        switch status {
+        case .notDetermined:
+            return .notDetermined
+        case .authorized:
+            return .granted
+        case .denied, .restricted:
+            return .denied
+        @unknown default:
+            return .notDetermined
+        }
+    }
+    
+    private func requestCameraPermission() async -> GoodtimesPermissionResult {
+        let granted = await AVCaptureDevice.requestAccess(for: .video)
+        if granted {
+            return .Granted.shared
+        } else {
+            let status = AVCaptureDevice.authorizationStatus(for: .video)
+            let canRequestAgain = status == .notDetermined
+            return .Denied(canRequestAgain: canRequestAgain)
+        }
+    }
+    
+    // MARK: - Photo Library
+    
+    private func checkPhotoLibraryStatus() -> GoodtimesPermissionStatus {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        switch status {
+        case .notDetermined:
+            return .notDetermined
+        case .authorized, .limited:
+            return .granted
+        case .denied, .restricted:
+            return .denied
+        @unknown default:
+            return .notDetermined
+        }
+    }
+    
+    private func requestPhotoLibraryPermission() async -> GoodtimesPermissionResult {
+        let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        switch status {
+        case .authorized, .limited:
+            return .Granted.shared
+        case .denied, .restricted:
+            return .Denied(canRequestAgain: false)
+        case .notDetermined:
+            return .Denied(canRequestAgain: true)
+        @unknown default:
             return .Denied(canRequestAgain: true)
         }
     }

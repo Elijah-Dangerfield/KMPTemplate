@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.random.Random
-import com.dangerfield.merizo.libraries.core.BuildInfo
+import com.dangerfield.goodtimes.libraries.core.BuildInfo
 import kotlin.time.Duration
 
 fun showSnackBar(

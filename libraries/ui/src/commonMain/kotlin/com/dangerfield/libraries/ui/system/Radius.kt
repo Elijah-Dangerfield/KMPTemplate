@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber")
 
-package com.dangerfield.merizo.system
+package com.dangerfield.goodtimes.system
 
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape

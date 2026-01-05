@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.libraries.ui.system.LocalContentColor
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.components.text.LocalTextConfig

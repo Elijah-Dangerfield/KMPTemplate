@@ -17,11 +17,11 @@ import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.components.icon.Icon
 import com.dangerfield.libraries.ui.components.icon.IconResource
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.HorizontalSpacerD200
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.HorizontalSpacerD200
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 
 /**
  * Reusable selectable card that supports optional icons, badges, and expandable content.

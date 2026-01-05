@@ -1,10 +1,10 @@
-package com.dangerfield.merizo.libraries.config.impl
+package com.dangerfield.goodtimes.libraries.config.impl
 
-import com.dangerfield.merizo.libraries.config.AppConfigRepository
-import com.dangerfield.merizo.libraries.config.EnsureAppConfigLoaded
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.core.ignoreValue
-import com.dangerfield.merizo.libraries.core.throwIfDebug
+import com.dangerfield.goodtimes.libraries.config.AppConfigRepository
+import com.dangerfield.goodtimes.libraries.config.EnsureAppConfigLoaded
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.core.ignoreValue
+import com.dangerfield.goodtimes.libraries.core.throwIfDebug
 import kotlinx.coroutines.flow.first
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope

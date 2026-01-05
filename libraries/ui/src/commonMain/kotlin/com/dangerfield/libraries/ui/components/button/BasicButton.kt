@@ -17,10 +17,10 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.Radii
-import com.dangerfield.merizo.system.thenIf
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.Radii
+import com.dangerfield.goodtimes.system.thenIf
 import com.dangerfield.libraries.ui.Border
 import com.dangerfield.libraries.ui.Elevation
 import com.dangerfield.libraries.ui.PreviewContent
@@ -203,15 +203,15 @@ private val MediumButtonWithIconPadding = PaddingValues(
 )
 
 private val LargeButtonPadding = PaddingValues(
-    horizontal = Dimension.D900,  // 24dp horizontal
-    vertical = Dimension.D700      // 16dp vertical
+    horizontal = Dimension.D900,
+    vertical = Dimension.D900
 )
 
 private val LargeButtonWithIconPadding = PaddingValues(
     start = Dimension.D800,       // 20dp start (reduced, icon adds weight)
     end = Dimension.D900,          // 24dp end (extra space for icon)
-    top = Dimension.D700,          // 16dp vertical (same as text-only)
-    bottom = Dimension.D700
+    top = Dimension.D900,          // 16dp vertical (same as text-only)
+    bottom = Dimension.D900
 )
 
 private val ButtonIconSpacing = Dimension.D200

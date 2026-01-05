@@ -1,13 +1,13 @@
-package com.dangerfield.merizo.libraries.config.impl.model
+package com.dangerfield.goodtimes.libraries.config.impl.model
 
-import com.dangerfield.merizo.libraries.core.logging.KLog
-import com.dangerfield.merizo.libraries.config.AppConfigMap
-import com.dangerfield.merizo.libraries.config.impl.serialization.ConfigJsonConverter
+import com.dangerfield.goodtimes.libraries.core.logging.KLog
+import com.dangerfield.goodtimes.libraries.config.AppConfigMap
+import com.dangerfield.goodtimes.libraries.config.impl.serialization.ConfigJsonConverter
 import kotlinx.coroutines.runBlocking
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
-import merizo.libraries.config.impl.generated.resources.Res
+import goodtimes.libraries.config.impl.generated.resources.Res
 
 @SingleIn(AppScope::class)
 class FallbackConfigMap @Inject constructor(

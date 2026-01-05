@@ -42,8 +42,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Radii
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Radii
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.roundToInt
 import kotlin.random.Random

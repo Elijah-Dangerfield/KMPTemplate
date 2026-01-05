@@ -15,9 +15,9 @@ import com.dangerfield.libraries.ui.components.icon.IconButton
 import com.dangerfield.libraries.ui.components.icon.Icons
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.system.color.ColorResource
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.VerticalSpacerD800
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.VerticalSpacerD800
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

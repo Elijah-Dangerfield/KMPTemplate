@@ -66,7 +66,7 @@ class TriggerFlow(
      * This method is thread-safe and can be called from any context.
      * Each call increments an internal counter, causing the flow to emit.
      *
-     * @see [kotlinx.coroutines.flow.MutableStateFlow.update] for thread-safety guarmerizoes
+     * @see [kotlinx.coroutines.flow.MutableStateFlow.update] for thread-safety guargoodtimeses
      */
     fun pull() {
         triggerCounter.update { it + 1 }

@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.Dimension
+import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.system.color.ColorResource
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable

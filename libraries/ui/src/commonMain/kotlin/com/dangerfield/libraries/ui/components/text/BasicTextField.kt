@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.typography.TypographyResource
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.PreviewContent
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -41,13 +41,13 @@ fun BasicTextField(
     minLines: Int = 1,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    cursorBrush: Brush = SolidColor(AppTheme.colors.accent.color),
+    cursorBrush: Brush = SolidColor(AppTheme.colors.accentPrimary.color),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() },
 ) {
     val textSelectionColors = TextSelectionColors(
-        handleColor = AppTheme.colors.accent.color,
-        backgroundColor = AppTheme.colors.accent.color.copy(alpha = 0.4F)
+        handleColor = AppTheme.colors.accentPrimary.color,
+        backgroundColor = AppTheme.colors.accentPrimary.color.copy(alpha = 0.4F)
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {

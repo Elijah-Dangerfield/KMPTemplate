@@ -1,10 +1,10 @@
-package com.dangerfield.merizo.libraries.config.impl.data
+package com.dangerfield.goodtimes.libraries.config.impl.data
 
-import com.dangerfield.merizo.libraries.core.logging.KLog
-import com.dangerfield.merizo.libraries.config.AppConfigMap
-import com.dangerfield.merizo.libraries.config.impl.model.BasicMapAppConfig
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.flowroutines.DispatcherProvider
+import com.dangerfield.goodtimes.libraries.core.logging.KLog
+import com.dangerfield.goodtimes.libraries.config.AppConfigMap
+import com.dangerfield.goodtimes.libraries.config.impl.model.BasicMapAppConfig
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.flowroutines.DispatcherProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject

@@ -1,5 +1,5 @@
 plugins {
-    id("merizo.kotlin.multiplatform")
+    id("goodtimes.kotlin.multiplatform")
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
@@ -10,7 +10,7 @@ moduleConfig {
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.config.impl"
+    namespace = "com.dangerfield.goodtimes.libraries.config.impl"
 }
 
 kotlin {

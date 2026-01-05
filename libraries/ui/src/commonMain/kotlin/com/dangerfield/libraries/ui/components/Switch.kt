@@ -5,7 +5,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.dangerfield.merizo.system.AppTheme
+import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.libraries.ui.PreviewContent
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -27,9 +27,9 @@ fun Switch(
             uncheckedThumbColor = AppTheme.colors.onSurfacePrimary.color,
             uncheckedTrackColor = AppTheme.colors.surfacePrimary.color,
             uncheckedBorderColor = AppTheme.colors.onSurfacePrimary.color,
-            checkedThumbColor = AppTheme.colors.onAccent.color,
-            checkedTrackColor = AppTheme.colors.accent.color,
-            checkedBorderColor = AppTheme.colors.accent.color,
+            checkedThumbColor = AppTheme.colors.onAccentPrimary.color,
+            checkedTrackColor = AppTheme.colors.accentPrimary.color,
+            checkedBorderColor = AppTheme.colors.accentPrimary.color,
             disabledCheckedBorderColor = AppTheme.colors.onSurfaceDisabled.color,
             disabledUncheckedBorderColor = AppTheme.colors.onSurfaceDisabled.color,
             disabledCheckedThumbColor = AppTheme.colors.onSurfaceDisabled.color,

@@ -1,4 +1,4 @@
-package com.dangerfield.merizo.libraries.config
+package com.dangerfield.goodtimes.libraries.config
 
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty

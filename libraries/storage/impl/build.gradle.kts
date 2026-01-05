@@ -1,9 +1,9 @@
 plugins {
-    id("merizo.kotlin.multiplatform")
+    id("goodtimes.kotlin.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.merizo.libraries.storage.impl"
+    namespace = "com.dangerfield.goodtimes.libraries.storage.impl"
 }
 
 moduleConfig.storage()
@@ -15,9 +15,9 @@ kotlin {
 
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
-            implementation(projects.libraries.merizo)
-            implementation(projects.libraries.merizo.storage)
-            implementation(projects.libraries.merizo.storage)
+            implementation(projects.libraries.goodtimes)
+            implementation(projects.libraries.goodtimes.storage)
+            implementation(projects.libraries.goodtimes.storage)
             implementation(libs.kotlinx.serialization.json)
         }
     }

@@ -1,8 +1,8 @@
-package com.dangerfield.merizo.libraries.config.impl.data
+package com.dangerfield.goodtimes.libraries.config.impl.data
 
-import com.dangerfield.merizo.libraries.storage.Cache
-import com.dangerfield.merizo.libraries.storage.CacheFactory
-import com.dangerfield.merizo.libraries.storage.versionedJsonSerializer
+import com.dangerfield.goodtimes.libraries.storage.Cache
+import com.dangerfield.goodtimes.libraries.storage.CacheFactory
+import com.dangerfield.goodtimes.libraries.storage.versionedJsonSerializer
 import kotlinx.serialization.Serializable
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope

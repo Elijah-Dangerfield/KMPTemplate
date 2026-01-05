@@ -47,7 +47,7 @@ private fun String.removeUnknownTags(): StringBuilder {
         }
     }
 
-    // Build the string without the unwmerizod tags
+    // Build the string without the unwgoodtimesd tags
     removeRanges.forEach {
         stringBuilder.append(this.substring(lastEnd, it.first))
         lastEnd = it.last + 1

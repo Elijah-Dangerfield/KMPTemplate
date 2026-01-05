@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.merizo.system.AppTheme
-import com.dangerfield.merizo.system.Dimension
-import com.dangerfield.merizo.system.VerticalSpacerD200
-import com.dangerfield.merizo.system.VerticalSpacerD500
-import com.dangerfield.merizo.system.thenIf
+import com.dangerfield.goodtimes.system.AppTheme
+import com.dangerfield.goodtimes.system.Dimension
+import com.dangerfield.goodtimes.system.VerticalSpacerD200
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
+import com.dangerfield.goodtimes.system.thenIf
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -109,7 +109,7 @@ fun <ID, Payload> BarChart(
     ) -> Unit)? = null,
     barShape: Shape = RoundedCornerShape(12.dp),
     barColors: @Composable (BarChartEntry<ID, Payload>, Boolean) -> Color = { _, isSelected ->
-        if (isSelected) AppTheme.colors.accent.color else AppTheme.colors.surfaceDisabled.color
+        if (isSelected) AppTheme.colors.accentPrimary.color else AppTheme.colors.surfaceDisabled.color
     }
 ) {
     if (entries.isEmpty()) return
@@ -484,8 +484,8 @@ private fun BarChartPreviewCustomBars() {
                     val gradient = if (isSelected) {
                         Brush.verticalGradient(
                             colors = listOf(
-                                AppTheme.colors.accent.color,
-                                AppTheme.colors.accent.color.copy(alpha = 0.4f)
+                                AppTheme.colors.accentPrimary.color,
+                                AppTheme.colors.accentPrimary.color.copy(alpha = 0.4f)
                             )
                         )
                     } else {
@@ -563,7 +563,7 @@ private fun BarChartPreviewDenseData() {
                 },
                 barColors = { entry, _ ->
                     if (entry.value >= 60f) {
-                        AppTheme.colors.accent.color
+                        AppTheme.colors.accentPrimary.color
                     } else {
                         AppTheme.colors.surfaceDisabled.color
                     }

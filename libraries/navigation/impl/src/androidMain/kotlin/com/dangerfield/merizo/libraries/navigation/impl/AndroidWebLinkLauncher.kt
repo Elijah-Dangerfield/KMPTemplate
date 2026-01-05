@@ -1,10 +1,10 @@
-package com.dangerfield.merizo.libraries.navigation.impl
+package com.dangerfield.goodtimes.libraries.navigation.impl
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.dangerfield.merizo.libraries.core.Catching
-import com.dangerfield.merizo.libraries.navigation.WebLinkLauncher
+import com.dangerfield.goodtimes.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.navigation.WebLinkLauncher
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding

@@ -1,6 +1,6 @@
-package com.dangerfield.merizo.libraries.flowroutines
+package com.dangerfield.goodtimes.libraries.flowroutines
 
-import com.dangerfield.merizo.libraries.core.Catching
+import com.dangerfield.goodtimes.libraries.core.Catching
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
