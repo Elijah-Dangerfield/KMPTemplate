@@ -19,6 +19,7 @@ class OnboardingViewModel @Inject constructor(
             is Action.SelectYes -> action.handle()
             is Action.SelectNo -> action.handle()
             is Action.ConfirmOnboarding -> action.handle()
+            is Action.SkipOnboarding -> action.handle()
         }
     }
 
@@ -27,7 +28,7 @@ class OnboardingViewModel @Inject constructor(
         updateState {
             it.copy(
                 isLoading = false,
-                timesDeclined = appData.numberOfTimesNoChecked
+                timesDeclined = appData.onboardingNoClicks
             )
         }
     }
@@ -50,7 +51,7 @@ class OnboardingViewModel @Inject constructor(
     private suspend fun Action.SelectNo.handle() {
         // Increment decline count and show dialog immediately
         val newDeclineCount = state.timesDeclined + 1
-        appCache.update { it.copy(numberOfTimesNoChecked = newDeclineCount) }
+        appCache.update { it.copy(onboardingNoClicks = newDeclineCount) }
         updateState { it.copy(timesDeclined = newDeclineCount) }
         sendEvent(Event.NavigateToDeclinedDialog(timesDeclined = newDeclineCount))
     }
@@ -58,9 +59,15 @@ class OnboardingViewModel @Inject constructor(
     private suspend fun Action.ConfirmOnboarding.handle() {
         // Only called when YES is selected
         if (state.selection == OnboardingSelection.YES) {
-            appCache.update { it.copy(hasUserOnboarded = true, numberOfTimesNoChecked = 0) }
+            appCache.update { it.copy(hasUserOnboarded = true, onboardingNoClicks = 0) }
             sendEvent(Event.NavigateToHome)
         }
+    }
+
+    private suspend fun Action.SkipOnboarding.handle() {
+        // Debug-only: skip onboarding immediately
+        appCache.update { it.copy(hasUserOnboarded = true, onboardingNoClicks = 0) }
+        sendEvent(Event.NavigateToHome)
     }
 }
 
@@ -98,4 +105,5 @@ sealed class Action {
     data object SelectYes : Action()
     data object SelectNo : Action()
     data object ConfirmOnboarding : Action()
+    data object SkipOnboarding : Action()
 }

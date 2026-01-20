@@ -11,11 +11,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Bathtub
+import androidx.compose.material.icons.filled.Blind
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Egg
+import androidx.compose.material.icons.filled.Exposure
+import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.filled.Person4
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Window
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Info
@@ -28,6 +36,8 @@ import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Egg
+import androidx.compose.material.icons.rounded.EggAlt
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LocationCity
 import androidx.compose.material.icons.rounded.LocationOn
@@ -134,6 +144,10 @@ enum class Icons(
 
     Charity(
         default = androidx.compose.material.icons.Icons.Rounded.VolunteerActivism,
+    ),
+
+    Dot(
+        default = androidx.compose.material.icons.Icons.Default.Adjust,
     ),
 
     Location(

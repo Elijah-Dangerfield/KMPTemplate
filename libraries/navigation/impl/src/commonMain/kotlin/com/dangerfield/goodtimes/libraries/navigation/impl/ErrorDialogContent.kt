@@ -18,6 +18,7 @@ import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.goodtimes.system.VerticalSpacerD1000
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -71,11 +72,15 @@ internal fun ErrorDialog(
                     Button(
                         size = ButtonSize.Medium,
                         type = ButtonType.Tertiary,
-                        onClick = { onReportToDeveloper?.invoke() },
+                        onClick = { onReportToDeveloper() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(text = reportActionTitle)
                     }
+
+                    VerticalSpacerD500()
+
+                    Text("(which is me cause I wrote myself)")
                 }
             }
         }

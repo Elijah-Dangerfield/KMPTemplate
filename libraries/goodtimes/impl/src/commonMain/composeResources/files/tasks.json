@@ -1,0 +1,5055 @@
+[
+  {
+    "id": "intro_welcome",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "isIntroTask": true,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "I'm going to ask you things. Some will be small, some will be strange, some might make you think. There's no right answer. Just honest ones.\n\nLet's start simple: What's one word that describes how today has been so far?",
+    "placeholder": "Today has been..."
+  },
+  {
+    "id": "first_task",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Look around you. What's one thing you notice right now?",
+    "placeholder": "I notice...",
+    "isIntroTask": true
+  },
+  {
+    "id": "light_or_deep",
+    "type": "SELECTION",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsSelection": true
+    },
+    "instruction": "Today, do you want to go light or deep?",
+    "selectionOptions": [
+      "Light",
+      "Deep",
+      "Surprise me"
+    ],
+    "isIntroTask": true
+  },
+  {
+    "id": "hold_finger_30",
+    "type": "HOLD_FINGER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Hold your finger on the screen for 30 seconds. Just... be here.",
+    "placeholder": "That was...",
+    "durationSeconds": 30,
+    "isIntroTask": true
+  },
+  {
+    "id": "three_sounds",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Close your eyes for a moment. What three sounds can you hear?",
+    "placeholder": "I hear...",
+    "isIntroTask": true
+  },
+  {
+    "id": "favorite_word",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your favorite word? Any word. Why that one?",
+    "placeholder": "My favorite word is...",
+    "isIntroTask": true
+  },
+  {
+    "id": "draw_turtle_dark",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw a turtle. In the dark. (Close your eyes while you draw.)",
+    "isIntroTask": true
+  },
+  {
+    "id": "stranger_or_alone",
+    "type": "SELECTION",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsSelection": true
+    },
+    "instruction": "Would you rather: be stuck in an elevator with a stranger, or completely alone?",
+    "selectionOptions": [
+      "With a stranger",
+      "Alone"
+    ],
+    "isIntroTask": true
+  },
+  {
+    "id": "photo_something_old",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of something old near you.",
+    "isIntroTask": true
+  },
+  {
+    "id": "describe_sky",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Describe the sky right now. Or if you can't see it, describe the last sky you remember.",
+    "placeholder": "The sky is...",
+    "isIntroTask": true
+  },
+  {
+    "id": "grateful_for_small",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Name one small thing you're grateful for today.",
+    "placeholder": "I'm grateful for...",
+    "isIntroTask": true
+  },
+  {
+    "id": "hum_something",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsVoice": true
+    },
+    "instruction": "Hum the first song that comes to mind. Just a few seconds.",
+    "isIntroTask": true
+  },
+  {
+    "id": "photo_your_hands",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of your hands. Just as they are.",
+    "isIntroTask": true
+  },
+  {
+    "id": "stillness_60",
+    "type": "STILLNESS",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Hold completely still for 60 seconds. See if you can.",
+    "placeholder": "That was...",
+    "durationSeconds": 60,
+    "isIntroTask": true
+  },
+  {
+    "id": "draw_your_mood",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw your current mood. Abstract is fine.",
+    "isIntroTask": true
+  },
+  {
+    "id": "used_to_be",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you used to be that you're not anymore?",
+    "placeholder": "I used to be...",
+    "isIntroTask": true
+  },
+  {
+    "id": "name_animal_feeling",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "If your current mood were an animal, what animal would it be?",
+    "placeholder": "My mood animal is..."
+  },
+  {
+    "id": "name_yourself",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Rename yourself. Just for today. What name fits who you are right now?",
+    "placeholder": "Today I am..."
+  },
+  {
+    "id": "name_the_app",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Give me a nickname. Something only you would call me.",
+    "placeholder": "I'll call you..."
+  },
+  {
+    "id": "name_color_feeling",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What color is your mood right now?",
+    "placeholder": "My mood is..."
+  },
+  {
+    "id": "draw_nondominant",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw a house using your non-dominant hand."
+  },
+  {
+    "id": "draw_blind",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Close your eyes and draw a cat. Don't peek."
+  },
+  {
+    "id": "draw_me",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw what you imagine I look like.",
+    "followUp": {
+      "type": "CUSTOM",
+      "customQuestion": "What made you draw me this way?"
+    }
+  },
+  {
+    "id": "draw_trace_guess",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Trace around your thumb. Then turn it into something else."
+  },
+  {
+    "id": "draw_bedroom_memory",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw your childhood bedroom from memory."
+  },
+  {
+    "id": "draw_scribble",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Scribble for 5 seconds. Then find something in it."
+  },
+  {
+    "id": "draw_dream",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw something from a recent dream. Even if it's just a feeling."
+  },
+  {
+    "id": "draw_fear_small",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw something you're afraid of. Make it as small as possible."
+  },
+  {
+    "id": "draw_happy_place",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw a place where you feel safe."
+  },
+  {
+    "id": "draw_self_portrait_feeling",
+    "type": "DRAWING",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw a self-portrait of how you feel inside right now. Not how you look\u2014how you feel."
+  },
+  {
+    "id": "photo_blue",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of something blue."
+  },
+  {
+    "id": "photo_ceiling",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of the ceiling."
+  },
+  {
+    "id": "photo_throw_away",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of something you should probably throw away but haven't."
+  },
+  {
+    "id": "photo_shoes",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of your shoes. Where have they taken you today?"
+  },
+  {
+    "id": "photo_selfie_now",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "requireFrontCamera": true,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a selfie. Don't fix your hair.",
+    "followUp": {
+      "type": "CUSTOM",
+      "customQuestion": "What do you see in this photo?"
+    }
+  },
+  {
+    "id": "photo_oldest_thing",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of the oldest thing near you."
+  },
+  {
+    "id": "photo_window_view",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of what's outside the nearest window."
+  },
+  {
+    "id": "photo_beautiful",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of something you find beautiful."
+  },
+  {
+    "id": "photo_mess",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of a mess you've been avoiding."
+  },
+  {
+    "id": "photo_hands",
+    "type": "PHOTO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsPhoto": true
+    },
+    "instruction": "Take a photo of your hands."
+  },
+  {
+    "id": "voice_nice_self",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Record yourself saying something nice about yourself. Mean it."
+  },
+  {
+    "id": "voice_affirmation",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Record yourself saying: 'I am doing my best, and that is enough.'"
+  },
+  {
+    "id": "voice_sing",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Sing the first song that comes to mind. Just a few lines."
+  },
+  {
+    "id": "voice_whisper_secret",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Whisper something you've never said out loud."
+  },
+  {
+    "id": "voice_thank_absent",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Say thank you to someone who isn't here. Tell them why."
+  },
+  {
+    "id": "voice_laugh",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Record yourself laughing. Even if you have to fake it at first."
+  },
+  {
+    "id": "voice_younger_self",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsAudio": true
+    },
+    "instruction": "Record a message for your younger self. What would you tell them?"
+  },
+  {
+    "id": "action_stretch",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Stand up and stretch your arms above your head. Hold for 10 seconds. Feel your body.",
+    "durationSeconds": 15,
+    "followUp": {
+      "type": "FEELING"
+    }
+  },
+  {
+    "id": "action_eyes_closed",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Close your eyes for 30 seconds. Just listen.",
+    "durationSeconds": 35,
+    "followUp": {
+      "type": "CUSTOM",
+      "customQuestion": "What did you hear?"
+    }
+  },
+  {
+    "id": "action_water",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Go get a glass of water. Drink the whole thing.",
+    "durationSeconds": 60,
+    "followUp": {
+      "type": "DID_YOU"
+    }
+  },
+  {
+    "id": "action_window",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Go to the nearest window. Look outside for a full minute.",
+    "durationSeconds": 70,
+    "followUp": {
+      "type": "CUSTOM",
+      "customQuestion": "What did you notice?"
+    }
+  },
+  {
+    "id": "action_touch_soft",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Find something soft nearby. Touch it. Really feel it.",
+    "durationSeconds": 20,
+    "followUp": {
+      "type": "FEELING"
+    }
+  },
+  {
+    "id": "action_kind",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {},
+    "instruction": "Do something kind for someone without telling them. It can be tiny.",
+    "followUp": {
+      "type": "DID_YOU"
+    }
+  },
+  {
+    "id": "action_deep_breath",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Take three deep breaths. Slower than you think you need to.",
+    "durationSeconds": 30,
+    "followUp": {
+      "type": "FEELING"
+    }
+  },
+  {
+    "id": "action_smile_mirror",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Find a mirror. Smile at yourself for 10 seconds. A real smile.",
+    "durationSeconds": 20,
+    "followUp": {
+      "type": "FEELING"
+    }
+  },
+  {
+    "id": "stillness_hold_finger",
+    "type": "HOLD_FINGER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Hold your finger on the screen. Stay here with me for a moment.",
+    "durationSeconds": 30
+  },
+  {
+    "id": "stillness_hold_breathe",
+    "type": "HOLD_FINGER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Hold your finger here and take slow, deep breaths until the time is up.",
+    "durationSeconds": 45
+  },
+  {
+    "id": "stillness_wait_60",
+    "type": "WAIT_TIMER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Wait here for 60 seconds. Don't do anything else. Just exist.",
+    "durationSeconds": 60
+  },
+  {
+    "id": "stillness_wait_90",
+    "type": "WAIT_TIMER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Stay with this screen for 90 seconds. Notice what your mind does.",
+    "durationSeconds": 90,
+    "followUp": {
+      "type": "CUSTOM",
+      "customQuestion": "What did your mind do during that time?"
+    }
+  },
+  {
+    "id": "stillness_color_meditate",
+    "type": "STILLNESS",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {},
+    "instruction": "Stare at the color on your screen. Let your eyes relax. Breathe.",
+    "durationSeconds": 45,
+    "assets": {
+      "backgroundColor": "#6B8E9F"
+    }
+  },
+  {
+    "id": "game_rock_paper",
+    "type": "SELECTION",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsSelection": true
+    },
+    "instruction": "Rock, paper, scissors. You vs me. Choose.",
+    "selectionOptions": [
+      "Rock",
+      "Paper",
+      "Scissors"
+    ]
+  },
+  {
+    "id": "game_rps_result_rock",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "I chose paper. I win! Best two out of three? Just kidding. Tell me\u2014are you competitive?",
+    "placeholder": "I am..."
+  },
+  {
+    "id": "game_rps_result_paper",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "I chose scissors. I win! Don't worry, I've had practice. Tell me\u2014do you like games?",
+    "placeholder": "Games are..."
+  },
+  {
+    "id": "game_rps_result_scissors",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "I chose rock. I win! What can I say, I'm good at this. How do you feel about losing?",
+    "placeholder": "Losing makes me feel..."
+  },
+  {
+    "id": "game_three_doors",
+    "type": "SELECTION",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsSelection": true
+    },
+    "instruction": "Three doors. Behind one is your past. Behind another, your future. Behind the third, right now. Which do you open?",
+    "selectionOptions": [
+      "Past",
+      "Future",
+      "Now"
+    ]
+  },
+  {
+    "id": "game_would_rather",
+    "type": "SELECTION",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsSelection": true
+    },
+    "instruction": "Would you rather know how you die, or when you die?",
+    "selectionOptions": [
+      "How",
+      "When",
+      "Neither"
+    ]
+  },
+  {
+    "id": "secret_never_told",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Tell me something you've never told anyone. I won't share it.",
+    "placeholder": "I've never told anyone that..."
+  },
+  {
+    "id": "secret_ashamed",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you're ashamed of that you probably shouldn't be?",
+    "placeholder": "I feel ashamed of..."
+  },
+  {
+    "id": "secret_fear",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What are you most afraid of right now? Not spiders or heights. The real thing.",
+    "placeholder": "I'm afraid of..."
+  },
+  {
+    "id": "secret_apology",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Write an apology you owe someone. You don't have to send it.",
+    "placeholder": "I'm sorry for..."
+  },
+  {
+    "id": "secret_loss",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Tell me about something you lost that you still think about.",
+    "placeholder": "I lost..."
+  },
+  {
+    "id": "social_someone_write",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": true,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Hand your phone to someone nearby. Have them type one word that describes you.",
+    "placeholder": "They said..."
+  },
+  {
+    "id": "social_describe_you",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": true,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Ask someone nearby to describe you in one sentence. Type what they say.",
+    "placeholder": "They described me as..."
+  },
+  {
+    "id": "social_draw_for_you",
+    "type": "DRAWING",
+    "categories": [
+      "SOCIAL",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": true,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Hand your phone to someone. Have them draw you."
+  },
+  {
+    "id": "social_text_someone",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL",
+      "ACTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {},
+    "instruction": "Text someone you haven't talked to in a while. Just say hi.",
+    "followUp": {
+      "type": "DID_YOU"
+    }
+  },
+  {
+    "id": "social_call_someone",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL",
+      "ACTION"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {},
+    "instruction": "Call someone you care about. Tell them one thing you appreciate about them.",
+    "followUp": {
+      "type": "DID_YOU"
+    }
+  },
+  {
+    "id": "prompt_how_really_doing",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "How are you really doing? Not the answer you give everyone else.",
+    "placeholder": "Honestly, I'm..."
+  },
+  {
+    "id": "prompt_proudest_moment",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's the proudest you've ever been of yourself?",
+    "placeholder": "I was proudest when..."
+  },
+  {
+    "id": "prompt_younger_self_advice",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What would you tell your 10-year-old self?",
+    "placeholder": "I would tell them..."
+  },
+  {
+    "id": "prompt_belly_laugh",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "When's the last time you laughed so hard your stomach hurt? What happened?",
+    "placeholder": "I laughed when..."
+  },
+  {
+    "id": "prompt_cant_stop_thinking",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you can't stop thinking about lately?",
+    "placeholder": "I keep thinking about..."
+  },
+  {
+    "id": "prompt_avoiding",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What are you avoiding right now?",
+    "placeholder": "I'm avoiding..."
+  },
+  {
+    "id": "prompt_grateful_today",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Name one thing you're grateful for today. Just one.",
+    "placeholder": "I'm grateful for..."
+  },
+  {
+    "id": "prompt_describe_sky",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Look at the sky right now. Describe it like you're explaining it to someone who's never seen one.",
+    "placeholder": "The sky is..."
+  },
+  {
+    "id": "prompt_noticed_today",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Tell me one thing you noticed today that you normally wouldn't have.",
+    "placeholder": "I noticed..."
+  },
+  {
+    "id": "prompt_last_cried",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "When's the last time you cried? What was it about?",
+    "placeholder": "I last cried when..."
+  },
+  {
+    "id": "prompt_perfect_day",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Describe your perfect day. From morning to night.",
+    "placeholder": "My perfect day would be..."
+  },
+  {
+    "id": "prompt_unpopular_opinion",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's an unpopular opinion you have?",
+    "placeholder": "I think..."
+  },
+  {
+    "id": "prompt_lie_often",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a lie you tell often?",
+    "placeholder": "I often say..."
+  },
+  {
+    "id": "prompt_miss",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What do you miss?",
+    "placeholder": "I miss..."
+  },
+  {
+    "id": "prompt_excited_about",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What are you excited about right now?",
+    "placeholder": "I'm excited about..."
+  },
+  {
+    "id": "prompt_hard_recently",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's been hard for you recently?",
+    "placeholder": "It's been hard to..."
+  },
+  {
+    "id": "prompt_small_joy",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a small thing that brings you joy?",
+    "placeholder": "A small joy is..."
+  },
+  {
+    "id": "prompt_future_self",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What do you hope your future self remembers about this time in your life?",
+    "placeholder": "I hope I remember..."
+  },
+  {
+    "id": "prompt_compliment_self",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Give yourself a compliment. A real one.",
+    "placeholder": "I am..."
+  },
+  {
+    "id": "prompt_forgive",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "What do you need to forgive yourself for?",
+    "placeholder": "I need to forgive myself for..."
+  },
+  {
+    "id": "prompt_body_feels",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "How does your body feel right now? Scan from head to toe.",
+    "placeholder": "My body feels..."
+  },
+  {
+    "id": "prompt_safe_person",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who makes you feel safe? Why?",
+    "placeholder": "I feel safe with..."
+  },
+  {
+    "id": "prompt_weird_habit",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a weird habit you have that no one knows about?",
+    "placeholder": "I secretly..."
+  },
+  {
+    "id": "prompt_childhood_memory",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Tell me about a happy memory from childhood.",
+    "placeholder": "I remember..."
+  },
+  {
+    "id": "prompt_letter_to_stranger",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Write a short letter to a stranger who's going through a hard time.",
+    "placeholder": "Dear stranger..."
+  },
+  {
+    "id": "prompt_changed_mind",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you used to believe that you don't anymore?",
+    "placeholder": "I used to think..."
+  },
+  {
+    "id": "prompt_makes_you_you",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What makes you, you?",
+    "placeholder": "What makes me, me is..."
+  },
+  {
+    "id": "prompt_current_worry",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's your biggest worry right now?",
+    "placeholder": "I'm worried about..."
+  },
+  {
+    "id": "prompt_comfort_food",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your comfort food? What does it remind you of?",
+    "placeholder": "My comfort food is..."
+  },
+  {
+    "id": "prompt_three_words",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Describe your life right now in exactly three words.",
+    "placeholder": "Three words..."
+  },
+  {
+    "id": "prompt_needs_saying",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "What's something that needs to be said that you haven't said yet?",
+    "placeholder": "I need to say..."
+  },
+  {
+    "id": "prompt_learn_about",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's something you'd love to learn more about?",
+    "placeholder": "I want to learn..."
+  },
+  {
+    "id": "prompt_superpower",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "If you had a superpower, what would it be and why?",
+    "placeholder": "My superpower would be..."
+  },
+  {
+    "id": "prompt_brave_recently",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "When's the last time you were brave?",
+    "placeholder": "I was brave when..."
+  },
+  {
+    "id": "prompt_different_ten_years",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "How are you different from who you were 10 years ago?",
+    "placeholder": "I've changed because..."
+  },
+  {
+    "id": "prompt_last_risk",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's the last risk you took?",
+    "placeholder": "I risked..."
+  },
+  {
+    "id": "prompt_home_smell",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What does home smell like to you?",
+    "placeholder": "Home smells like..."
+  },
+  {
+    "id": "prompt_current_relationship",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What relationship in your life needs attention right now?",
+    "placeholder": "I need to focus on..."
+  },
+  {
+    "id": "prompt_secret_dream",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's a secret dream you have that you rarely share?",
+    "placeholder": "Secretly, I dream of..."
+  },
+  {
+    "id": "prompt_holding_onto",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What are you holding onto that you need to let go of?",
+    "placeholder": "I'm holding onto..."
+  },
+  {
+    "id": "prompt_simple_pleasure",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What simple pleasure did you experience today?",
+    "placeholder": "Today I enjoyed..."
+  },
+  {
+    "id": "prompt_thank_body",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Write a thank you note to your body.",
+    "placeholder": "Dear body..."
+  },
+  {
+    "id": "prompt_lost_touch",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who have you lost touch with that you think about sometimes?",
+    "placeholder": "I sometimes think about..."
+  },
+  {
+    "id": "prompt_good_at",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's something you're genuinely good at?",
+    "placeholder": "I'm good at..."
+  },
+  {
+    "id": "prompt_bad_day_help",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What helps you on a bad day?",
+    "placeholder": "On bad days, I..."
+  },
+  {
+    "id": "prompt_time_alone",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What do you do when you're alone that you wouldn't do around others?",
+    "placeholder": "When I'm alone, I..."
+  },
+  {
+    "id": "prompt_conversation_replay",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What conversation do you replay in your head?",
+    "placeholder": "I keep replaying..."
+  },
+  {
+    "id": "prompt_boundary",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What boundary do you need to set?",
+    "placeholder": "I need to set a boundary around..."
+  },
+  {
+    "id": "prompt_last_kind_thing",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's the last kind thing someone did for you?",
+    "placeholder": "Someone was kind when..."
+  },
+  {
+    "id": "prompt_energy_drain",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What drains your energy the most?",
+    "placeholder": "I feel drained by..."
+  },
+  {
+    "id": "prompt_energy_give",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What gives you energy?",
+    "placeholder": "I feel energized by..."
+  },
+  {
+    "id": "prompt_quiet_thought",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's a thought you often have but never say?",
+    "placeholder": "I often think..."
+  },
+  {
+    "id": "prompt_best_advice",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's the best advice you've ever received?",
+    "placeholder": "The best advice was..."
+  },
+  {
+    "id": "prompt_world_problem",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "If you could solve one problem in the world, what would it be?",
+    "placeholder": "I would solve..."
+  },
+  {
+    "id": "prompt_guilty_pleasure",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": false,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your guilty pleasure?",
+    "placeholder": "My guilty pleasure is..."
+  },
+  {
+    "id": "prompt_trusted_advice",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who do you trust to give you advice? Why?",
+    "placeholder": "I trust..."
+  },
+  {
+    "id": "prompt_moment_today",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What was the best moment of your day so far?",
+    "placeholder": "The best moment was..."
+  },
+  {
+    "id": "prompt_most_alive",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "When do you feel most alive?",
+    "placeholder": "I feel most alive when..."
+  },
+  {
+    "id": "prompt_hard_truth",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's a hard truth you've been avoiding?",
+    "placeholder": "The truth is..."
+  },
+  {
+    "id": "prompt_unfinished_business",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What unfinished business weighs on you?",
+    "placeholder": "I still need to..."
+  },
+  {
+    "id": "prompt_say_more_often",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What do you wish you said more often?",
+    "placeholder": "I wish I said..."
+  },
+  {
+    "id": "prompt_wrong_about",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What were you wrong about recently?",
+    "placeholder": "I was wrong about..."
+  },
+  {
+    "id": "prompt_looking_forward",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What are you looking forward to?",
+    "placeholder": "I'm looking forward to..."
+  },
+  {
+    "id": "prompt_name_three_sounds",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Close your eyes. Name three sounds you can hear right now.",
+    "placeholder": "I hear..."
+  },
+  {
+    "id": "prompt_one_word_year",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's one word to describe this year so far?",
+    "placeholder": "This year has been..."
+  },
+  {
+    "id": "prompt_keep_secret",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "DISCOMFORT"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "bestForMoods": [
+      "OKAY",
+      "GOOD",
+      "GREAT"
+    ],
+    "avoidForMoods": [
+      "BAD",
+      "BAD"
+    ],
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you've kept to yourself for too long?",
+    "placeholder": "I've kept..."
+  },
+  {
+    "id": "late_night_thoughts",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "timeOfDayRange": {
+        "startHour": 23,
+        "endHour": 4
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "It's late. What's keeping you up?",
+    "placeholder": "I'm up because..."
+  },
+  {
+    "id": "early_morning_intention",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "timeOfDayRange": {
+        "startHour": 5,
+        "endHour": 8
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Good morning. What's one intention for today?",
+    "placeholder": "Today I intend to..."
+  },
+  {
+    "id": "been_away_check_in",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "daysSinceLastSession": 3
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "It's been a few days. How have you been?",
+    "placeholder": "I've been..."
+  },
+  {
+    "id": "year_end_reflection",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "As the year winds down, what moment from this year would you want to remember forever?",
+    "placeholder": "This year, I'll always remember..."
+  },
+  {
+    "id": "year_lessons_learned",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something this year taught you that you didn't expect to learn?",
+    "placeholder": "I learned..."
+  },
+  {
+    "id": "year_end_gratitude",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who made your year better? Send them a thank you message right now if you can.",
+    "placeholder": "This person made my year better..."
+  },
+  {
+    "id": "year_end_letter_to_future",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 12
+      },
+      "dayOfMonthRange": {
+        "startDay": 26,
+        "endDay": 31
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Write a note to yourself to read next December. What do you hope will be true?",
+    "placeholder": "Dear future me..."
+  },
+  {
+    "id": "year_end_letting_go",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What are you ready to leave behind in this year?",
+    "placeholder": "I'm ready to let go of..."
+  },
+  {
+    "id": "new_year_intentions",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 1
+      },
+      "dayOfMonthRange": {
+        "startDay": 28,
+        "endDay": 7
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Forget resolutions. What's one word you want to guide your new year?",
+    "placeholder": "My word for the new year is..."
+  },
+  {
+    "id": "new_year_first_week",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 1,
+        "endMonth": 1
+      },
+      "dayOfMonthRange": {
+        "startDay": 1,
+        "endDay": 7
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Happy new year! How does a fresh start feel right now?",
+    "placeholder": "A fresh start feels..."
+  },
+  {
+    "id": "january_fresh_energy",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 1,
+        "endMonth": 1
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "January energy can be hopeful or heavy. Which is it for you right now?",
+    "placeholder": "Right now January feels..."
+  },
+  {
+    "id": "january_small_step",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 1,
+        "endMonth": 1
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's one tiny step you could take today toward something you want?",
+    "placeholder": "One small step I could take..."
+  },
+  {
+    "id": "first_of_month_intention",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "dayOfMonthRange": {
+        "startDay": 1,
+        "endDay": 3
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "New month, new page. What's one thing you want to make happen this month?",
+    "placeholder": "This month I want to..."
+  },
+  {
+    "id": "end_of_month_reflection",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "dayOfMonthRange": {
+        "startDay": 28,
+        "endDay": 31
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "The month is almost over. What surprised you about it?",
+    "placeholder": "This month surprised me with..."
+  },
+  {
+    "id": "winter_cozy_moment",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "allowsPhoto": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's bringing you warmth today (literally or figuratively)?",
+    "placeholder": "What's warming me is..."
+  },
+  {
+    "id": "winter_hibernation_check",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Winter can be a time to slow down. What are you resting from?",
+    "placeholder": "I'm resting from..."
+  },
+  {
+    "id": "winter_indoor_joy",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 12,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's something you enjoy that's best done indoors?",
+    "placeholder": "I enjoy..."
+  },
+  {
+    "id": "spring_new_beginning",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 3,
+        "endMonth": 5
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Spring is about new growth. What's trying to bloom in your life right now?",
+    "placeholder": "What's growing in me is..."
+  },
+  {
+    "id": "spring_clean_mind",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 3,
+        "endMonth": 5
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Time for a mental spring cleaning. What thought pattern could you let go of?",
+    "placeholder": "I could let go of thinking..."
+  },
+  {
+    "id": "spring_outside",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 3,
+        "endMonth": 5
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "allowsPhoto": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Go outside for 5 minutes. Notice something that's changed since winter.",
+    "placeholder": "I noticed..."
+  },
+  {
+    "id": "summer_adventure",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 6,
+        "endMonth": 8
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's your ideal summer day look like? Have you had one yet?",
+    "placeholder": "My ideal summer day..."
+  },
+  {
+    "id": "summer_memory",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 6,
+        "endMonth": 8
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's a favorite summer memory from when you were younger?",
+    "placeholder": "I remember..."
+  },
+  {
+    "id": "summer_slow_down",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 6,
+        "endMonth": 8
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Summer energy can be intense. Take 2 minutes to just... be still. What do you notice?",
+    "placeholder": "I notice..."
+  },
+  {
+    "id": "fall_letting_go",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 9,
+        "endMonth": 11
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Trees release their leaves in fall. What could you release?",
+    "placeholder": "I could release..."
+  },
+  {
+    "id": "fall_gratitude_harvest",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 9,
+        "endMonth": 11
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Fall is harvest season. What have you 'harvested' from your efforts this year?",
+    "placeholder": "I've harvested..."
+  },
+  {
+    "id": "fall_cozy_ritual",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 9,
+        "endMonth": 11
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your favorite cozy fall ritual?",
+    "placeholder": "My cozy ritual is..."
+  },
+  {
+    "id": "holiday_boundary",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 11,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Holiday season can be overwhelming. What's one boundary you need to protect?",
+    "placeholder": "I need to protect..."
+  },
+  {
+    "id": "holiday_meaning",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 11,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Beyond the commercial stuff, what does this time of year actually mean to you?",
+    "placeholder": "This time of year means..."
+  },
+  {
+    "id": "holiday_tradition",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 11,
+        "endMonth": 12
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's a tradition (old or new) that actually feels meaningful to you?",
+    "placeholder": "A meaningful tradition is..."
+  },
+  {
+    "id": "february_self_love",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 2,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Forget romantic love for a second. What's one way you could show yourself more love?",
+    "placeholder": "I could show myself love by..."
+  },
+  {
+    "id": "february_love_letter_self",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "HEAVY",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 2,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "LONG"
+    },
+    "instruction": "Write yourself a short love letter. What would you want to hear?",
+    "placeholder": "Dear me..."
+  },
+  {
+    "id": "february_connection",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 2,
+        "endMonth": 2
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who's someone who makes you feel seen? Have you told them lately?",
+    "placeholder": "Someone who sees me is..."
+  },
+  {
+    "id": "midyear_checkin",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 6,
+        "endMonth": 7
+      },
+      "dayOfMonthRange": {
+        "startDay": 15,
+        "endDay": 15
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "We're about halfway through the year. How's it going, honestly?",
+    "placeholder": "Honestly, this year has been..."
+  },
+  {
+    "id": "midyear_course_correct",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "conditions": {
+      "monthRange": {
+        "startMonth": 6,
+        "endMonth": 7
+      }
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "If you could course-correct one thing in the second half of this year, what would it be?",
+    "placeholder": "I'd like to change..."
+  },
+  {
+    "id": "crossword_challenge",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Complete today's crossword. No pressure, just play.",
+    "placeholder": "How'd it go?"
+  },
+  {
+    "id": "crossword_one_clue",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Try the crossword. Even solving one clue counts as a win.",
+    "placeholder": "I got..."
+  },
+  {
+    "id": "crossword_new_word",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play the crossword. Did you learn any new words?",
+    "placeholder": "I learned..."
+  },
+  {
+    "id": "wordle_daily",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Time for Wordle. What's your starting word strategy?",
+    "placeholder": "I usually start with..."
+  },
+  {
+    "id": "wordle_share",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play Wordle. Share your grid (no spoilers!) with someone.",
+    "placeholder": "I got it in..."
+  },
+  {
+    "id": "wordle_brain_warm",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Warm up your brain with a quick Wordle.",
+    "placeholder": "That was..."
+  },
+  {
+    "id": "pong_quick_game",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play a quick round of Pong. Classic never dies.",
+    "placeholder": "I scored..."
+  },
+  {
+    "id": "pong_beat_score",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Try to beat your Pong high score. You've got this.",
+    "placeholder": "My score was..."
+  },
+  {
+    "id": "pong_zen_mode",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play Pong for a few minutes. Just focus on the ball. Nothing else.",
+    "placeholder": "That felt..."
+  },
+  {
+    "id": "game_break",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Take a quick game break. Pick any game here and just play.",
+    "placeholder": "I played..."
+  },
+  {
+    "id": "game_childhood_memory",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What game did you love playing as a kid? Why that one?",
+    "placeholder": "I loved playing..."
+  },
+  {
+    "id": "game_stress_relief",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Stressed? Play a quick game. It's okay to take a break.",
+    "placeholder": "After playing I feel..."
+  },
+  {
+    "id": "game_focus_exercise",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Games can sharpen focus. Pick one and give it your full attention.",
+    "placeholder": "I noticed my focus..."
+  },
+  {
+    "id": "game_just_for_fun",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "No goals, no scores to beat. Just play something for fun.",
+    "placeholder": "That was..."
+  },
+  {
+    "id": "game_new_strategy",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Try a game with a completely different strategy than usual.",
+    "placeholder": "I tried..."
+  },
+  {
+    "id": "word_game_favorite",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a word you learned from a game that stuck with you?",
+    "placeholder": "A word I learned..."
+  },
+  {
+    "id": "word_play_creativity",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Make up a word that should exist but doesn't. What does it mean?",
+    "placeholder": "My made-up word is..."
+  },
+  {
+    "id": "game_personal_best",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Challenge yourself. Try to set a new personal best in any game.",
+    "placeholder": "My new record..."
+  },
+  {
+    "id": "game_three_rounds",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play three quick rounds of something. Best of three against yourself.",
+    "placeholder": "Results:"
+  },
+  {
+    "id": "game_losing_gracefully",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Games teach us to lose gracefully. What's something you've 'lost' at lately that was actually okay?",
+    "placeholder": "I lost at..."
+  },
+  {
+    "id": "game_mindful_play",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play a game slowly. Notice your breathing. Notice your reactions.",
+    "placeholder": "I noticed..."
+  },
+  {
+    "id": "game_before_bed",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "timeOfDay": "EVENING"
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Wind down with a relaxing game before bed.",
+    "placeholder": "That helped me..."
+  },
+  {
+    "id": "game_morning_wake",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "timeOfDay": "MORNING"
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Wake up your brain with a quick puzzle or word game.",
+    "placeholder": "Now I feel..."
+  },
+  {
+    "id": "game_share_score",
+    "type": "GAME",
+    "categories": [
+      "PLAY",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play a game and text someone your score. Challenge them to beat it.",
+    "placeholder": "I challenged..."
+  },
+  {
+    "id": "game_teach_someone",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Think of someone who might enjoy a game you like. Would you teach them?",
+    "placeholder": "I'd teach..."
+  },
+  {
+    "id": "puzzle_satisfaction",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's satisfying about solving a puzzle?",
+    "placeholder": "The satisfaction comes from..."
+  },
+  {
+    "id": "puzzle_stuck",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "When you're stuck on a puzzle, what's your approach? Does that apply to life problems too?",
+    "placeholder": "When I'm stuck, I..."
+  },
+  {
+    "id": "game_two_minutes",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "You have 2 minutes. Go play something. Now.",
+    "placeholder": "Done!"
+  },
+  {
+    "id": "game_celebrate_win",
+    "type": "GAME",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Play until you win something. Then actually celebrate it.",
+    "placeholder": "I won!"
+  },
+  {
+    "id": "creativity_doodle_mood",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Doodle your current mood without thinking too hard.",
+    "placeholder": ""
+  },
+  {
+    "id": "creativity_dream_room",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Describe your dream room. What's in it? What does it smell like?",
+    "placeholder": "My dream room has..."
+  },
+  {
+    "id": "creativity_six_word_story",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Write a six-word story about your life right now.",
+    "placeholder": "Six words:"
+  },
+  {
+    "id": "creativity_alternate_ending",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Think of something that happened today. Write an alternate ending.",
+    "placeholder": "What if instead..."
+  },
+  {
+    "id": "creativity_name_that_color",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Look around. Find a color and give it a brand new name.",
+    "placeholder": "I call this color..."
+  },
+  {
+    "id": "creativity_haiku_now",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Write a haiku about this exact moment. 5-7-5 syllables.",
+    "placeholder": "Line 1 / Line 2 / Line 3"
+  },
+  {
+    "id": "creativity_invent_holiday",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Invent a holiday. What's it called? How do people celebrate?",
+    "placeholder": "My holiday is..."
+  },
+  {
+    "id": "creativity_draw_invention",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw an invention that would make your life easier.",
+    "placeholder": ""
+  },
+  {
+    "id": "creativity_movie_title",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "If today were a movie, what would the title be?",
+    "placeholder": "Today's movie title:"
+  },
+  {
+    "id": "creativity_texture_story",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Touch something near you. Describe how it feels in the weirdest way possible.",
+    "placeholder": "It feels like..."
+  },
+  {
+    "id": "creativity_superhero_power",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "You get one superpower but it's incredibly specific. What is it?",
+    "placeholder": "My very specific superpower is..."
+  },
+  {
+    "id": "creativity_draw_future_self",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw yourself 5 years from now. What do you look like?",
+    "placeholder": ""
+  },
+  {
+    "id": "creativity_emoji_story",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Tell me about your day using only 5 emojis.",
+    "placeholder": "My day in emojis:"
+  },
+  {
+    "id": "creativity_letter_from_object",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Pick an object near you. Write a short letter from its perspective.",
+    "placeholder": "Dear human..."
+  },
+  {
+    "id": "creativity_new_constellation",
+    "type": "DRAWING",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsDrawing": true
+    },
+    "instruction": "Draw a new constellation and name it.",
+    "placeholder": ""
+  },
+  {
+    "id": "wellness_body_scan",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Quick body scan: where are you holding tension right now?",
+    "placeholder": "I'm holding tension in..."
+  },
+  {
+    "id": "wellness_water_check",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Have you had enough water today? Go drink some now.",
+    "placeholder": "Done! I feel..."
+  },
+  {
+    "id": "wellness_posture_check",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Check your posture. Roll your shoulders back. Unclench your jaw.",
+    "placeholder": "Adjusted!"
+  },
+  {
+    "id": "wellness_sleep_reflect",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "How did you sleep last night? What affected it?",
+    "placeholder": "Last night I slept..."
+  },
+  {
+    "id": "wellness_energy_level",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Rate your energy right now 1-10. What would move it up one notch?",
+    "placeholder": "My energy is... I could..."
+  },
+  {
+    "id": "wellness_one_nice_thing",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's one nice thing you could do for your body today?",
+    "placeholder": "I could..."
+  },
+  {
+    "id": "wellness_screen_break",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Look away from all screens. Focus on something 20 feet away for 20 seconds.",
+    "placeholder": "I looked at..."
+  },
+  {
+    "id": "wellness_meal_mindful",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What was the last thing you ate? Did you actually taste it?",
+    "placeholder": "I ate... and it tasted..."
+  },
+  {
+    "id": "wellness_fresh_air",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Open a window or step outside. Take 5 deep breaths of fresh air.",
+    "placeholder": "That felt..."
+  },
+  {
+    "id": "wellness_comfort_item",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's something that always makes you feel physically comfortable?",
+    "placeholder": "I feel comfortable when..."
+  },
+  {
+    "id": "wellness_stress_where",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Where does stress show up in your body? Shoulders? Stomach? Somewhere else?",
+    "placeholder": "I feel stress in my..."
+  },
+  {
+    "id": "wellness_movement_joy",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What type of movement actually feels good to you (not should, but does)?",
+    "placeholder": "Movement I enjoy..."
+  },
+  {
+    "id": "wellness_check_in_honest",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Honest check-in: How are you really doing today? Mind and body.",
+    "placeholder": "Honestly, I'm..."
+  },
+  {
+    "id": "action_dance_30sec",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Dance for 30 seconds. No one's watching. Or they are. Who cares.",
+    "placeholder": "That was..."
+  },
+  {
+    "id": "action_tidy_one_thing",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Tidy one small thing near you. Just one.",
+    "placeholder": "I tidied..."
+  },
+  {
+    "id": "action_text_someone",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Text someone you haven't talked to in a while. Just say hi.",
+    "placeholder": "I texted..."
+  },
+  {
+    "id": "action_walk_around",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Get up and walk around for 2 minutes. Anywhere counts.",
+    "placeholder": "I walked..."
+  },
+  {
+    "id": "action_compliment",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Give someone a genuine compliment today. In person or by message.",
+    "placeholder": "I told someone..."
+  },
+  {
+    "id": "action_change_location",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Move to a different spot. Different room, different chair, outside. Just shift.",
+    "placeholder": "I moved to..."
+  },
+  {
+    "id": "action_sing_something",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Sing a few lines of any song. Out loud. Volume optional.",
+    "placeholder": "I sang..."
+  },
+  {
+    "id": "action_make_your_bed",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "conditions": {
+      "timeOfDay": "MORNING"
+    },
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "If you haven't already, go make your bed. It takes 2 minutes.",
+    "placeholder": "Done!"
+  },
+  {
+    "id": "action_jump",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Jump up and down 10 times. Shake things loose.",
+    "placeholder": "Now I feel..."
+  },
+  {
+    "id": "action_send_photo",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Send someone a photo of something you see right now. No context needed.",
+    "placeholder": "I sent a photo of..."
+  },
+  {
+    "id": "action_hold_plank",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Hold a plank for as long as you can. How long did you last?",
+    "placeholder": "I held it for..."
+  },
+  {
+    "id": "action_smile_mirror",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Find a mirror. Smile at yourself. Mean it.",
+    "placeholder": "That felt..."
+  },
+  {
+    "id": "action_declutter_five",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Find 5 things you don't need. Put them in a donation pile.",
+    "placeholder": "I found..."
+  },
+  {
+    "id": "social_thinking_of_you",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Send a 'thinking of you' message to someone. That's it.",
+    "placeholder": "I messaged..."
+  },
+  {
+    "id": "social_who_needs_checkin",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Who in your life might need a check-in right now?",
+    "placeholder": "I should check on..."
+  },
+  {
+    "id": "social_gratitude_text",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Text someone and tell them one specific thing you appreciate about them.",
+    "placeholder": "I told them I appreciate..."
+  },
+  {
+    "id": "social_old_friend",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who's an old friend you've lost touch with? What do you miss about them?",
+    "placeholder": "I miss..."
+  },
+  {
+    "id": "social_ask_for_help",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something you could ask for help with? Who could you ask?",
+    "placeholder": "I could ask for help with..."
+  },
+  {
+    "id": "social_last_laugh",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "When did you last really laugh with someone? What happened?",
+    "placeholder": "We laughed about..."
+  },
+  {
+    "id": "social_recommend_something",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Recommend a song, show, or book to someone who'd love it.",
+    "placeholder": "I recommended..."
+  },
+  {
+    "id": "social_inside_joke",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's an inside joke you have with someone? (You don't have to explain it)",
+    "placeholder": "The inside joke is..."
+  },
+  {
+    "id": "social_learned_from",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who's someone who taught you something important? Have you told them?",
+    "placeholder": "I learned from..."
+  },
+  {
+    "id": "social_safe_person",
+    "type": "PROMPT",
+    "categories": [
+      "SOCIAL",
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who's someone you feel completely safe with? What makes them that person?",
+    "placeholder": "I feel safe with..."
+  },
+  {
+    "id": "social_voice_note",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Send someone a voice note instead of a text. It's more personal.",
+    "placeholder": "I sent a voice note to..."
+  },
+  {
+    "id": "social_memory_share",
+    "type": "INSTRUCTION",
+    "categories": [
+      "SOCIAL"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Share a memory with someone who was there. 'Remember when...'",
+    "placeholder": "I reminded them about..."
+  },
+  {
+    "id": "stillness_breath_count",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Take 10 slow breaths. Count each exhale. Start now.",
+    "placeholder": "After 10 breaths I feel..."
+  },
+  {
+    "id": "stillness_one_minute_silence",
+    "type": "WAIT_TIMER",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Sit in complete silence for one minute. Just be.",
+    "placeholder": "That was..."
+  },
+  {
+    "id": "stillness_notice_sounds",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Close your eyes. Name 5 different sounds you can hear.",
+    "placeholder": "I heard..."
+  },
+  {
+    "id": "stillness_feet_on_ground",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Feel your feet on the ground. Really feel them. Wiggle your toes.",
+    "placeholder": "I notice..."
+  },
+  {
+    "id": "stillness_box_breathing",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Box breathing: Breathe in 4 seconds, hold 4, out 4, hold 4. Repeat 4 times.",
+    "placeholder": "After box breathing..."
+  },
+  {
+    "id": "stillness_watch_clouds",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "If you can, look at the sky. Watch it for a full minute.",
+    "placeholder": "The sky looked..."
+  },
+  {
+    "id": "stillness_hands_rest",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Place your hands palm-down on your thighs. Feel their weight. Rest.",
+    "placeholder": "That felt..."
+  },
+  {
+    "id": "stillness_here_now",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's true right here, right now, in this exact moment?",
+    "placeholder": "Right now..."
+  },
+  {
+    "id": "stillness_letting_thoughts_pass",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "For 2 minutes, notice your thoughts but don't follow them. Let them pass like clouds.",
+    "placeholder": "I noticed thoughts about..."
+  },
+  {
+    "id": "stillness_single_object",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Pick one object. Look at it for 30 seconds like you've never seen it before.",
+    "placeholder": "I noticed..."
+  },
+  {
+    "id": "gratitude_three_things",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Name three things you're grateful for right now. Be specific.",
+    "placeholder": "1. 2. 3."
+  },
+  {
+    "id": "gratitude_body_part",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a body part you're grateful for? Why that one?",
+    "placeholder": "I'm grateful for my..."
+  },
+  {
+    "id": "gratitude_small_thing",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's a tiny thing you're grateful for that most people overlook?",
+    "placeholder": "A small thing I appreciate..."
+  },
+  {
+    "id": "gratitude_challenge",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something difficult that you're secretly grateful for?",
+    "placeholder": "I'm grateful for the challenge of..."
+  },
+  {
+    "id": "gratitude_person_unsaid",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "SOCIAL"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "Who deserves your thanks but hasn't heard it? What would you say?",
+    "placeholder": "I'd thank..."
+  },
+  {
+    "id": "gratitude_past_self",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What's something your past self did that you're now grateful for?",
+    "placeholder": "Thanks to past me for..."
+  },
+  {
+    "id": "gratitude_senses",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's one thing you can see, hear, or smell right now that you appreciate?",
+    "placeholder": "I appreciate..."
+  },
+  {
+    "id": "music_current_mood",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY",
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What song matches your mood right now?",
+    "placeholder": "My mood song is..."
+  },
+  {
+    "id": "music_memory_song",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "What song instantly takes you back to a specific memory?",
+    "placeholder": "When I hear... I remember..."
+  },
+  {
+    "id": "music_listen_fully",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "MEDIUM",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Put on a song and actually listen to it. All of it. Nothing else.",
+    "placeholder": "I listened to... and noticed..."
+  },
+  {
+    "id": "music_hum_something",
+    "type": "INSTRUCTION",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Hum the first song that comes to mind. What was it?",
+    "placeholder": "I hummed..."
+  },
+  {
+    "id": "music_soundtrack_life",
+    "type": "PROMPT",
+    "categories": [
+      "PLAY"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "MEDIUM"
+    },
+    "instruction": "If your life had a soundtrack, what would be playing right now?",
+    "placeholder": "My life soundtrack is..."
+  },
+  {
+    "id": "music_childhood_song",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What song reminds you of childhood?",
+    "placeholder": "From my childhood..."
+  },
+  {
+    "id": "audio_record_thought",
+    "type": "AUDIO_CAPTURE",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsVoice": true
+    },
+    "instruction": "Record a quick voice note to yourself. What's on your mind?",
+    "placeholder": ""
+  },
+  {
+    "id": "sound_favorite",
+    "type": "PROMPT",
+    "categories": [
+      "REFLECTION"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your favorite sound? Not music - just a sound.",
+    "placeholder": "My favorite sound is..."
+  },
+  {
+    "id": "body_temperature",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Are you warm enough? Too warm? What would feel better?",
+    "placeholder": "Right now I feel..."
+  },
+  {
+    "id": "body_hands_doing",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Look at your hands. What have they done today?",
+    "placeholder": "My hands have..."
+  },
+  {
+    "id": "body_face_tension",
+    "type": "INSTRUCTION",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Relax your forehead. Relax your jaw. Relax your tongue from the roof of your mouth.",
+    "placeholder": "That felt..."
+  },
+  {
+    "id": "body_shake_it",
+    "type": "INSTRUCTION",
+    "categories": [
+      "ACTION",
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Stand up and shake your whole body for 15 seconds. Get weird with it.",
+    "placeholder": "Now I feel..."
+  },
+  {
+    "id": "body_heart_rate",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "Put your hand on your chest. Feel your heartbeat. Is it fast or slow?",
+    "placeholder": "My heartbeat is..."
+  },
+  {
+    "id": "body_favorite_stretch",
+    "type": "PROMPT",
+    "categories": [
+      "STILLNESS"
+    ],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {
+      "allowsText": true,
+      "expectedLength": "SHORT"
+    },
+    "instruction": "What's your favorite stretch? Do it now.",
+    "placeholder": "I stretched my..."
+  }
+]

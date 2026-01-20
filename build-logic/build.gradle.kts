@@ -30,6 +30,7 @@ dependencies {
     compileOnly(libs.compose.gradlePlugin)
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
     api(libs.ksp.gradlePlugin)
+    api(libs.androidx.room.gradlePlugin)
     api(libs.kotlinx.serialization.gradlePlugin)
     api(libs.buildconfig.gradlePlugin)
 }

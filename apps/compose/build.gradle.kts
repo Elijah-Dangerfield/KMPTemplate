@@ -39,6 +39,10 @@ kotlin {
             implementation(projects.features.home.impl)
             implementation(projects.features.onboarding)
             implementation(projects.features.onboarding.impl)
+            implementation(projects.features.tasks)
+            implementation(projects.features.tasks.impl)
+
+            implementation(libs.atomicfu)
             
             implementation(compose.runtime)
             implementation(compose.foundation)

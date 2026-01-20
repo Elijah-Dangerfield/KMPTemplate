@@ -15,6 +15,8 @@ struct iOSApp: App {
             nativeViewFactory: nativeViewFactory
         )
         iOSAppComponent.telemetry.initialize()
+        // Force eager initialization of lifecycle observer
+        _ = iOSAppComponent.appEventDispatcher
     }
     
     var body: some Scene {

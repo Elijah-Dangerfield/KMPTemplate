@@ -1,9 +1,6 @@
 Agent Notes: 
 
-This is a KMP app for splitting dinner bills. I plan to use on device OCR. Probably ML fit from firebase. And then use shared kotlin logic to parse that into line items in a bill that add up to the total
-
-
-There’s are lots of different rule options that you can apply to app groups. There’s a scheduled block. EX: Im only allowed to use my social app group on weekend from 9am-10am and then 7pm - 10pm. There’s also pause rules. Like wait 5 seconds before opening instagram (which in reality instagram is blocked, you just have to open he app and unlock the group, but you can’t click unlock until you wait). You can do that same idea with making them solve a math question or watch a video, or type a message etc. Theres also app time limits and app open max counts. When you reach your limits the app is blocked. Depending on the RuleConfig you might be able to temporarily lift that block to continue using. Otherwise you have to completely lift your rule, Which is a violation that triggers a donation. Okay so you get the idea now. Tech Stack: 
+Tech stack:
 - Kotlin Multi Platform
 - Compose Multi Platform
 - Skie (plugin for KMP)

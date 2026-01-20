@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavGraphBuilder
+import com.dangerfield.goodtimes.features.onboarding.impl.OnboardingCopy
 import com.dangerfield.goodtimes.libraries.navigation.AnimationType
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
 import com.dangerfield.goodtimes.libraries.navigation.Route
@@ -90,7 +91,7 @@ fun SplashScreen(
             CircularProgressIndicator()
         } else {
             TypewriterTextEffect(
-                text = "The App of Good Times",
+                text = OnboardingCopy.appTitle,
                 minDelayInMillis = 50,
                 maxDelayInMillis = 150,
                 minCharacterChunk = 1,

@@ -47,7 +47,7 @@ fun ListSection(
     title: String? = null,
     supportingText: String? = null,
     backgroundColor: ColorResource = AppTheme.colors.surfacePrimary,
-    dividerColor: ColorResource = AppTheme.colors.borderSecondary,
+    dividerColor: ColorResource = AppTheme.colors.border,
 ) {
     if (items.isEmpty()) return
 
@@ -246,7 +246,7 @@ object ListItemDefaults {
     }
 
     @Composable
-    fun headlineTypography(): TypographyResource = AppTheme.typography.Body.B700
+    fun headlineTypography(): TypographyResource = AppTheme.typography.Body.B700.SemiBold
 
     @Composable
     fun supportingTypography(): TypographyResource = AppTheme.typography.Body.B500

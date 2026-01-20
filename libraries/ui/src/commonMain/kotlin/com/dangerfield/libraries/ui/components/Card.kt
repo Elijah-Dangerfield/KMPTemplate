@@ -7,17 +7,20 @@ import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.goodtimes.system.Radii
 import com.dangerfield.libraries.ui.Elevation
+import com.dangerfield.libraries.ui.system.color.ColorResource
 
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
+    color: ColorResource? = AppTheme.colors.surfacePrimary,
+    contentColor: ColorResource = AppTheme.colors.onSurfacePrimary,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Surface(
         modifier = modifier,
-        color = AppTheme.colors.surfacePrimary,
-        contentColor = AppTheme.colors.onSurfacePrimary,
+        color = color,
+        contentColor = contentColor,
         onClick = onClick ?: {},
         bounceScale = if (onClick != null) 0.9f else 1f,
         elevation = Elevation.Button,

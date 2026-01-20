@@ -14,6 +14,7 @@ kotlin {
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.ui)
             implementation(projects.libraries.flowroutines)
+            implementation(projects.libraries.goodtimes)
             api(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
         }

@@ -51,10 +51,6 @@ class AppViewModel(
             }
         }
     }
-
-    private suspend fun Action.load() {
-
-    }
 }
 
 

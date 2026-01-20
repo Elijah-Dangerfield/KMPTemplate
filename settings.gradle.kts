@@ -44,6 +44,8 @@ include(":features:home")
 include(":features:home:impl")
 include(":features:onboarding")
 include(":features:onboarding:impl")
+include(":features:tasks")
+include(":features:tasks:impl")
 
 
 // Libraries

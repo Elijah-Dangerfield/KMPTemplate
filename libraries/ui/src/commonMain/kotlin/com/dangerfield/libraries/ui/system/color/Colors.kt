@@ -88,16 +88,16 @@ val defaultColors = object : Colors {
     override val textDisabled = ColorResource.Ink400
     override val danger = ColorResource.Mahogany600
     // Cream/parchment surfaces for that aged paper feel
-    override val surfacePrimary = ColorResource.Parchment100
-    override val surfaceDisabled = ColorResource.Parchment300
+    override val surfacePrimary = ColorResource.Parchment200
+    override val surfaceDisabled = ColorResource.Parchment500
     override val onSurfacePrimary = ColorResource.Ink900
-    override val surfaceSecondary = ColorResource.Parchment200
+    override val surfaceSecondary = ColorResource.Parchment400
     override val onSurfaceSecondary = ColorResource.Ink800
-    override val surfaceTertiary = ColorResource.Parchment300
+    override val surfaceTertiary = ColorResource.Sepia400
     override val onSurfaceTertiary = ColorResource.Ink700
     override val onSurfaceDisabled = ColorResource.Ink400
     // Light cream background like book pages
-    override val background = ColorResource.Parchment100
+    override val background = ColorResource.Parchment300
     override val onBackground = ColorResource.Ink900
     override val border = ColorResource.Parchment400
     override val borderSecondary = ColorResource.Sepia400
@@ -322,6 +322,14 @@ private fun SurfaceStack(colors: Colors) {
                 title = "Tertiary",
                 background = colors.surfaceTertiary,
                 foreground = colors.onSurfaceTertiary,
+                border = colors.border,
+                supporting = colors.surfaceTertiary.toHexString()
+            )
+
+            SurfaceCard(
+                title = "Disabled",
+                background = colors.surfaceDisabled,
+                foreground = colors.onSurfaceDisabled,
                 border = colors.border,
                 supporting = colors.surfaceTertiary.toHexString()
             )

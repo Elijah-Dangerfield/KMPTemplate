@@ -16,7 +16,7 @@ import kotlin.math.min
 
 fun Modifier.fadingEdge(
     scrollState: ScrollState,
-    startHeight: Dp = Dimension.D1500,
+    startHeight: Dp = Dimension.D500,
     ): Modifier = this.composed {
 
     val color = AppTheme.colors.background.color

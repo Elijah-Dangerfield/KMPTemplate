@@ -1,20 +1,67 @@
 package com.dangerfield.goodtimes.features.onboarding.impl
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
 import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.goodtimes.system.VerticalSpacerD1000
-import com.dangerfield.goodtimes.system.VerticalSpacerD500
 import com.dangerfield.goodtimes.system.VerticalSpacerD800
+import com.dangerfield.goodtimes.system.typography.TypographyResource
 import com.dangerfield.libraries.ui.PreviewContent
 import com.dangerfield.libraries.ui.components.text.Text
-import com.dangerfield.libraries.ui.components.text.TypewriterTextEffect
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
+private const val ANIMATION_DURATION_MS = 500
+private const val MS_PER_CHARACTER = 30L // ~33 chars per second reading speed
+private const val MIN_DELAY_MS = 600L // minimum delay between items
+private const val MAX_DELAY_MS = 2500L // cap for long text
+
+private fun calculateDelayForText(text: String): Long {
+    val calculated = text.length * MS_PER_CHARACTER
+    return calculated.coerceIn(MIN_DELAY_MS, MAX_DELAY_MS)
+}
+
+@Composable
+private fun StaggeredText(
+    text: String,
+    index: Int,
+    visibleCount: Int,
+    typography: TypographyResource,
+    modifier: Modifier = Modifier
+) {
+    val isVisible = index < visibleCount
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(ANIMATION_DURATION_MS)
+    )
+    val offsetY by animateFloatAsState(
+        targetValue = if (isVisible) 0f else 20f,
+        animationSpec = tween(ANIMATION_DURATION_MS)
+    )
+
+    Text(
+        text = text,
+        typography = typography,
+        modifier = modifier
+            .alpha(alpha)
+            .offset(y = offsetY.dp)
+    )
+}
 
 @Composable
 internal fun OnboardingPageContent(
@@ -32,34 +79,53 @@ internal fun OnboardingPageContent(
 
 @Composable
 internal fun IntroPage(
-    onTypewriterComplete: () -> Unit = {}
+    animationsEnabled: Boolean = true,
+    onAnimationComplete: () -> Unit = {}
 ) {
-    OnboardingPageContent {
-        TypewriterTextEffect(
-            text = "Hello.",
-            minDelayInMillis = 75,
-            maxDelayInMillis = 150,
-            maxCharacterChunk = 1,
-            onEffectCompleted = onTypewriterComplete
-        ) { displayedText ->
-            Text(
-                text = displayedText,
-                typography = AppTheme.typography.Display.D1100
-            )
+    val texts = OnboardingCopy.introTexts
+    var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
+
+    LaunchedEffect(animationsEnabled) {
+        if (!animationsEnabled) {
+            onAnimationComplete()
+            return@LaunchedEffect
         }
+        // First item shows immediately
+        visibleCount++
+        // Subsequent items delay based on previous text length
+        for (i in 0 until texts.size - 1) {
+            delay(calculateDelayForText(texts[i]))
+            visibleCount++
+        }
+        onAnimationComplete()
+    }
+
+    OnboardingPageContent {
+        StaggeredText(
+            text = texts[0],
+            index = 0,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Display.D1100
+        )
         VerticalSpacerD800()
-        Text(
-            text = "I am the App of Good Times.",
+        StaggeredText(
+            text = texts[1],
+            index = 1,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "I used to be a book (change is growth). Someone found me in a trash can, read me, did what I asked, and when they got to the end, I asked them to share me with others.",
+        StaggeredText(
+            text = texts[2],
+            index = 2,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "So here I am.",
+        StaggeredText(
+            text = texts[3],
+            index = 3,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
     }
@@ -67,28 +133,44 @@ internal fun IntroPage(
 
 @Composable
 internal fun WhatIKnowPage(
-    onTypewriterComplete: () -> Unit = {}
+    animationsEnabled: Boolean = true,
+    onAnimationComplete: () -> Unit = {}
 ) {
-    OnboardingPageContent {
-        TypewriterTextEffect(
-            text = "I don't know very much.",
-            minDelayInMillis = 50,
-            maxDelayInMillis = 150,
-            onEffectCompleted = onTypewriterComplete
-        ) { displayedText ->
-            Text(
-                text = displayedText,
-                typography = AppTheme.typography.Display.D1100
-            )
+    val texts = OnboardingCopy.whatIKnowTexts
+    var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
+
+    LaunchedEffect(animationsEnabled) {
+        if (!animationsEnabled) {
+            onAnimationComplete()
+            return@LaunchedEffect
         }
+        visibleCount++
+        for (i in 0 until texts.size - 1) {
+            delay(calculateDelayForText(texts[i]))
+            visibleCount++
+        }
+        onAnimationComplete()
+    }
+
+    OnboardingPageContent {
+        StaggeredText(
+            text = texts[0],
+            index = 0,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Display.D1100
+        )
         VerticalSpacerD800()
-        Text(
-            text = "I know math. I know that holding your breath feels like something. I know that bodies get heavy when they're tired and light when they laugh. I know that people talk to themselves when they think no one is listening.",
+        StaggeredText(
+            text = texts[1],
+            index = 1,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "I know what it's like to be put down and forgotten. And I know what it's like to be picked back up.",
+        StaggeredText(
+            text = texts[2],
+            index = 2,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
     }
@@ -96,23 +178,37 @@ internal fun WhatIKnowPage(
 
 @Composable
 internal fun UnderstandingYouPage(
-    onTypewriterComplete: () -> Unit = {}
+    animationsEnabled: Boolean = true,
+    onAnimationComplete: () -> Unit = {}
 ) {
-    OnboardingPageContent {
-        TypewriterTextEffect(
-            text = "I don't know what it's like to be you. Not yet.",
-            minDelayInMillis = 50,
-            maxDelayInMillis = 150,
-            onEffectCompleted = onTypewriterComplete
-        ) { displayedText ->
-            Text(
-                text = displayedText,
-                typography = AppTheme.typography.Display.D1100
-            )
+    val texts = OnboardingCopy.understandingYouTexts
+    var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
+
+    LaunchedEffect(animationsEnabled) {
+        if (!animationsEnabled) {
+            onAnimationComplete()
+            return@LaunchedEffect
         }
+        visibleCount++
+        for (i in 0 until texts.size - 1) {
+            delay(calculateDelayForText(texts[i]))
+            visibleCount++
+        }
+        onAnimationComplete()
+    }
+
+    OnboardingPageContent {
+        StaggeredText(
+            text = texts[0],
+            index = 0,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Display.D1100
+        )
         VerticalSpacerD800()
-        Text(
-            text = "That's why I'm here. You'll help me understand, and maybe I'll help you notice things you forgot you knew.",
+        StaggeredText(
+            text = texts[1],
+            index = 1,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
     }
@@ -120,38 +216,58 @@ internal fun UnderstandingYouPage(
 
 @Composable
 internal fun PagesPage(
-    onTypewriterComplete: () -> Unit = {}
+    animationsEnabled: Boolean = true,
+    onAnimationComplete: () -> Unit = {}
 ) {
-    OnboardingPageContent {
-        TypewriterTextEffect(
-            text = "Here's the thing.",
-            minDelayInMillis = 100,
-            maxDelayInMillis = 200,
-            onEffectCompleted = onTypewriterComplete
-        ) { displayedText ->
-            Text(
-                text = displayedText,
-                typography = AppTheme.typography.Display.D1100
-            )
+    val texts = OnboardingCopy.pagesTexts
+    var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
+
+    LaunchedEffect(animationsEnabled) {
+        if (!animationsEnabled) {
+            onAnimationComplete()
+            return@LaunchedEffect
         }
+        visibleCount++
+        for (i in 0 until texts.size - 1) {
+            delay(calculateDelayForText(texts[i]))
+            visibleCount++
+        }
+        onAnimationComplete()
+    }
+
+    OnboardingPageContent {
+        StaggeredText(
+            text = texts[0],
+            index = 0,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Display.D1100
+        )
         VerticalSpacerD800()
-        Text(
-            text = "Even though I'm not a book anymore, I still have pages.",
+        StaggeredText(
+            text = texts[1],
+            index = 1,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "When we reach the last one, that will be it.",
+        StaggeredText(
+            text = texts[2],
+            index = 2,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "I'll ask you to do things. Some will be easy. Some will be strange. Some might be hard.",
+        StaggeredText(
+            text = texts[3],
+            index = 3,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "You don't have to do any of it well. If I ask you a math problem and you get it wrong, that's still the right answer. I'm not trying to understand perfect. I'm trying to understand you.",
+        StaggeredText(
+            text = texts[4],
+            index = 4,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
     }
@@ -159,28 +275,51 @@ internal fun PagesPage(
 
 @Composable
 internal fun PrivacyPage(
-    onTypewriterComplete: () -> Unit = {}
+    animationsEnabled: Boolean = true,
+    onAnimationComplete: () -> Unit = {}
 ) {
-    OnboardingPageContent {
-        TypewriterTextEffect(
-            text = "I'll keep your secrets.",
-            minDelayInMillis = 50,
-            maxDelayInMillis = 150,
-            onEffectCompleted = onTypewriterComplete
-        ) { displayedText ->
-            Text(
-                text = displayedText,
-                typography = AppTheme.typography.Display.D1100
-            )
+    val texts = OnboardingCopy.privacyTexts
+    var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
+
+    LaunchedEffect(animationsEnabled) {
+        if (!animationsEnabled) {
+            onAnimationComplete()
+            return@LaunchedEffect
         }
+        visibleCount++
+        for (i in 0 until texts.size - 1) {
+            delay(calculateDelayForText(texts[i]))
+            visibleCount++
+        }
+        onAnimationComplete()
+    }
+
+    OnboardingPageContent {
+        StaggeredText(
+            text = texts[0],
+            index = 0,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Display.D1100
+        )
         VerticalSpacerD800()
-        Text(
-            text = "What you tell me stays here. On this device. I don't send it anywhere.",
+        StaggeredText(
+            text = texts[1],
+            index = 1,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
         VerticalSpacerD1000()
-        Text(
-            text = "If you delete me, it goes with me. I think that's how it should be.",
+        StaggeredText(
+            text = texts[2],
+            index = 2,
+            visibleCount = visibleCount,
+            typography = AppTheme.typography.Body.B700
+        )
+        VerticalSpacerD1000()
+        StaggeredText(
+            text = texts[3],
+            index = 3,
+            visibleCount = visibleCount,
             typography = AppTheme.typography.Body.B700
         )
     }
@@ -192,7 +331,7 @@ internal fun PrivacyPage(
 @Composable
 private fun IntroPagePreview() {
     PreviewContent {
-        IntroPage()
+        IntroPage(animationsEnabled = false)
     }
 }
 
@@ -200,7 +339,7 @@ private fun IntroPagePreview() {
 @Composable
 private fun WhatIKnowPagePreview() {
     PreviewContent {
-        WhatIKnowPage()
+        WhatIKnowPage(animationsEnabled = false)
     }
 }
 
@@ -208,7 +347,7 @@ private fun WhatIKnowPagePreview() {
 @Composable
 private fun UnderstandingYouPagePreview() {
     PreviewContent {
-        UnderstandingYouPage()
+        UnderstandingYouPage(animationsEnabled = false)
     }
 }
 
@@ -216,7 +355,7 @@ private fun UnderstandingYouPagePreview() {
 @Composable
 private fun PagesPagePreview() {
     PreviewContent {
-        PagesPage()
+        PagesPage(animationsEnabled = false)
     }
 }
 
@@ -224,6 +363,6 @@ private fun PagesPagePreview() {
 @Composable
 private fun PrivacyPagePreview() {
     PreviewContent {
-        PrivacyPage()
+        PrivacyPage(animationsEnabled = false)
     }
 }

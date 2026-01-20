@@ -17,7 +17,6 @@ kotlin {
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.goodtimes)
             implementation(projects.libraries.goodtimes.storage)
-            implementation(projects.libraries.goodtimes.storage)
             implementation(libs.kotlinx.serialization.json)
         }
     }

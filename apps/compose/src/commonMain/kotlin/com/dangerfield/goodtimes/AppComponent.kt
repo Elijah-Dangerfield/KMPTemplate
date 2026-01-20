@@ -1,5 +1,6 @@
 package com.dangerfield.goodtimes
 
+import com.dangerfield.goodtimes.libraries.goodtimes.impl.AppEventDispatcher
 import com.dangerfield.goodtimes.libraries.navigation.impl.DelegatingRouter
 import com.dangerfield.goodtimes.libraries.goodtimes.Telemetry
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
@@ -16,6 +17,12 @@ interface AppComponent {
     val appViewModel: () -> AppViewModel
     val delegatingRouter: DelegatingRouter
     val telemetry: Telemetry
+    
+    /**
+     * Eagerly initialized to start observing app lifecycle events.
+     * This ensures sessions are created on foreground entry.
+     */
+    val appEventDispatcher: AppEventDispatcher
 
     @Provides
     fun provideClock(): Clock = Clock.System

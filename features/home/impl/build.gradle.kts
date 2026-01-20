@@ -10,6 +10,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.features.home)
+            implementation(projects.features.tasks)
+            implementation(projects.features.tasks.impl)
             implementation(projects.libraries.navigation)
 
             implementation(projects.libraries.core)

@@ -35,7 +35,7 @@ fun TopBar(
     title: String? = null,
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
-    typographyToken: TypographyResource = AppTheme.typography.Heading.H900,
+    typographyToken: TypographyResource = AppTheme.typography.Display.D900,
     backgroundColor: Color = AppTheme.colors.background.color,
     actions: @Composable () -> Unit = {},
     scrollState: ScrollState? = null,

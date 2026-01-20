@@ -11,6 +11,8 @@ class MainActivity : ComponentActivity() {
 
         val appComponent = AndroidAppComponent::class.create(application)
         appComponent.telemetry.initialize()
+        // Force eager initialization of lifecycle observer
+        appComponent.appEventDispatcher
 
         setContent {
             App(appComponent)

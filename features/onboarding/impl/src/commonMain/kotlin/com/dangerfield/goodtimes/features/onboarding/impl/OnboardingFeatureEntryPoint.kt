@@ -8,6 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import com.dangerfield.goodtimes.features.home.HomeRoute
 import com.dangerfield.goodtimes.features.onboarding.OnboardingDeclinedDialogRoute
 import com.dangerfield.goodtimes.features.onboarding.OnboardingRoute
+import com.dangerfield.goodtimes.libraries.core.BuildInfo
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
 import com.dangerfield.goodtimes.libraries.navigation.NavigationOptions
 import com.dangerfield.goodtimes.libraries.navigation.Router
@@ -55,10 +56,12 @@ class OnboardingFeatureEntryPoint(
 
             OnboardingScreen(
                 state = state,
+                isDebug = BuildInfo.isDebug,
                 onNextClicked = { viewModel.takeAction(Action.NextPage) },
                 onYesSelected = { viewModel.takeAction(Action.SelectYes) },
                 onNoSelected = { viewModel.takeAction(Action.SelectNo) },
-                onConfirmClicked = { viewModel.takeAction(Action.ConfirmOnboarding) }
+                onConfirmClicked = { viewModel.takeAction(Action.ConfirmOnboarding) },
+                onSkipClicked = { viewModel.takeAction(Action.SkipOnboarding) }
             )
         }
 

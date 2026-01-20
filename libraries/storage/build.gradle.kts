@@ -14,6 +14,8 @@ room {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            api(libs.androidx.room.runtime)
+            api(libs.androidx.sqlite.bundled)
             api(libs.androidx.datastore.core)
             api(libs.androidx.datastore.core.okio)
             api(libs.androidx.datastore.preferences)

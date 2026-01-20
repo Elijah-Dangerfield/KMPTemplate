@@ -1,8 +1,7 @@
 package com.dangerfield.goodtimes.features.onboarding.impl
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.goodtimes.system.VerticalSpacerD1000
 import com.dangerfield.goodtimes.system.VerticalSpacerD800
@@ -33,10 +33,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun OnboardingScreen(
     state: State,
+    isDebug: Boolean = false,
     onNextClicked: () -> Unit,
     onYesSelected: () -> Unit,
     onNoSelected: () -> Unit,
-    onConfirmClicked: () -> Unit
+    onConfirmClicked: () -> Unit,
+    onSkipClicked: () -> Unit = {}
 ) {
     Screen(modifier = Modifier.fillMaxSize()) { paddingValues ->
         if (state.isLoading) {
@@ -71,6 +73,21 @@ fun OnboardingScreen(
                     .padding(paddingValues)
                     .padding(horizontal = Dimension.D800)
             ) {
+                if (isDebug) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        Button(
+                            onClick = onSkipClicked,
+                            size = ButtonSize.Small,
+                            type = ButtonType.Ghost
+                        ) {
+                            Text(text = "Skip")
+                        }
+                    }
+                }
+
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier
@@ -78,7 +95,7 @@ fun OnboardingScreen(
                         .fillMaxWidth(),
                     userScrollEnabled = false
                 ) { page ->
-                    val onTypewriterComplete = {
+                    val onAnimationComplete = {
                         if (page == state.currentPage) {
                             isCurrentPageReady = true
                         }
@@ -86,25 +103,25 @@ fun OnboardingScreen(
 
                     when (OnboardingPage.entries[page]) {
                         OnboardingPage.INTRO -> IntroPage(
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                         OnboardingPage.WHAT_I_KNOW -> WhatIKnowPage(
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                         OnboardingPage.UNDERSTANDING_YOU -> UnderstandingYouPage(
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                         OnboardingPage.PAGES -> PagesPage(
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                         OnboardingPage.PRIVACY -> PrivacyPage(
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                         OnboardingPage.CONSENT -> ConsentPage(
                             selection = state.selection,
                             onYesSelected = onYesSelected,
                             onNoSelected = onNoSelected,
-                            onTypewriterComplete = onTypewriterComplete
+                            onAnimationComplete = onAnimationComplete
                         )
                     }
                 }
@@ -115,26 +132,27 @@ fun OnboardingScreen(
                 // - On non-final pages: after typewriter completes
                 // - On final page: only after YES is selected
                 val showButton = isCurrentPageReady && state.canProceed
+                val buttonAlpha by animateFloatAsState(
+                    targetValue = if (showButton) 1f else 0f,
+                    animationSpec = tween(300)
+                )
                 
-                AnimatedVisibility(
-                    visible = showButton,
-                    enter = fadeIn(),
-                    exit = fadeOut()
+                Button(
+                    onClick = {
+                        if (state.isOnFinalPage) {
+                            onConfirmClicked()
+                        } else {
+                            onNextClicked()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(buttonAlpha),
+                    size = ButtonSize.Large,
+                    type = ButtonType.Primary,
+                    enabled = showButton
                 ) {
-                    Button(
-                        onClick = {
-                            if (state.isOnFinalPage) {
-                                onConfirmClicked()
-                            } else {
-                                onNextClicked()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        size = ButtonSize.Large,
-                        type = ButtonType.Primary
-                    ) {
-                        Text(text = if (state.isOnFinalPage) "Continue" else "Next →")
-                    }
+                    Text(text = if (state.isOnFinalPage) "Continue" else "Next →")
                 }
 
                 VerticalSpacerD1000()

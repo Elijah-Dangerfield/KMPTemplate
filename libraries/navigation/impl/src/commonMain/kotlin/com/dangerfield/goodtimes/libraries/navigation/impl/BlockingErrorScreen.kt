@@ -24,6 +24,7 @@ import com.dangerfield.goodtimes.system.Dimension
 import com.dangerfield.goodtimes.system.VerticalSpacerD1000
 import com.dangerfield.goodtimes.system.VerticalSpacerD1200
 import com.dangerfield.goodtimes.system.VerticalSpacerD1600
+import com.dangerfield.goodtimes.system.VerticalSpacerD500
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -70,12 +71,16 @@ internal fun BlockingErrorScreen(
 
             if (onReportToDevelopers != null) {
                 Button(
-                    size = ButtonSize.Medium,
+                    size = ButtonSize.Large,
                     onClick = onReportToDevelopers,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Report to developers")
                 }
+
+                VerticalSpacerD500()
+
+                Text("(which is me cause I wrote myself)")
 
                 VerticalSpacerD1600()
             }

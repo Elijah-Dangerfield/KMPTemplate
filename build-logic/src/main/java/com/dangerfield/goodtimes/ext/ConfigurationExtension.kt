@@ -1,5 +1,7 @@
 package com.dangerfield.goodtimes.ext
 
+import androidx.room.gradle.RoomExtension
+import com.dangerfield.goodtimes.util.addKspDependencyForAllTargets
 import com.dangerfield.goodtimes.util.configureKotlinInject
 import com.dangerfield.goodtimes.util.getModule
 import com.dangerfield.goodtimes.util.libs
@@ -22,9 +24,14 @@ abstract class ConfigurationExtension {
 
     fun storage() {
         serialization()
+        project.pluginManager.apply(project.libs.plugins.androidxRoom.get().pluginId)
+        project.extensions.configure(RoomExtension::class.java) {
+            schemaDirectory("${project.projectDir}/schemas")
+        }
         project.dependencies {
             add("implementation", getModule("libraries:storage"))
         }
+        project.addKspDependencyForAllTargets(project.libs.androidx.room.compiler)
     }
 
 

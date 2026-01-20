@@ -8,6 +8,7 @@ androidx-lifecycle = "2.9.6"
 android-lifecycle-etx = "2.2.0"
 androidx-testExt = "1.3.0"
 androidx-work = "2.9.1"
+atomicfu = "0.29.0"
 composeMultiplatform = "1.9.3"
 compottie="2.0.2"
 configurationAnnotations = "0.10.8"
@@ -35,6 +36,7 @@ lifecycleProcess = "2.10.0"
 
 [libraries]
 anvil-compiler = { module = "software.amazon.lastmile.kotlin.inject.anvil:compiler", version.ref = "kotlinInjectAnvil" }
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 configuration-annotations = { module = "co.touchlab.skie:configuration-annotations", version.ref = "configurationAnnotations" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlin-inject-compiler-ksp = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlinInject" }
@@ -72,6 +74,10 @@ androidx-datastore-core = { module = "androidx.datastore:datastore", version.ref
 androidx-datastore-core-okio = { module = "androidx.datastore:datastore-core-okio", version.ref = "datastore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "roomGradlePlugin" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 buildconfig-gradlePlugin = { module = "com.github.gmazzo.buildconfig:plugin", version.ref = "buildconfig" }
 
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
