@@ -85,7 +85,7 @@ internal fun IntroPage(
     val texts = OnboardingCopy.introTexts
     var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
 
-    LaunchedEffect(animationsEnabled) {
+    LaunchedEffect(animationsEnabled, onAnimationComplete) {
         if (!animationsEnabled) {
             onAnimationComplete()
             return@LaunchedEffect
@@ -139,7 +139,7 @@ internal fun WhatIKnowPage(
     val texts = OnboardingCopy.whatIKnowTexts
     var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
 
-    LaunchedEffect(animationsEnabled) {
+    LaunchedEffect(animationsEnabled, onAnimationComplete) {
         if (!animationsEnabled) {
             onAnimationComplete()
             return@LaunchedEffect
@@ -184,7 +184,7 @@ internal fun UnderstandingYouPage(
     val texts = OnboardingCopy.understandingYouTexts
     var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
 
-    LaunchedEffect(animationsEnabled) {
+    LaunchedEffect(animationsEnabled, onAnimationComplete) {
         if (!animationsEnabled) {
             onAnimationComplete()
             return@LaunchedEffect
@@ -222,7 +222,7 @@ internal fun PagesPage(
     val texts = OnboardingCopy.pagesTexts
     var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
 
-    LaunchedEffect(animationsEnabled) {
+    LaunchedEffect(animationsEnabled, onAnimationComplete) {
         if (!animationsEnabled) {
             onAnimationComplete()
             return@LaunchedEffect
@@ -281,7 +281,7 @@ internal fun PrivacyPage(
     val texts = OnboardingCopy.privacyTexts
     var visibleCount by remember { mutableIntStateOf(if (animationsEnabled) 0 else texts.size) }
 
-    LaunchedEffect(animationsEnabled) {
+    LaunchedEffect(animationsEnabled, onAnimationComplete) {
         if (!animationsEnabled) {
             onAnimationComplete()
             return@LaunchedEffect

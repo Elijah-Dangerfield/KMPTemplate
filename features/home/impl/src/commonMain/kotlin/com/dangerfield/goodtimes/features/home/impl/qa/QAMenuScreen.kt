@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import com.dangerfield.goodtimes.system.AppTheme
 import com.dangerfield.goodtimes.system.VerticalSpacerD1000
 import com.dangerfield.libraries.ui.PreviewContent
+import com.dangerfield.libraries.ui.components.ListSection
+import com.dangerfield.libraries.ui.components.ListSectionItem
 import com.dangerfield.libraries.ui.components.Screen
 import com.dangerfield.libraries.ui.components.header.TopBar
 import com.dangerfield.libraries.ui.components.text.Text
@@ -20,6 +22,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun QAMenuScreen(
     onBackClicked: () -> Unit,
+    onTaskPreviewClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -43,16 +46,15 @@ fun QAMenuScreen(
         ) {
             VerticalSpacerD1000()
 
-            Text(
-                text = "Nothing here yet.",
-                typography = AppTheme.typography.Body.B600,
-                color = AppTheme.colors.textSecondary,
-            )
-
-            Text(
-                text = "This is where QA options will live. Things like resetting state, triggering specific screens, or testing edge cases.",
-                typography = AppTheme.typography.Body.B500,
-                color = AppTheme.colors.textDisabled,
+            ListSection(
+                title = "Tools",
+                items = listOf(
+                    ListSectionItem(
+                        headlineText = "Task Preview",
+                        supportingText = "Browse and preview all tasks",
+                        onClick = onTaskPreviewClicked
+                    )
+                )
             )
 
             VerticalSpacerD1000()
@@ -65,7 +67,8 @@ fun QAMenuScreen(
 fun QAMenuScreenPreview() {
     PreviewContent {
         QAMenuScreen(
-            onBackClicked = {}
+            onBackClicked = {},
+            onTaskPreviewClicked = {}
         )
     }
 }

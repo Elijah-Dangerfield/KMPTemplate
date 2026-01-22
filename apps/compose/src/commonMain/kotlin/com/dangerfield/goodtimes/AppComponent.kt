@@ -14,9 +14,10 @@ import kotlin.time.Clock
 @SingleIn(AppScope::class)
 interface AppComponent {
     val featureEntryPoints: Set<FeatureEntryPoint>
-    val appViewModel: () -> AppViewModel
+    val appViewModel: AppViewModel  // Singleton, shared between MainActivity and App
     val delegatingRouter: DelegatingRouter
     val telemetry: Telemetry
+    val shakeHandler: ShakeHandler
     
     /**
      * Eagerly initialized to start observing app lifecycle events.

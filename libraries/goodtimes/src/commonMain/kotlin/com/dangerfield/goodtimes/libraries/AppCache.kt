@@ -40,6 +40,7 @@ data class AppData(
     val madeWithLoveClicks: Int = 0,
     val madeWithLovePersistenceUnlocked: Boolean = false,
     val persistenceDialogOpens: Int = 0,
+    val fakeSkipButtonClicked: Boolean = false,
     
     // Screen visits - automatically tracked for any TrackableRoute
     val screenVisits: Map<String, Int> = emptyMap(),
@@ -48,6 +49,9 @@ data class AppData(
     val feedbacksGiven: Int = 0,
     val bugsReported: Int = 0,
     val freshStartsCompleted: Int = 0,
+    
+    // Tooltips
+    val hasSeenPinchToZoomTooltip: Boolean = false,
 ) {
     /**
      * Get the visit count for a screen by its tracking key.

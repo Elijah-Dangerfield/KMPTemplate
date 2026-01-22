@@ -33,6 +33,7 @@ class DataStoreCacheFactory (
 ) : CacheFactory {
 
     private val inMemoryCaches: MutableSet<InMemoryCache<*>> = mutableSetOf()
+    private val persistentCaches: MutableMap<String, Cache<*>> = mutableMapOf()
 
     override fun <T : Any> inMemory(
         defaultValue: () -> T,
@@ -40,11 +41,22 @@ class DataStoreCacheFactory (
         defaultValue,
     ).also { inMemoryCaches.add(it) }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Any> persistent(
         name: String,
         serializer: CacheJsonSerializer<T>,
         loadEagerly: Boolean
         ): Cache<T> {
+        return persistentCaches.getOrPut(name) {
+            createPersistentCache(name, serializer, loadEagerly)
+        } as Cache<T>
+    }
+    
+    private fun <T : Any> createPersistentCache(
+        name: String,
+        serializer: CacheJsonSerializer<T>,
+        loadEagerly: Boolean
+    ): Cache<T> {
         val storage = OkioStorage(
             fileSystem = FileSystem.SYSTEM,
             serializer = serializer.toOkioSerializer(),
@@ -64,11 +76,6 @@ class DataStoreCacheFactory (
 
         if (loadEagerly) {
             scope.launch {
-                // This will:
-                // - Open the file
-                // - Use default if missing
-                // - Run migrations if needed
-                // - Cache value in memory
                 dataStore.data.first()
             }
         }

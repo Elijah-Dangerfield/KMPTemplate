@@ -5,6 +5,8 @@ import com.dangerfield.goodtimes.features.home.impl.HomeEvent.*
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskCompletionResult
 import com.dangerfield.goodtimes.libraries.flowroutines.SEAViewModel
 import com.dangerfield.goodtimes.libraries.goodtimes.AppCache
+import com.dangerfield.goodtimes.libraries.goodtimes.Difficulty
+import com.dangerfield.goodtimes.libraries.goodtimes.GetAwarenessContextUseCase
 import com.dangerfield.goodtimes.libraries.goodtimes.GetNextTaskUseCase
 import com.dangerfield.goodtimes.libraries.goodtimes.Reaction
 import com.dangerfield.goodtimes.libraries.goodtimes.ReactionContext
@@ -13,6 +15,7 @@ import com.dangerfield.goodtimes.libraries.goodtimes.Session
 import com.dangerfield.goodtimes.libraries.goodtimes.SessionRepository
 import com.dangerfield.goodtimes.libraries.goodtimes.Signal
 import com.dangerfield.goodtimes.libraries.goodtimes.Task
+import com.dangerfield.goodtimes.libraries.goodtimes.TaskCategory
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskOutcome
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskReactionEngine
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskRepository
@@ -56,6 +59,7 @@ class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val userRepository: UserRepository,
     private val getNextTask: GetNextTaskUseCase,
+    private val getAwarenessContext: GetAwarenessContextUseCase,
     private val taskReactionEngine: TaskReactionEngine,
     private val thinkingMessageProvider: ThinkingMessageProvider,
     private val clock: Clock,
@@ -108,6 +112,7 @@ class HomeViewModel @Inject constructor(
         appCache.updates
             .onEach { appData ->
                 takeAction(HomeAction.ShowUselessButton(appData.uselessButtonClicks < USELESS_BUTTON_MAX_CLICKS))
+                takeAction(HomeAction.ShowFakeSkipButton(!appData.fakeSkipButtonClicked))
             }
             .launchIn(viewModelScope)
     }
@@ -153,6 +158,24 @@ class HomeViewModel @Inject constructor(
 
             is HomeAction.ShowUselessButton -> {
                 action.updateState { it.copy(showUselessButton = action.show) }
+            }
+            
+            is HomeAction.ShowFakeSkipButton -> {
+                action.updateState { it.copy(showFakeSkipButton = action.show) }
+            }
+            
+            is HomeAction.ClickFakeSkipButton -> {
+                val currentFlowState = state.taskFlowState
+                val currentTask = (currentFlowState as? TaskFlowState.ShowingTask)?.task ?: return
+                
+                appCache.update { it.copy(fakeSkipButtonClicked = true) }
+                
+                recordFakeSkipSignals(currentTask)
+                
+                sendEvent(HomeEvent.NavigateToFakeSkipDialog(
+                    taskId = currentTask.id,
+                    taskCategories = currentTask.categories.map { it.name },
+                ))
             }
             
             is HomeAction.LoadNextTask -> {
@@ -237,6 +260,12 @@ class HomeViewModel @Inject constructor(
      * Shows a "thinking" message while loading the next task.
      * The delay and message make it feel like the app is genuinely considering
      * what to show, not just pulling from a queue.
+     * 
+     * Uses AwarenessContext to personalize the thinking message based on:
+     * - Time since last session (welcome back experience)
+     * - Time of day (late night, early morning)
+     * - User's name (if known)
+     * - Device state (battery level)
      */
     private suspend fun HomeAction.loadNextTaskWithThinking(
         isFirstTask: Boolean,
@@ -244,6 +273,9 @@ class HomeViewModel @Inject constructor(
         justCompleted: Boolean,
     ) {
         val session = sessionRepository.currentSession.value
+        val awareness = getAwarenessContext()
+        val user = userRepository.getUser()
+        
         val thinkingContext = ThinkingContext(
             isFirstTask = isFirstTask,
             justCompletedTask = justCompleted,
@@ -251,18 +283,26 @@ class HomeViewModel @Inject constructor(
             consecutiveSkips = consecutiveSkips,
             tasksCompletedThisSession = tasksCompletedThisSession,
             currentMood = session?.mood,
-            isLateNight = isLateNight(),
+            isLateNight = awareness.isLateNight,
+            isEarlyMorning = awareness.time.isEarlyMorning,
             sessionNumber = session?.sessionNumber ?: 1,
+            // New awareness-driven fields
+            userName = user?.name,
+            timeSinceLastSession = awareness.session.timeSinceLastSession,
+            isBatteryLow = awareness.device.isBatteryLow,
+            isWeekend = awareness.time.isWeekend,
         )
         
         val thinkingMessage = thinkingMessageProvider.getThinkingMessage(thinkingContext)
         updateState { it.copy(taskFlowState = TaskFlowState.Loading(thinkingMessage)) }
         
         // Variable delay to feel organic - longer after completions, shorter after skips
-        val baseDelay = if (justSkipped) {
-            THINKING_DELAY_MIN
-        } else {
-            THINKING_DELAY_MIN + (THINKING_DELAY_MAX - THINKING_DELAY_MIN) / 2
+        // Also add extra delay for welcome back to let the message land
+        val isWelcomeBack = isFirstTask && thinkingContext.isReturningUser
+        val baseDelay = when {
+            isWelcomeBack -> THINKING_DELAY_MAX // Give welcome back message time to sink in
+            justSkipped -> THINKING_DELAY_MIN
+            else -> THINKING_DELAY_MIN + (THINKING_DELAY_MAX - THINKING_DELAY_MIN) / 2
         }
         val variance = ((THINKING_DELAY_MAX - THINKING_DELAY_MIN).inWholeMilliseconds * Random.nextFloat()).toLong()
         delay(baseDelay + variance.milliseconds)
@@ -325,6 +365,38 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    
+    private fun recordFakeSkipSignals(task: Task) {
+        viewModelScope.launch {
+            val signals = buildList {
+                if (task.categories.contains(TaskCategory.SOCIAL)) {
+                    add(Signal(ScoreDimension.SOCIAL_COMFORT, delta = -3))
+                }
+                if (task.categories.contains(TaskCategory.REFLECTION)) {
+                    add(Signal(ScoreDimension.REFLECTION_DEPTH, delta = -2))
+                }
+                if (task.categories.contains(TaskCategory.DISCOMFORT)) {
+                    add(Signal(ScoreDimension.OPENNESS, delta = -2))
+                }
+                if (task.categories.contains(TaskCategory.STILLNESS)) {
+                    add(Signal(ScoreDimension.PATIENCE, delta = -2))
+                }
+                if (task.categories.contains(TaskCategory.PLAY)) {
+                    add(Signal(ScoreDimension.PLAYFULNESS, delta = -1))
+                }
+                if (task.difficulty == Difficulty.HEAVY) {
+                    add(Signal(ScoreDimension.OPENNESS, delta = -1))
+                }
+            }
+            
+            if (signals.isNotEmpty()) {
+                userRepository.onTaskSkipped(
+                    taskId = task.id,
+                    signals = signals,
+                )
+            }
+        }
+    }
 
     // TODO should we not get this from like a context repository?
     // maybe instead of CopyContext its AwarenessContext and it comes from a repo.
@@ -338,6 +410,7 @@ class HomeViewModel @Inject constructor(
 
 data class HomeState(
     val showUselessButton: Boolean = true,
+    val showFakeSkipButton: Boolean = true,
     val taskFlowState: TaskFlowState = TaskFlowState.Loading(),
 )
 
@@ -368,11 +441,18 @@ sealed class HomeEvent {
     data class NavigateToUselessButtonDialog(
         val clickCount: Int,
     ) : HomeEvent()
+    
+    data class NavigateToFakeSkipDialog(
+        val taskId: String,
+        val taskCategories: List<String>,
+    ) : HomeEvent()
 }
 
 sealed class HomeAction {
     data object ClickUselessButton : HomeAction()
     data class ShowUselessButton(val show: Boolean): HomeAction()
+    data class ShowFakeSkipButton(val show: Boolean): HomeAction()
+    data object ClickFakeSkipButton : HomeAction()
     data object LoadNextTask : HomeAction()
     data class TaskCompleted(val result: TaskCompletionResult) : HomeAction()
     data object ReactionDismissed : HomeAction()

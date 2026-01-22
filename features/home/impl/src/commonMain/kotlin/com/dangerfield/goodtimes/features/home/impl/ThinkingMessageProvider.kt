@@ -7,6 +7,9 @@ import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Generates contextual "thinking" messages that make transitions feel alive.
@@ -15,10 +18,12 @@ import kotlin.random.Random
  * not just pulling from a queue. Messages adapt to context but stay mysterious
  * enough that users can't predict the algorithm.
  *
- * Thoughts for improvement:
- * - what other bits of context could we add
- * - how can we add to and or improve our messages with the context to make this seem more dynamic?
- * - Maybe using the persons name?
+ * Key contexts that shape messages:
+ * - Time away: Acknowledges absence when returning after hours/days
+ * - Time of day: Late night, early morning get special treatment
+ * - User name: Personalizes greetings when known
+ * - Session patterns: First session vs veteran user
+ * - Device state: Battery level acknowledgment
  */
 interface ThinkingMessageProvider {
     fun getThinkingMessage(context: ThinkingContext): String
@@ -32,8 +37,18 @@ data class ThinkingContext(
     val tasksCompletedThisSession: Int = 0,
     val currentMood: Mood? = null,
     val isLateNight: Boolean = false,
+    val isEarlyMorning: Boolean = false,
     val sessionNumber: Int = 1,
-)
+    // New awareness fields
+    val userName: String? = null,
+    val timeSinceLastSession: Duration? = null,
+    val isBatteryLow: Boolean = false,
+    val isWeekend: Boolean = false,
+) {
+    /** User is returning after 6+ hours */
+    val isReturningUser: Boolean 
+        get() = timeSinceLastSession?.let { it >= 6.hours } ?: false
+}
 
 @Inject
 @SingleIn(AppScope::class)
@@ -63,6 +78,12 @@ class ThinkingMessageProviderImpl : ThinkingMessageProvider {
     }
     
     private fun buildCandidateMessages(context: ThinkingContext): List<String> = buildList {
+        // Returning after substantial absence - prioritize welcome back
+        if (context.isFirstTask && context.isReturningUser) {
+            addAll(welcomeBackMessages(context))
+            return@buildList
+        }
+        
         // First task of session - welcoming/orienting
         if (context.isFirstTask) {
             addAll(firstTaskMessages(context))
@@ -85,27 +106,115 @@ class ThinkingMessageProviderImpl : ThinkingMessageProvider {
         addAll(generalMessages(context))
     }
     
+    /**
+     * Messages for users returning after a significant time away.
+     * These acknowledge the absence and ease back in.
+     */
+    private fun welcomeBackMessages(context: ThinkingContext): List<String> {
+        val name = context.userName
+        val timeSince = context.timeSinceLastSession
+        
+        // Week+ absence - warm, acknowledging
+        if (timeSince != null && timeSince >= 7.days) {
+            return buildList {
+                if (name != null) {
+                    add("$name. It's been a while...")
+                    add("Oh, $name. Welcome back...")
+                    add("$name returns...")
+                }
+                add("You've been away...")
+                add("It's been a while...")
+                add("I was starting to wonder...")
+                
+                // Time of day awareness even for long returns
+                if (context.isLateNight) {
+                    add("Late night return...")
+                }
+            }
+        }
+        
+        // 1-7 days - gentle acknowledgment
+        if (timeSince != null && timeSince >= 1.days) {
+            val days = timeSince.inWholeDays.toInt()
+            return buildList {
+                if (name != null) {
+                    add("Welcome back, $name...")
+                    add("$name, picking up where we left off...")
+                    if (days == 1) add("$name. Just a day, but I noticed...")
+                }
+                add("Picking up where we left off...")
+                add("Back again...")
+                add("Let's continue...")
+                
+                if (context.isLateNight) {
+                    add("Late night visit...")
+                } else if (context.isEarlyMorning) {
+                    add("Early morning check-in...")
+                }
+            }
+        }
+        
+        // 6+ hours - light acknowledgment
+        if (timeSince != null && timeSince >= 6.hours) {
+            return buildList {
+                if (name != null) {
+                    add("Hey $name...")
+                    add("$name, back for more...")
+                }
+                add("Back again...")
+                add("Where were we...")
+                add("Continuing...")
+                
+                if (context.isLateNight) {
+                    add("Couldn't sleep?...")
+                } else if (context.isEarlyMorning) {
+                    add("Early riser...")
+                }
+                
+                if (context.isBatteryLow) {
+                    add("Your battery's low, but you're here...")
+                }
+            }
+        }
+        
+        // Fallback to regular first task messages
+        return firstTaskMessages(context)
+    }
+    
     private fun firstTaskMessages(context: ThinkingContext): List<String> {
-        val base = listOf(
-            "Let's see...",
-            "Thinking...",
-            "Where to start...",
-            "Hmm...",
-        )
+        val name = context.userName
+        val base = buildList {
+            add("Let's see...")
+            add("Thinking...")
+            add("Where to start...")
+            add("Hmm...")
+            // Add personalized options if we have a name
+            if (name != null) {
+                add("Okay $name...")
+                add("Alright $name, let's see...")
+            }
+        }
         
         return when {
-            context.isLateNight -> base + listOf(
-                "Late night thoughts...",
-                "Quiet hours...",
-            )
+            context.isLateNight -> base + buildList {
+                add("Late night thoughts...")
+                add("Quiet hours...")
+                if (name != null) add("Burning the midnight oil, $name?...")
+            }
+            context.isEarlyMorning -> base + buildList {
+                add("Early start...")
+                add("Fresh morning...")
+                if (name != null) add("Up early, $name...")
+            }
             context.sessionNumber == 1 -> base + listOf(
-                "First things first...",
-                "Starting somewhere...",
+                "Let's get started...",
+                "Here we go...",
+                "Starting with something simple...",
             )
-            context.sessionNumber > 10 -> base + listOf(
-                "Welcome back...",
-                "You again...",
-            )
+            context.sessionNumber > 10 -> base + buildList {
+                add("Welcome back...")
+                if (name != null) add("$name, good to see you...")
+            }
             else -> base
         }
     }
@@ -142,6 +251,14 @@ class ThinkingMessageProviderImpl : ThinkingMessageProvider {
         )
         
         val taskCount = context.tasksCompletedThisSession
+        val name = context.userName
+        val isNewUser = context.sessionNumber <= 2
+        
+        // Early tasks for new users - be warm and encouraging
+        // This is their first impression of the app's personality
+        if (isNewUser && taskCount <= 5) {
+            return earlyUserCompletionMessages(taskCount, name)
+        }
         
         return when {
             taskCount >= 5 -> base + listOf(
@@ -163,6 +280,65 @@ class ThinkingMessageProviderImpl : ThinkingMessageProvider {
                 "Easy one...",
             )
             else -> base
+        }
+    }
+    
+    /**
+     * Warm, encouraging messages for new users completing their first few tasks.
+     * First impressions matter - we want them to feel seen and encouraged.
+     */
+    private fun earlyUserCompletionMessages(taskCount: Int, name: String?): List<String> {
+        return when (taskCount) {
+            1 -> buildList {
+                add("Good start...")
+                add("I like that...")
+                add("Okay, I see you...")
+                if (name != null) {
+                    add("Nice, $name...")
+                    add("Good one, $name...")
+                }
+            }
+            2 -> buildList {
+                add("I'm learning about you...")
+                add("This is helpful...")
+                add("Interesting...")
+                add("Getting a sense of you...")
+                if (name != null) {
+                    add("Thanks $name, keep going...")
+                }
+            }
+            3 -> buildList {
+                add("This is great, I'm learning a lot...")
+                add("You're giving me a lot to work with...")
+                add("We're getting somewhere...")
+                add("I like this...")
+                if (name != null) {
+                    add("$name, this is great...")
+                }
+            }
+            4 -> buildList {
+                add("I feel like I'm starting to know you...")
+                add("Keep going...")
+                add("This is good...")
+                add("Getting to know you...")
+                if (name != null) {
+                    add("$name, you're doing great...")
+                }
+            }
+            5 -> buildList {
+                add("We're building something here...")
+                add("This is really helpful...")
+                add("I'm getting better at this...")
+                add("Thanks for sticking around...")
+                if (name != null) {
+                    add("$name, I think we're going to get along...")
+                }
+            }
+            else -> listOf(
+                "Let's keep going...",
+                "What else...",
+                "One more...",
+            )
         }
     }
     

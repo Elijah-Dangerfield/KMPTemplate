@@ -26,7 +26,7 @@ sealed class TaskResponse {
     data class Text(val value: String) : TaskResponse()
     data class Selection(val selected: List<String>) : TaskResponse()
     data class Media(val type: MediaType, val filePath: String) : TaskResponse()
-    data class Drawing(val filePath: String) : TaskResponse()
+    data class Drawing(val strokeData: String, val filePath: String? = null) : TaskResponse()
     data class Compound(val text: String?, val media: List<Media>?) : TaskResponse()
     data object None : TaskResponse()
 }

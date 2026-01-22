@@ -16,8 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavGraphBuilder
 import com.dangerfield.goodtimes.features.onboarding.impl.OnboardingCopy
+import com.dangerfield.goodtimes.libraries.core.BuildInfo
+import com.dangerfield.goodtimes.libraries.core.Platform
 import com.dangerfield.goodtimes.libraries.navigation.AnimationType
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
+import com.dangerfield.goodtimes.libraries.navigation.NavigationOptions
 import com.dangerfield.goodtimes.libraries.navigation.Route
 import com.dangerfield.goodtimes.libraries.navigation.Router
 import com.dangerfield.goodtimes.libraries.navigation.screen
@@ -28,6 +31,7 @@ import com.dangerfield.libraries.ui.components.CircularProgressIndicator
 import com.dangerfield.libraries.ui.components.text.Text
 import com.dangerfield.libraries.ui.components.text.TypewriterTextEffect
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import me.tatarka.inject.annotations.Inject
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -46,48 +50,79 @@ class SplashRoute : Route(
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, multibinding = true)
 @Inject
-class SplashScreenEntryPoint(
-    private val splashCompletedCallback: SplashCompletedCallback,
-) : FeatureEntryPoint {
+class SplashScreenEntryPoint : FeatureEntryPoint {
 
     override fun NavGraphBuilder.buildNavGraph(router: Router) {
         screen<SplashRoute>(
             typeMap = mapOf(typeOf<AnimationType>() to serializableType<AnimationType>())
         ) {
-            SplashScreen(
-                onSplashAnimFinished = { splashCompletedCallback.onSplashCompleted() }
-            )
+            // Placeholder - actual SplashScreen is rendered in App.kt with access to AppViewModel
+            // This just registers the route so navigation works
         }
     }
 }
 
-
+/**
+ * Splash screen that handles platform-specific behavior:
+ * - **iOS**: Shows typewriter animation, then navigates when complete
+ * - **Android**: Immediately navigates (native splash already showed)
+ * 
+ * @param destinationRoute The route to navigate to once splash is complete
+ * @param onNavigate Callback to perform the navigation
+ */
 @Composable
 fun SplashScreen(
-    onSplashAnimFinished: () -> Unit
+    destinationRoute: Route?,
+    onNavigate: (Route) -> Unit,
 ) {
+    // On Android, navigate immediately - native splash already showed
+    if (BuildInfo.platform == Platform.Android) {
+        LaunchedEffect(destinationRoute) {
+            destinationRoute?.let { onNavigate(it) }
+        }
+        // Show matching background while navigation happens
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = AppTheme.colors.background.color),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Empty - just background color matching native splash
+        }
+        return
+    }
+    
+    // iOS: Show the full typewriter splash experience
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = AppTheme.colors.background.color),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-
     ) {
         var shouldShowLoading by remember { mutableStateOf(false) }
         var isTypewriterComplete by remember { mutableStateOf(false) }
+        var hasNavigated by remember { mutableStateOf(false) }
 
-        // After typewriter completes, wait a moment then notify the ViewModel
-        LaunchedEffect(isTypewriterComplete) {
-            if (isTypewriterComplete) {
+        // After typewriter completes, wait a moment then navigate
+        LaunchedEffect(isTypewriterComplete, destinationRoute) {
+            if (isTypewriterComplete && destinationRoute != null && !hasNavigated) {
                 delay(1000) // Let the text hang for a moment
-                onSplashAnimFinished()
-                delay(1000) // Give ViewModel time to navigate before showing loading
+                hasNavigated = true
+                onNavigate(destinationRoute)
+            }
+        }
+        
+        // Show loading if we're waiting too long for the destination
+        LaunchedEffect(Unit) {
+            delay(5000) // Fallback timeout
+            if (!hasNavigated) {
                 shouldShowLoading = true
             }
         }
 
-        if (shouldShowLoading) {
+        if (shouldShowLoading && !hasNavigated) {
             CircularProgressIndicator()
         } else {
             TypewriterTextEffect(
@@ -115,7 +150,8 @@ fun SplashScreen(
 private fun PreviewSplashScreen() {
     PreviewContent {
         SplashScreen(
-            onSplashAnimFinished = {}
+            destinationRoute = null,
+            onNavigate = {}
         )
     }
 }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -12,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dangerfield.libraries.ui.PreviewAppState
 import com.dangerfield.libraries.ui.components.Screen
@@ -29,21 +32,24 @@ import com.dangerfield.goodtimes.libraries.core.BuildInfo
 import com.dangerfield.goodtimes.libraries.core.logging.KLog
 import com.dangerfield.goodtimes.libraries.navigation.AnimationType
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
+import com.dangerfield.goodtimes.libraries.navigation.NavigationOptions
 import com.dangerfield.goodtimes.libraries.navigation.Route
 import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.FloatingWindowHost
 import com.dangerfield.goodtimes.libraries.navigation.floatingwindow.FloatingWindowNavigator
 import com.dangerfield.goodtimes.libraries.navigation.impl.DelegatingRouter
+import com.dangerfield.goodtimes.libraries.navigation.screen
 import com.dangerfield.goodtimes.libraries.navigation.serializableType
 import com.dangerfield.goodtimes.libraries.navigation.toEnterTransition
 import com.dangerfield.goodtimes.libraries.navigation.toExitTransition
 import com.dangerfield.goodtimes.libraries.navigation.toRouteOrNull
 import com.dangerfield.goodtimes.system.AppThemeProvider
+import kotlinx.coroutines.flow.collectLatest
 import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun App(appComponent: AppComponent) {
-    val appViewModel: AppViewModel = viewModel { appComponent.appViewModel() }
+    val appViewModel = appComponent.appViewModel
     val state by appViewModel.stateFlow.collectAsStateWithLifecycle()
     val floatingWindowNavigator = remember { FloatingWindowNavigator() }
     val navController = rememberNavController(floatingWindowNavigator)
@@ -51,6 +57,15 @@ fun App(appComponent: AppComponent) {
     val splashRoute = remember { SplashRoute() }
     val router = remember { appComponent.delegatingRouter }
     val dialogHostState = rememberDialogHostState()
+    
+    val shakeHandler = remember { appComponent.shakeHandler }
+    
+    DisposableEffect(shakeHandler) {
+        shakeHandler.start()
+        onDispose {
+            shakeHandler.stop()
+        }
+    }
 
     RecompositionCounter(
         tag = "App",
@@ -79,7 +94,6 @@ fun App(appComponent: AppComponent) {
     )
 
     CompositionLocalProvider(
-        // TODO give real app state
         LocalAppState provides PreviewAppState,
         LocalClock provides appComponent.provideClock(),
         LocalBuildInfo provides BuildInfo,
@@ -93,6 +107,8 @@ fun App(appComponent: AppComponent) {
                     featureEntryPoints = appComponent.featureEntryPoints,
                     startDestination = splashRoute,
                     router = router,
+                    appViewModel = appViewModel,
+                    destinationRoute = state.startDestination,
                 )
 
                 DialogHost(
@@ -111,6 +127,8 @@ private fun AppNavigation(
     featureEntryPoints: Set<FeatureEntryPoint>,
     startDestination: Any,
     router: DelegatingRouter,
+    appViewModel: AppViewModel,
+    destinationRoute: Route?,
 ) {
 
     Screen(
@@ -180,11 +198,32 @@ private fun AppNavigation(
                     typeOf<AnimationType>() to serializableType<AnimationType>()
                 )
             ) {
-                featureEntryPoints.forEach { entryPoint ->
-                    with(entryPoint) {
-                        buildNavGraph(router)
-                    }
+                // Register splash screen with access to destination and router
+                screen<SplashRoute>(
+                    typeMap = mapOf(typeOf<AnimationType>() to serializableType<AnimationType>())
+                ) {
+                    SplashScreen(
+                        destinationRoute = destinationRoute,
+                        onNavigate = { route ->
+                            router.navigate(
+                                route = route,
+                                options = NavigationOptions(
+                                    clearBackStack = true,
+                                    launchSingleTop = true
+                                )
+                            )
+                        }
+                    )
                 }
+                
+                // Register all other feature entry points
+                featureEntryPoints
+                    .filterNot { it is SplashScreenEntryPoint }
+                    .forEach { entryPoint ->
+                        with(entryPoint) {
+                            buildNavGraph(router)
+                        }
+                    }
             }
 
             FloatingWindowHost(floatingWindowNavigator)

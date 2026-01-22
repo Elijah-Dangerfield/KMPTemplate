@@ -2,6 +2,7 @@ package com.dangerfield.libraries.ui.components.icon
 
 import BootstrapFillBarChart
 import BootstrapOutlineBarChart
+import EraserIcon
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Adjust
@@ -38,6 +41,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Egg
 import androidx.compose.material.icons.rounded.EggAlt
+import androidx.compose.material.icons.rounded.FitScreen
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LocationCity
 import androidx.compose.material.icons.rounded.LocationOn
@@ -184,6 +188,11 @@ enum class Icons(
     ),
 
 
+    Eraser(
+        default = EraserIcon
+    ),
+
+
     Plus(
         default = androidx.compose.material.icons.Icons.Default.Add,
     ),
@@ -235,6 +244,18 @@ enum class Icons(
 
     Close(
         default = androidx.compose.material.icons.Icons.Rounded.Close,
+    ),
+
+    Undo(
+        default = androidx.compose.material.icons.Icons.AutoMirrored.Filled.Undo,
+    ),
+
+    Redo(
+        default = androidx.compose.material.icons.Icons.AutoMirrored.Filled.Redo,
+    ),
+
+    FitScreen(
+        default = androidx.compose.material.icons.Icons.Rounded.FitScreen,
     )
 
     ;
@@ -283,12 +304,13 @@ fun Icons.TwoTone(contentDescription: String?): IconResource {
         contentDescription = contentDescription,
     )
 }
-@Preview(heightDp = 1500, widthDp = 700)
+@Preview
 @Composable
 private fun IconPreviewGrid() {
     PreviewContent {
-        Column {
-            Icons.entries.forEach { icon ->
+        androidx.compose.foundation.lazy.LazyColumn {
+            items(Icons.entries.size) { index ->
+                val icon = Icons.entries[index]
                 Row(
                     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                     modifier = Modifier.border(1.dp, Color.Gray).padding(vertical = 32.dp)
@@ -335,13 +357,13 @@ private fun IconPreviewGrid() {
                     val outlined = icon.outlined
                     val twoTone = icon.twoTone
 
-                    IconCell(modifier = Modifier.weight(1f),icon.name, default)
+                    IconCell(modifier = Modifier.weight(1f), icon.name, default)
                     HorizontalSpacerD800()
-                    IconCell(modifier = Modifier.weight(1f),"Filled", filled)
+                    IconCell(modifier = Modifier.weight(1f), "Filled", filled)
                     HorizontalSpacerD800()
-                    IconCell(modifier = Modifier.weight(1f),"Outlined", outlined)
+                    IconCell(modifier = Modifier.weight(1f), "Outlined", outlined)
                     HorizontalSpacerD800()
-                    IconCell(modifier = Modifier.weight(1f),"TwoTone", twoTone)
+                    IconCell(modifier = Modifier.weight(1f), "TwoTone", twoTone)
                 }
             }
         }

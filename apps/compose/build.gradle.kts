@@ -13,6 +13,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core.splashscreen)
             implementation(libs.androidx.work.runtime)
             implementation(compose.uiTooling)
         }

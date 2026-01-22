@@ -2,13 +2,18 @@ package com.dangerfield.goodtimes.features.home.impl
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
 import com.dangerfield.goodtimes.features.home.AboutMeRoute
 import com.dangerfield.goodtimes.features.home.AboutYouRoute
+import com.dangerfield.goodtimes.features.home.FakeSkipDialogRoute
 import com.dangerfield.goodtimes.features.home.FeedbackRoute
 import com.dangerfield.goodtimes.features.home.FreshStartDialogRoute
 import com.dangerfield.goodtimes.features.home.HomeRoute
@@ -17,15 +22,21 @@ import com.dangerfield.goodtimes.features.home.PersistenceUnlockedDialogRoute
 import com.dangerfield.goodtimes.features.home.QAMenuRoute
 import com.dangerfield.goodtimes.features.home.SecretOptionDialogRoute
 import com.dangerfield.goodtimes.features.home.SettingsRoute
+import com.dangerfield.goodtimes.features.home.TaskPreviewDetailRoute
+import com.dangerfield.goodtimes.features.home.TaskPreviewListRoute
 import com.dangerfield.goodtimes.features.home.UselessButtonDialogRoute
 import com.dangerfield.goodtimes.features.home.impl.bugreport.BugReportScreen
 import com.dangerfield.goodtimes.features.home.impl.bugreport.BugReportViewModel
 import com.dangerfield.goodtimes.features.home.impl.feedback.FeedbackScreen
 import com.dangerfield.goodtimes.features.home.impl.feedback.FeedbackViewModel
 import com.dangerfield.goodtimes.features.home.impl.qa.QAMenuScreen
+import com.dangerfield.goodtimes.features.home.impl.qa.TaskPreviewDetailScreen
+import com.dangerfield.goodtimes.features.home.impl.qa.TaskPreviewListScreen
+import com.dangerfield.goodtimes.features.home.impl.qa.TaskPreviewListState
 import com.dangerfield.goodtimes.features.profile.BugReportRoute
 import com.dangerfield.goodtimes.libraries.core.BuildInfo
 import com.dangerfield.goodtimes.libraries.goodtimes.AppCache
+import com.dangerfield.goodtimes.libraries.goodtimes.TaskRepository
 import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
 import com.dangerfield.goodtimes.libraries.navigation.Router
 import com.dangerfield.goodtimes.libraries.navigation.bottomSheet
@@ -39,6 +50,7 @@ import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 import com.dangerfield.goodtimes.features.tasks.impl.TaskViewModelFactory
+import kotlinx.coroutines.withContext
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, multibinding = true)
@@ -54,6 +66,7 @@ class HomeFeatureEntryPoint(
     private val freshStartViewModelFactory: () -> FreshStartViewModel,
     private val appCache: AppCache,
     private val taskViewModelFactory: TaskViewModelFactory,
+    private val taskRepository: TaskRepository,
 ) : FeatureEntryPoint {
 
     override fun NavGraphBuilder.buildNavGraph(router: Router) {
@@ -74,6 +87,12 @@ class HomeFeatureEntryPoint(
                         }
                         is HomeEvent.NavigateToUselessButtonDialog -> {
                             router.navigate(UselessButtonDialogRoute(clickCount = event.clickCount))
+                        }
+                        is HomeEvent.NavigateToFakeSkipDialog -> {
+                            router.navigate(FakeSkipDialogRoute(
+                                taskId = event.taskId,
+                                taskCategories = event.taskCategories
+                            ))
                         }
                     }
                 }
@@ -250,6 +269,13 @@ class HomeFeatureEntryPoint(
             )
         }
 
+        dialog<FakeSkipDialogRoute> { backStackEntry, dialogState ->
+            FakeSkipDialog(
+                dialogState = dialogState,
+                onDismiss = { router.goBack() }
+            )
+        }
+
         screen<FeedbackRoute> {
             val viewModel = viewModel { feedbackViewModelFactory() }
             val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -279,6 +305,40 @@ class HomeFeatureEntryPoint(
 
         screen<QAMenuRoute> {
             QAMenuScreen(
+                onBackClicked = { router.goBack() },
+                onTaskPreviewClicked = { router.navigate(TaskPreviewListRoute()) }
+            )
+        }
+
+        screen<TaskPreviewListRoute> {
+            val state by produceState<TaskPreviewListState>(TaskPreviewListState.Loading) {
+                val tasks = taskRepository.getAllTasks()
+                value = TaskPreviewListState.Loaded(
+                    totalCount = tasks.size,
+                    tasksByType = tasks.groupBy { it.type },
+                )
+            }
+
+            TaskPreviewListScreen(
+                state = state,
+                onBackClicked = { router.goBack() },
+                onTaskClicked = { task ->
+                    router.navigate(TaskPreviewDetailRoute(taskId = task.id))
+                }
+            )
+        }
+
+        screen<TaskPreviewDetailRoute> { backStackEntry ->
+            val route: TaskPreviewDetailRoute = backStackEntry.toRoute()
+            var task by remember { mutableStateOf<com.dangerfield.goodtimes.libraries.goodtimes.Task?>(null) }
+
+            LaunchedEffect(route.taskId) {
+                task = taskRepository.getTask(route.taskId)
+            }
+
+            TaskPreviewDetailScreen(
+                task = task,
+                taskViewModelFactory = taskViewModelFactory,
                 onBackClicked = { router.goBack() }
             )
         }

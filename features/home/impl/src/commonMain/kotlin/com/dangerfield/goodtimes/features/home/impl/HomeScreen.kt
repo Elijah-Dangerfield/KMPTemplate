@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.dangerfield.goodtimes.features.tasks.impl.TaskHost
 import com.dangerfield.goodtimes.features.tasks.impl.TaskViewModelFactory
 import com.dangerfield.goodtimes.libraries.goodtimes.Reaction
@@ -47,6 +50,7 @@ fun HomeScreen(
     ) { padding ->
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
         ) {
             Row(
@@ -70,7 +74,9 @@ fun HomeScreen(
 
             AnimatedContent(
                 targetState = state.taskFlowState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
             ) { flowState ->
                 when (flowState) {
@@ -84,6 +90,8 @@ fun HomeScreen(
                             onTaskCompleted = { result ->
                                 onAction(HomeAction.TaskCompleted(result))
                             },
+                            showFakeSkipButton = state.showFakeSkipButton,
+                            onFakeSkipClicked = { onAction(HomeAction.ClickFakeSkipButton) },
                             modifier = Modifier.fillMaxSize(),
                         )
                     }

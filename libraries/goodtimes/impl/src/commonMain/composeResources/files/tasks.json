@@ -2,9 +2,7 @@
   {
     "id": "intro_welcome",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "isIntroTask": true,
@@ -19,9 +17,7 @@
   {
     "id": "first_task",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -36,9 +32,7 @@
   {
     "id": "light_or_deep",
     "type": "SELECTION",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -46,19 +40,13 @@
       "allowsSelection": true
     },
     "instruction": "Today, do you want to go light or deep?",
-    "selectionOptions": [
-      "Light",
-      "Deep",
-      "Surprise me"
-    ],
+    "selectionOptions": ["Light", "Deep", "Surprise me"],
     "isIntroTask": true
   },
   {
     "id": "hold_finger_30",
     "type": "HOLD_FINGER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -74,9 +62,7 @@
   {
     "id": "three_sounds",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -91,9 +77,7 @@
   {
     "id": "favorite_word",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -108,9 +92,7 @@
   {
     "id": "draw_turtle_dark",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -123,9 +105,7 @@
   {
     "id": "stranger_or_alone",
     "type": "SELECTION",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -133,18 +113,13 @@
       "allowsSelection": true
     },
     "instruction": "Would you rather: be stuck in an elevator with a stranger, or completely alone?",
-    "selectionOptions": [
-      "With a stranger",
-      "Alone"
-    ],
+    "selectionOptions": ["With a stranger", "Alone"],
     "isIntroTask": true
   },
   {
     "id": "photo_something_old",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -157,9 +132,7 @@
   {
     "id": "describe_sky",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -174,9 +147,7 @@
   {
     "id": "grateful_for_small",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -191,9 +162,7 @@
   {
     "id": "hum_something",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -206,9 +175,7 @@
   {
     "id": "photo_your_hands",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -221,9 +188,7 @@
   {
     "id": "stillness_60",
     "type": "STILLNESS",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -239,9 +204,7 @@
   {
     "id": "draw_your_mood",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -254,9 +217,7 @@
   {
     "id": "used_to_be",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -271,10 +232,7 @@
   {
     "id": "name_animal_feeling",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -288,9 +246,7 @@
   {
     "id": "name_yourself",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -304,9 +260,7 @@
   {
     "id": "name_the_app",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -320,10 +274,7 @@
   {
     "id": "name_color_feeling",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -337,9 +288,7 @@
   {
     "id": "draw_nondominant",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -351,9 +300,7 @@
   {
     "id": "draw_blind",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -365,10 +312,7 @@
   {
     "id": "draw_me",
     "type": "DRAWING",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -384,9 +328,7 @@
   {
     "id": "draw_trace_guess",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -398,9 +340,7 @@
   {
     "id": "draw_bedroom_memory",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -412,9 +352,7 @@
   {
     "id": "draw_scribble",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -426,9 +364,7 @@
   {
     "id": "draw_dream",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -440,21 +376,11 @@
   {
     "id": "draw_fear_small",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsDrawing": true
@@ -464,9 +390,7 @@
   {
     "id": "draw_happy_place",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -478,9 +402,7 @@
   {
     "id": "draw_self_portrait_feeling",
     "type": "DRAWING",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -492,9 +414,7 @@
   {
     "id": "photo_blue",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -506,9 +426,7 @@
   {
     "id": "photo_ceiling",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -520,9 +438,7 @@
   {
     "id": "photo_throw_away",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -534,9 +450,7 @@
   {
     "id": "photo_shoes",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -548,9 +462,7 @@
   {
     "id": "photo_selfie_now",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "requireFrontCamera": true,
@@ -567,9 +479,7 @@
   {
     "id": "photo_oldest_thing",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -581,9 +491,7 @@
   {
     "id": "photo_window_view",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -595,9 +503,7 @@
   {
     "id": "photo_beautiful",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -609,9 +515,7 @@
   {
     "id": "photo_mess",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -623,9 +527,7 @@
   {
     "id": "photo_hands",
     "type": "PHOTO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -637,16 +539,10 @@
   {
     "id": "voice_nice_self",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsAudio": true
@@ -656,9 +552,7 @@
   {
     "id": "voice_affirmation",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -670,9 +564,7 @@
   {
     "id": "voice_sing",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -684,21 +576,11 @@
   {
     "id": "voice_whisper_secret",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsAudio": true
@@ -708,9 +590,7 @@
   {
     "id": "voice_thank_absent",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -722,9 +602,7 @@
   {
     "id": "voice_laugh",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -736,20 +614,11 @@
   {
     "id": "voice_younger_self",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsAudio": true
@@ -759,10 +628,7 @@
   {
     "id": "action_stretch",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "STILLNESS"
-    ],
+    "categories": ["ACTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -776,9 +642,7 @@
   {
     "id": "action_eyes_closed",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -793,9 +657,7 @@
   {
     "id": "action_water",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -809,9 +671,7 @@
   {
     "id": "action_window",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -826,9 +686,7 @@
   {
     "id": "action_touch_soft",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -842,9 +700,7 @@
   {
     "id": "action_kind",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -857,9 +713,7 @@
   {
     "id": "action_deep_breath",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -873,10 +727,7 @@
   {
     "id": "action_smile_mirror",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "PLAY"
-    ],
+    "categories": ["ACTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -890,9 +741,7 @@
   {
     "id": "stillness_hold_finger",
     "type": "HOLD_FINGER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -903,9 +752,7 @@
   {
     "id": "stillness_hold_breathe",
     "type": "HOLD_FINGER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -916,9 +763,7 @@
   {
     "id": "stillness_wait_60",
     "type": "WAIT_TIMER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -929,9 +774,7 @@
   {
     "id": "stillness_wait_90",
     "type": "WAIT_TIMER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -946,9 +789,7 @@
   {
     "id": "stillness_color_meditate",
     "type": "STILLNESS",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -962,9 +803,7 @@
   {
     "id": "game_rock_paper",
     "type": "SELECTION",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -972,18 +811,12 @@
       "allowsSelection": true
     },
     "instruction": "Rock, paper, scissors. You vs me. Choose.",
-    "selectionOptions": [
-      "Rock",
-      "Paper",
-      "Scissors"
-    ]
+    "selectionOptions": ["Rock", "Paper", "Scissors"]
   },
   {
     "id": "game_rps_result_rock",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -997,9 +830,7 @@
   {
     "id": "game_rps_result_paper",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -1013,9 +844,7 @@
   {
     "id": "game_rps_result_scissors",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -1029,10 +858,7 @@
   {
     "id": "game_three_doors",
     "type": "SELECTION",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -1040,19 +866,12 @@
       "allowsSelection": true
     },
     "instruction": "Three doors. Behind one is your past. Behind another, your future. Behind the third, right now. Which do you open?",
-    "selectionOptions": [
-      "Past",
-      "Future",
-      "Now"
-    ]
+    "selectionOptions": ["Past", "Future", "Now"]
   },
   {
     "id": "game_would_rather",
     "type": "SELECTION",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1060,30 +879,16 @@
       "allowsSelection": true
     },
     "instruction": "Would you rather know how you die, or when you die?",
-    "selectionOptions": [
-      "How",
-      "When",
-      "Neither"
-    ]
+    "selectionOptions": ["How", "When", "Neither"]
   },
   {
     "id": "secret_never_told",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1095,21 +900,11 @@
   {
     "id": "secret_ashamed",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1121,21 +916,11 @@
   {
     "id": "secret_fear",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1147,21 +932,11 @@
   {
     "id": "secret_apology",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1173,21 +948,11 @@
   {
     "id": "secret_loss",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1199,10 +964,7 @@
   {
     "id": "social_someone_write",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "PLAY"
-    ],
+    "categories": ["SOCIAL", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": true,
     "safeToReflect": false,
@@ -1216,10 +978,7 @@
   {
     "id": "social_describe_you",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": true,
     "safeToReflect": true,
@@ -1233,10 +992,7 @@
   {
     "id": "social_draw_for_you",
     "type": "DRAWING",
-    "categories": [
-      "SOCIAL",
-      "PLAY"
-    ],
+    "categories": ["SOCIAL", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": true,
     "safeToReflect": false,
@@ -1248,10 +1004,7 @@
   {
     "id": "social_text_someone",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL",
-      "ACTION"
-    ],
+    "categories": ["SOCIAL", "ACTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1264,17 +1017,10 @@
   {
     "id": "social_call_someone",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL",
-      "ACTION"
-    ],
+    "categories": ["SOCIAL", "ACTION"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {},
     "instruction": "Call someone you care about. Tell them one thing you appreciate about them.",
@@ -1285,9 +1031,7 @@
   {
     "id": "prompt_how_really_doing",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1301,9 +1045,7 @@
   {
     "id": "prompt_proudest_moment",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1317,9 +1059,7 @@
   {
     "id": "prompt_younger_self_advice",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1333,10 +1073,7 @@
   {
     "id": "prompt_belly_laugh",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1350,9 +1087,7 @@
   {
     "id": "prompt_cant_stop_thinking",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1366,17 +1101,10 @@
   {
     "id": "prompt_avoiding",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1388,9 +1116,7 @@
   {
     "id": "prompt_grateful_today",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1404,16 +1130,10 @@
   {
     "id": "prompt_describe_sky",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1425,9 +1145,7 @@
   {
     "id": "prompt_noticed_today",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1441,21 +1159,11 @@
   {
     "id": "prompt_last_cried",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1467,9 +1175,7 @@
   {
     "id": "prompt_perfect_day",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1483,10 +1189,7 @@
   {
     "id": "prompt_unpopular_opinion",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -1500,17 +1203,10 @@
   {
     "id": "prompt_lie_often",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1522,9 +1218,7 @@
   {
     "id": "prompt_miss",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1538,16 +1232,10 @@
   {
     "id": "prompt_excited_about",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1559,9 +1247,7 @@
   {
     "id": "prompt_hard_recently",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1575,9 +1261,7 @@
   {
     "id": "prompt_small_joy",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1591,9 +1275,7 @@
   {
     "id": "prompt_future_self",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1607,16 +1289,10 @@
   {
     "id": "prompt_compliment_self",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1628,21 +1304,11 @@
   {
     "id": "prompt_forgive",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1654,10 +1320,7 @@
   {
     "id": "prompt_body_feels",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "STILLNESS"
-    ],
+    "categories": ["REFLECTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1671,9 +1334,7 @@
   {
     "id": "prompt_safe_person",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1687,10 +1348,7 @@
   {
     "id": "prompt_weird_habit",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -1704,9 +1362,7 @@
   {
     "id": "prompt_childhood_memory",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1720,9 +1376,7 @@
   {
     "id": "prompt_letter_to_stranger",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1736,9 +1390,7 @@
   {
     "id": "prompt_changed_mind",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1752,9 +1404,7 @@
   {
     "id": "prompt_makes_you_you",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1768,9 +1418,7 @@
   {
     "id": "prompt_current_worry",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1784,10 +1432,7 @@
   {
     "id": "prompt_comfort_food",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1801,9 +1446,7 @@
   {
     "id": "prompt_three_words",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1817,21 +1460,11 @@
   {
     "id": "prompt_needs_saying",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1843,9 +1476,7 @@
   {
     "id": "prompt_learn_about",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1859,10 +1490,7 @@
   {
     "id": "prompt_superpower",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1876,9 +1504,7 @@
   {
     "id": "prompt_brave_recently",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1892,9 +1518,7 @@
   {
     "id": "prompt_different_ten_years",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1908,9 +1532,7 @@
   {
     "id": "prompt_last_risk",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1924,9 +1546,7 @@
   {
     "id": "prompt_home_smell",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1940,9 +1560,7 @@
   {
     "id": "prompt_current_relationship",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1956,9 +1574,7 @@
   {
     "id": "prompt_secret_dream",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -1972,21 +1588,11 @@
   {
     "id": "prompt_holding_onto",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -1998,9 +1604,7 @@
   {
     "id": "prompt_simple_pleasure",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2014,9 +1618,7 @@
   {
     "id": "prompt_thank_body",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2030,9 +1632,7 @@
   {
     "id": "prompt_lost_touch",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2046,9 +1646,7 @@
   {
     "id": "prompt_good_at",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2062,9 +1660,7 @@
   {
     "id": "prompt_bad_day_help",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2078,9 +1674,7 @@
   {
     "id": "prompt_time_alone",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2094,9 +1688,7 @@
   {
     "id": "prompt_conversation_replay",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2110,17 +1702,10 @@
   {
     "id": "prompt_boundary",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -2132,9 +1717,7 @@
   {
     "id": "prompt_last_kind_thing",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2148,9 +1731,7 @@
   {
     "id": "prompt_energy_drain",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2164,9 +1745,7 @@
   {
     "id": "prompt_energy_give",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2180,9 +1759,7 @@
   {
     "id": "prompt_quiet_thought",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2196,9 +1773,7 @@
   {
     "id": "prompt_best_advice",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2212,9 +1787,7 @@
   {
     "id": "prompt_world_problem",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2228,10 +1801,7 @@
   {
     "id": "prompt_guilty_pleasure",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "PLAY"
-    ],
+    "categories": ["REFLECTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": false,
@@ -2245,9 +1815,7 @@
   {
     "id": "prompt_trusted_advice",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2261,9 +1829,7 @@
   {
     "id": "prompt_moment_today",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2277,9 +1843,7 @@
   {
     "id": "prompt_most_alive",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2293,21 +1857,11 @@
   {
     "id": "prompt_hard_truth",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -2319,9 +1873,7 @@
   {
     "id": "prompt_unfinished_business",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2335,9 +1887,7 @@
   {
     "id": "prompt_say_more_often",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2351,9 +1901,7 @@
   {
     "id": "prompt_wrong_about",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2367,9 +1915,7 @@
   {
     "id": "prompt_looking_forward",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2383,10 +1929,7 @@
   {
     "id": "prompt_name_three_sounds",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS",
-      "REFLECTION"
-    ],
+    "categories": ["STILLNESS", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2400,9 +1943,7 @@
   {
     "id": "prompt_one_word_year",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -2416,21 +1957,11 @@
   {
     "id": "prompt_keep_secret",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "DISCOMFORT"
-    ],
+    "categories": ["REFLECTION", "DISCOMFORT"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
-    "bestForMoods": [
-      "OKAY",
-      "GOOD",
-      "GREAT"
-    ],
-    "avoidForMoods": [
-      "BAD",
-      "BAD"
-    ],
+    "bestForMoods": ["OKAY", "GOOD", "GREAT"],
+    "avoidForMoods": ["BAD", "BAD"],
     "safeToReflect": true,
     "responseStyle": {
       "allowsText": true,
@@ -2442,9 +1973,7 @@
   {
     "id": "late_night_thoughts",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2464,9 +1993,7 @@
   {
     "id": "early_morning_intention",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2486,9 +2013,7 @@
   {
     "id": "been_away_check_in",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2505,9 +2030,7 @@
   {
     "id": "year_end_reflection",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2527,9 +2050,7 @@
   {
     "id": "year_lessons_learned",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2549,9 +2070,7 @@
   {
     "id": "year_end_gratitude",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2571,9 +2090,7 @@
   {
     "id": "year_end_letter_to_future",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
     "conditions": {
@@ -2597,9 +2114,7 @@
   {
     "id": "year_end_letting_go",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
     "conditions": {
@@ -2619,9 +2134,7 @@
   {
     "id": "new_year_intentions",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2645,9 +2158,7 @@
   {
     "id": "new_year_first_week",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2671,9 +2182,7 @@
   {
     "id": "january_fresh_energy",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2693,9 +2202,7 @@
   {
     "id": "january_small_step",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2715,9 +2222,7 @@
   {
     "id": "first_of_month_intention",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2737,9 +2242,7 @@
   {
     "id": "end_of_month_reflection",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2759,9 +2262,7 @@
   {
     "id": "winter_cozy_moment",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2782,9 +2283,7 @@
   {
     "id": "winter_hibernation_check",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2804,9 +2303,7 @@
   {
     "id": "winter_indoor_joy",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2826,9 +2323,7 @@
   {
     "id": "spring_new_beginning",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2848,9 +2343,7 @@
   {
     "id": "spring_clean_mind",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2870,9 +2363,7 @@
   {
     "id": "spring_outside",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2893,9 +2384,7 @@
   {
     "id": "summer_adventure",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2915,9 +2404,7 @@
   {
     "id": "summer_memory",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2937,9 +2424,7 @@
   {
     "id": "summer_slow_down",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -2959,9 +2444,7 @@
   {
     "id": "fall_letting_go",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -2981,9 +2464,7 @@
   {
     "id": "fall_gratitude_harvest",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3003,9 +2484,7 @@
   {
     "id": "fall_cozy_ritual",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3025,9 +2504,7 @@
   {
     "id": "holiday_boundary",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -3047,9 +2524,7 @@
   {
     "id": "holiday_meaning",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -3069,9 +2544,7 @@
   {
     "id": "holiday_tradition",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3091,9 +2564,7 @@
   {
     "id": "february_self_love",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -3113,9 +2584,7 @@
   {
     "id": "february_love_letter_self",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "HEAVY",
     "requiresSocial": false,
     "conditions": {
@@ -3135,9 +2604,7 @@
   {
     "id": "february_connection",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3157,9 +2624,7 @@
   {
     "id": "midyear_checkin",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -3183,9 +2648,7 @@
   {
     "id": "midyear_course_correct",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "conditions": {
@@ -3205,9 +2668,7 @@
   {
     "id": "crossword_challenge",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3221,9 +2682,7 @@
   {
     "id": "crossword_one_clue",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3237,9 +2696,7 @@
   {
     "id": "crossword_new_word",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3253,9 +2710,7 @@
   {
     "id": "wordle_daily",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3269,10 +2724,7 @@
   {
     "id": "wordle_share",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "SOCIAL"
-    ],
+    "categories": ["PLAY", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3286,9 +2738,7 @@
   {
     "id": "wordle_brain_warm",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3302,9 +2752,7 @@
   {
     "id": "pong_quick_game",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3318,9 +2766,7 @@
   {
     "id": "pong_beat_score",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3334,10 +2780,7 @@
   {
     "id": "pong_zen_mode",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "STILLNESS"
-    ],
+    "categories": ["PLAY", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3351,9 +2794,7 @@
   {
     "id": "game_break",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3367,10 +2808,7 @@
   {
     "id": "game_childhood_memory",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3384,10 +2822,7 @@
   {
     "id": "game_stress_relief",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "STILLNESS"
-    ],
+    "categories": ["PLAY", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3401,10 +2836,7 @@
   {
     "id": "game_focus_exercise",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "STILLNESS"
-    ],
+    "categories": ["PLAY", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3418,9 +2850,7 @@
   {
     "id": "game_just_for_fun",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3434,9 +2864,7 @@
   {
     "id": "game_new_strategy",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3450,10 +2878,7 @@
   {
     "id": "word_game_favorite",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3467,9 +2892,7 @@
   {
     "id": "word_play_creativity",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3483,9 +2906,7 @@
   {
     "id": "game_personal_best",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3499,9 +2920,7 @@
   {
     "id": "game_three_rounds",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3515,10 +2934,7 @@
   {
     "id": "game_losing_gracefully",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3532,10 +2948,7 @@
   {
     "id": "game_mindful_play",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "STILLNESS"
-    ],
+    "categories": ["PLAY", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3549,9 +2962,7 @@
   {
     "id": "game_before_bed",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3568,9 +2979,7 @@
   {
     "id": "game_morning_wake",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -3587,10 +2996,7 @@
   {
     "id": "game_share_score",
     "type": "GAME",
-    "categories": [
-      "PLAY",
-      "SOCIAL"
-    ],
+    "categories": ["PLAY", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3604,10 +3010,7 @@
   {
     "id": "game_teach_someone",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "SOCIAL"
-    ],
+    "categories": ["PLAY", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3621,10 +3024,7 @@
   {
     "id": "puzzle_satisfaction",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3638,10 +3038,7 @@
   {
     "id": "puzzle_stuck",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3655,9 +3052,7 @@
   {
     "id": "game_two_minutes",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3671,9 +3066,7 @@
   {
     "id": "game_celebrate_win",
     "type": "GAME",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3687,9 +3080,7 @@
   {
     "id": "creativity_doodle_mood",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3702,9 +3093,7 @@
   {
     "id": "creativity_dream_room",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3718,9 +3107,7 @@
   {
     "id": "creativity_six_word_story",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3734,10 +3121,7 @@
   {
     "id": "creativity_alternate_ending",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3751,9 +3135,7 @@
   {
     "id": "creativity_name_that_color",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3767,9 +3149,7 @@
   {
     "id": "creativity_haiku_now",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3783,9 +3163,7 @@
   {
     "id": "creativity_invent_holiday",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3799,9 +3177,7 @@
   {
     "id": "creativity_draw_invention",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3814,9 +3190,7 @@
   {
     "id": "creativity_movie_title",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3830,9 +3204,7 @@
   {
     "id": "creativity_texture_story",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3846,9 +3218,7 @@
   {
     "id": "creativity_superhero_power",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3862,10 +3232,7 @@
   {
     "id": "creativity_draw_future_self",
     "type": "DRAWING",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3878,9 +3245,7 @@
   {
     "id": "creativity_emoji_story",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3894,9 +3259,7 @@
   {
     "id": "creativity_letter_from_object",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3910,9 +3273,7 @@
   {
     "id": "creativity_new_constellation",
     "type": "DRAWING",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3925,9 +3286,7 @@
   {
     "id": "wellness_body_scan",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3941,9 +3300,7 @@
   {
     "id": "wellness_water_check",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3957,9 +3314,7 @@
   {
     "id": "wellness_posture_check",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3973,10 +3328,7 @@
   {
     "id": "wellness_sleep_reflect",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS",
-      "REFLECTION"
-    ],
+    "categories": ["STILLNESS", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -3990,9 +3342,7 @@
   {
     "id": "wellness_energy_level",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4006,9 +3356,7 @@
   {
     "id": "wellness_one_nice_thing",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4022,9 +3370,7 @@
   {
     "id": "wellness_screen_break",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4038,9 +3384,7 @@
   {
     "id": "wellness_meal_mindful",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4054,9 +3398,7 @@
   {
     "id": "wellness_fresh_air",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4070,10 +3412,7 @@
   {
     "id": "wellness_comfort_item",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS",
-      "REFLECTION"
-    ],
+    "categories": ["STILLNESS", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4087,9 +3426,7 @@
   {
     "id": "wellness_stress_where",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4103,10 +3440,7 @@
   {
     "id": "wellness_movement_joy",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS",
-      "REFLECTION"
-    ],
+    "categories": ["STILLNESS", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4120,9 +3454,7 @@
   {
     "id": "wellness_check_in_honest",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4136,10 +3468,7 @@
   {
     "id": "action_dance_30sec",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "PLAY"
-    ],
+    "categories": ["ACTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4153,9 +3482,7 @@
   {
     "id": "action_tidy_one_thing",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4169,10 +3496,7 @@
   {
     "id": "action_text_someone",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "SOCIAL"
-    ],
+    "categories": ["ACTION", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4186,10 +3510,7 @@
   {
     "id": "action_walk_around",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "STILLNESS"
-    ],
+    "categories": ["ACTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4203,10 +3524,7 @@
   {
     "id": "action_compliment",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "SOCIAL"
-    ],
+    "categories": ["ACTION", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4220,9 +3538,7 @@
   {
     "id": "action_change_location",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4236,10 +3552,7 @@
   {
     "id": "action_sing_something",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "PLAY"
-    ],
+    "categories": ["ACTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4253,9 +3566,7 @@
   {
     "id": "action_make_your_bed",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "conditions": {
@@ -4272,10 +3583,7 @@
   {
     "id": "action_jump",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "PLAY"
-    ],
+    "categories": ["ACTION", "PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4289,10 +3597,7 @@
   {
     "id": "action_send_photo",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "SOCIAL"
-    ],
+    "categories": ["ACTION", "SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4306,10 +3611,7 @@
   {
     "id": "action_hold_plank",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "STILLNESS"
-    ],
+    "categories": ["ACTION", "STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4323,9 +3625,7 @@
   {
     "id": "action_smile_mirror",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4339,9 +3639,7 @@
   {
     "id": "action_declutter_five",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION"
-    ],
+    "categories": ["ACTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4355,9 +3653,7 @@
   {
     "id": "social_thinking_of_you",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4371,10 +3667,7 @@
   {
     "id": "social_who_needs_checkin",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4388,9 +3681,7 @@
   {
     "id": "social_gratitude_text",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4404,10 +3695,7 @@
   {
     "id": "social_old_friend",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4421,10 +3709,7 @@
   {
     "id": "social_ask_for_help",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4438,10 +3723,7 @@
   {
     "id": "social_last_laugh",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4455,9 +3737,7 @@
   {
     "id": "social_recommend_something",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4471,10 +3751,7 @@
   {
     "id": "social_inside_joke",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4488,10 +3765,7 @@
   {
     "id": "social_learned_from",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4505,10 +3779,7 @@
   {
     "id": "social_safe_person",
     "type": "PROMPT",
-    "categories": [
-      "SOCIAL",
-      "REFLECTION"
-    ],
+    "categories": ["SOCIAL", "REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4522,9 +3793,7 @@
   {
     "id": "social_voice_note",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4538,9 +3807,7 @@
   {
     "id": "social_memory_share",
     "type": "INSTRUCTION",
-    "categories": [
-      "SOCIAL"
-    ],
+    "categories": ["SOCIAL"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4554,9 +3821,7 @@
   {
     "id": "stillness_breath_count",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4570,9 +3835,7 @@
   {
     "id": "stillness_one_minute_silence",
     "type": "WAIT_TIMER",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4586,9 +3849,7 @@
   {
     "id": "stillness_notice_sounds",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4602,9 +3863,7 @@
   {
     "id": "stillness_feet_on_ground",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4618,9 +3877,7 @@
   {
     "id": "stillness_box_breathing",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4634,9 +3891,7 @@
   {
     "id": "stillness_watch_clouds",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4650,9 +3905,7 @@
   {
     "id": "stillness_hands_rest",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4666,10 +3919,7 @@
   {
     "id": "stillness_here_now",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS",
-      "REFLECTION"
-    ],
+    "categories": ["STILLNESS", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4683,9 +3933,7 @@
   {
     "id": "stillness_letting_thoughts_pass",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4699,9 +3947,7 @@
   {
     "id": "stillness_single_object",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4715,9 +3961,7 @@
   {
     "id": "gratitude_three_things",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4731,10 +3975,7 @@
   {
     "id": "gratitude_body_part",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "STILLNESS"
-    ],
+    "categories": ["REFLECTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4748,9 +3989,7 @@
   {
     "id": "gratitude_small_thing",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4764,9 +4003,7 @@
   {
     "id": "gratitude_challenge",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4780,10 +4017,7 @@
   {
     "id": "gratitude_person_unsaid",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "SOCIAL"
-    ],
+    "categories": ["REFLECTION", "SOCIAL"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4797,9 +4031,7 @@
   {
     "id": "gratitude_past_self",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4813,10 +4045,7 @@
   {
     "id": "gratitude_senses",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION",
-      "STILLNESS"
-    ],
+    "categories": ["REFLECTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4830,10 +4059,7 @@
   {
     "id": "music_current_mood",
     "type": "PROMPT",
-    "categories": [
-      "PLAY",
-      "REFLECTION"
-    ],
+    "categories": ["PLAY", "REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4847,9 +4073,7 @@
   {
     "id": "music_memory_song",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4863,9 +4087,7 @@
   {
     "id": "music_listen_fully",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "MEDIUM",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4879,9 +4101,7 @@
   {
     "id": "music_hum_something",
     "type": "INSTRUCTION",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4895,9 +4115,7 @@
   {
     "id": "music_soundtrack_life",
     "type": "PROMPT",
-    "categories": [
-      "PLAY"
-    ],
+    "categories": ["PLAY"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4911,9 +4129,7 @@
   {
     "id": "music_childhood_song",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4927,9 +4143,7 @@
   {
     "id": "audio_record_thought",
     "type": "AUDIO_CAPTURE",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4942,9 +4156,7 @@
   {
     "id": "sound_favorite",
     "type": "PROMPT",
-    "categories": [
-      "REFLECTION"
-    ],
+    "categories": ["REFLECTION"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4958,9 +4170,7 @@
   {
     "id": "body_temperature",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4974,9 +4184,7 @@
   {
     "id": "body_hands_doing",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -4990,9 +4198,7 @@
   {
     "id": "body_face_tension",
     "type": "INSTRUCTION",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -5006,10 +4212,7 @@
   {
     "id": "body_shake_it",
     "type": "INSTRUCTION",
-    "categories": [
-      "ACTION",
-      "STILLNESS"
-    ],
+    "categories": ["ACTION", "STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -5023,9 +4226,7 @@
   {
     "id": "body_heart_rate",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -5039,9 +4240,7 @@
   {
     "id": "body_favorite_stretch",
     "type": "PROMPT",
-    "categories": [
-      "STILLNESS"
-    ],
+    "categories": ["STILLNESS"],
     "difficulty": "LIGHT",
     "requiresSocial": false,
     "safeToReflect": true,
@@ -5051,5 +4250,15 @@
     },
     "instruction": "What's your favorite stretch? Do it now.",
     "placeholder": "I stretched my..."
+  },
+  {
+    "id": "ephemeral_moment",
+    "type": "INSTRUCTION",
+    "categories": ["REFLECTION", "STILLNESS"],
+    "difficulty": "LIGHT",
+    "requiresSocial": false,
+    "safeToReflect": true,
+    "responseStyle": {},
+    "instruction": "This screen will never appear again.\n\nEvery moment you've ever lived has come and gone exactly once. The people you passed on the street today, the light through your window this morning, the last breath you took—all unrepeatable.\n\nLife doesn't announce which moments matter. It just keeps moving.\n\nThink of one moment from today that you almost missed. Hold it for a second. Then let it go."
   }
 ]

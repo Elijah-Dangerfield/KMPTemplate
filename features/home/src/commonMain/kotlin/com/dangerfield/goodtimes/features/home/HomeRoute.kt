@@ -46,4 +46,18 @@ data class PersistenceUnlockedDialogRoute(
 ) : Route()
 
 @Serializable
+data class FakeSkipDialogRoute(
+    val taskId: String,
+    val taskCategories: List<String>,
+) : Route()
+
+@Serializable
 class QAMenuRoute : Route()
+
+@Serializable
+class TaskPreviewListRoute : Route()
+
+@Serializable
+data class TaskPreviewDetailRoute(
+    val taskId: String,
+) : Route()

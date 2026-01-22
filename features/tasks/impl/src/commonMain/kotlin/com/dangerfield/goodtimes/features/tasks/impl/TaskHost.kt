@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskCompletionResult
 import com.dangerfield.goodtimes.libraries.goodtimes.TaskOutcome
+import com.dangerfield.goodtimes.features.tasks.impl.templates.drawing.DrawingScreen
+import com.dangerfield.goodtimes.features.tasks.impl.templates.drawing.DrawingViewModel
 import com.dangerfield.goodtimes.features.tasks.impl.templates.instruction.InstructionScreen
 import com.dangerfield.goodtimes.features.tasks.impl.templates.instruction.InstructionViewModel
 import com.dangerfield.goodtimes.features.tasks.impl.templates.prompt.PromptScreen
@@ -51,6 +54,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * @param task The current task to display, or null if loading
  * @param onTaskCompleted Callback when a task is completed
  * @param viewModelFactory Factory to create the appropriate ViewModel for each task
+ * @param showFakeSkipButton Whether to show the fake skip button at the bottom
+ * @param onFakeSkipClicked Callback when the fake skip button is clicked
  */
 @Composable
 fun TaskHost(
@@ -58,6 +63,8 @@ fun TaskHost(
     onTaskCompleted: (TaskCompletionResult) -> Unit,
     viewModelFactory: TaskViewModelFactory,
     modifier: Modifier = Modifier,
+    showFakeSkipButton: Boolean = false,
+    onFakeSkipClicked: () -> Unit = {},
 ) {
     AnimatedContent(
         targetState = task,
@@ -70,17 +77,57 @@ fun TaskHost(
         if (currentTask == null) {
             TaskLoadingState()
         } else {
-            // Key forces recomposition when task changes
-            // QUESTION: is the key thing valid? Cause I figured it would recompose when
-            // the task changed anyway?
             key(currentTask.id) {
-                TaskContent(
+                TaskContentWithSkip(
                     task = currentTask,
                     viewModelFactory = viewModelFactory,
                     onTaskCompleted = onTaskCompleted,
+                    showFakeSkipButton = showFakeSkipButton,
+                    onFakeSkipClicked = onFakeSkipClicked,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TaskContentWithSkip(
+    task: Task,
+    viewModelFactory: TaskViewModelFactory,
+    onTaskCompleted: (TaskCompletionResult) -> Unit,
+    showFakeSkipButton: Boolean,
+    onFakeSkipClicked: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.weight(1f)) {
+            TaskContent(
+                task = task,
+                viewModelFactory = viewModelFactory,
+                onTaskCompleted = onTaskCompleted,
+            )
+        }
+        
+        if (showFakeSkipButton) {
+            FakeSkipButton(onClick = onFakeSkipClicked)
+        }
+    }
+}
+
+@Composable
+private fun FakeSkipButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimension.D600)
+            .padding(bottom = Dimension.D500),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "skip",
+            typography = AppTheme.typography.Body.B500,
+            color = AppTheme.colors.textSecondary,
+            modifier = Modifier.clickable(onClick = onClick),
+        )
     }
 }
 
@@ -118,6 +165,22 @@ private fun TaskContent(
             }
             
             InstructionScreen(
+                state = state,
+                onAction = viewModel::onAction,
+            )
+        }
+        
+        TaskType.DRAWING -> {
+            val viewModel = remember(task.id) { viewModelFactory.createDrawingViewModel(task) }
+            val state by viewModel.state.collectAsState()
+            
+            LaunchedEffect(viewModel) {
+                viewModel.completionResult.collect { result ->
+                    onTaskCompleted(result)
+                }
+            }
+            
+            DrawingScreen(
                 state = state,
                 onAction = viewModel::onAction,
             )
@@ -276,6 +339,7 @@ private fun PlaceholderTaskScreen(
 interface TaskViewModelFactory {
     fun createPromptViewModel(task: Task): PromptViewModel
     fun createInstructionViewModel(task: Task): InstructionViewModel
+    fun createDrawingViewModel(task: Task): DrawingViewModel
 }
 
 // ============ Previews ============

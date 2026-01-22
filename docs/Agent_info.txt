@@ -1,5 +1,22 @@
 Agent Notes: 
 
+This is a KMP app inspired by "The Book of Good Times"—a fictional book from Hank Green's novel "An Absolutely Remarkable Thing." In the novel, the book is found in a trash can and is semi-sentient. It wants to become human. Its pages change based on the reader, asking them to do things that subtly improve their life: talk to a stranger, invest in a stock, pay attention to something they'd normally ignore.
+
+Hank released a real physical version, but a printed book can't adapt. This app can.
+
+The app presents "tasks"—invitations to do things. Take a photo with a stranger. Draw something in the dark. Sing into a recording. Journal about a memory. Play a small game. Some tasks are playful, some are reflective, some push social comfort.
+
+How the user responds teaches the app about them. Not just whether they complete a task, but _how_: Did they skip it? Did they take twice as long as usual? Did they write three words or three paragraphs? Each response adjusts internal scores (social comfort, openness, playfulness, patience, reflection depth), and those scores influence which tasks appear next.
+
+We also track mood. Each session can optionally capture how the user is feeling, and we track the trend over time. If someone's been low for several sessions, the app might ask: "I've noticed things have been heavy lately. Do you want something light, or do you want to sit with it?" Their answer shapes what comes next.
+
+The app has a final page. It ends. When the user reaches it, we show them what we learned and thank them. No streaks, no notifications, no infinite engagement. Just a beginning, middle, and end—like any good book.
+
+Target: 200-300 tasks, with the selection algorithm ensuring each user's path feels personal.
+
+No AI. Just thoughtful conditional logic and careful observation.
+
+
 Tech stack:
 - Kotlin Multi Platform
 - Compose Multi Platform
