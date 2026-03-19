@@ -1,10 +1,10 @@
 
 plugins {
-    id("goodtimes.compose.multiplatform")
+    id("kmptemplate.compose.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.libraries.ui"
+    namespace = "com.kmptemplate.libraries.ui"
 }
 
 kotlin {
@@ -17,8 +17,8 @@ kotlin {
 
         commonMain.dependencies {
             implementation(projects.libraries.core)
-            // TODO honestly the goodtimes library should expose the component that require goodtimes domain
-            implementation(projects.libraries.goodtimes)
+            // TODO honestly the kmptemplate library should expose the component that require kmptemplate domain
+            implementation(projects.libraries.kmptemplate)
 
             api(compose.ui)
             api(compose.uiUtil)

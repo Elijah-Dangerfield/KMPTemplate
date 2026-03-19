@@ -6,8 +6,8 @@ import UniformTypeIdentifiers
 // MARK: - App Group Helpers
 
 enum AppGroup {
-    static let identifier = "group.com.dangerfield.goodtimes"
-    private static let logger = Logger(subsystem: "com.dangerfield.goodtimes.monitor", category: "AppGroup")
+    static let identifier = "group.com.kmptemplate"
+    private static let logger = Logger(subsystem: "com.kmptemplate.monitor", category: "AppGroup")
 
     static func containerURL(fileManager: FileManager = .default) throws -> URL {
         guard let containerURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: identifier) else {
@@ -143,7 +143,7 @@ struct UsageEventRecord: Codable {
 final class DeviceActivityConfigurationStore {
     private let fileURL: URL
     private let decoder = JSONDecoder()
-    private let logger = Logger(subsystem: "com.dangerfield.goodtimes.monitor", category: "DeviceActivityConfigurationStore")
+    private let logger = Logger(subsystem: "com.kmptemplate.monitor", category: "DeviceActivityConfigurationStore")
 
     init(fileManager: FileManager = .default) throws {
         let container = try AppGroup.containerURL(fileManager: fileManager)
@@ -189,11 +189,11 @@ final class UsageLogWriter {
         static let nextRecordId = "usageLog.nextRecordId"
     }
 
-    private let queue = DispatchQueue(label: "com.goodtimes.usage.log.writer", qos: .utility)
+    private let queue = DispatchQueue(label: "com.kmptemplate.usage.log.writer", qos: .utility)
     private let fileURL: URL
     private let defaults: UserDefaults
     private let encoder = JSONEncoder()
-    private let logger = Logger(subsystem: "com.dangerfield.goodtimes.monitor", category: "UsageLogWriter")
+    private let logger = Logger(subsystem: "com.kmptemplate.monitor", category: "UsageLogWriter")
 
     init(fileManager: FileManager = .default, defaults: UserDefaults? = UserDefaults(suiteName: AppGroup.identifier)) throws {
         self.defaults = defaults ?? .standard

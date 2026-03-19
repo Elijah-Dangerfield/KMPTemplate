@@ -9,7 +9,7 @@ final class UsageLogReader {
     private let fileURL: URL
     private let defaults: UserDefaults
     private let decoder = JSONDecoder()
-    private let logger = Logger(subsystem: "com.dangerfield.goodtimes.usage", category: "UsageLogReader")
+    private let logger = Logger(subsystem: "com.kmptemplate.usage", category: "UsageLogReader")
 
     init(fileManager: FileManager = .default, defaults: UserDefaults? = UserDefaults(suiteName: AppGroup.identifier)) throws {
         self.defaults = defaults ?? UserDefaults.standard

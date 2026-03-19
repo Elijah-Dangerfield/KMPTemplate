@@ -12,7 +12,7 @@ import UserNotifications
 import AVFoundation
 import Photos
 
-class IOSPermissionManager: GoodtimesPermissionManager {
+class IOSPermissionManager: KMPTemplatePermissionManager {
 
     private let authorizationCenter = AuthorizationCenter.shared
     private let logger = KLog.shared
@@ -31,7 +31,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         authorizationStatusCancellable?.cancel()
     }
     
-    func __ensurePermission(permission: GoodtimesPermission) async throws -> GoodtimesPermissionResult {
+    func __ensurePermission(permission: KMPTemplatePermission) async throws -> KMPTemplatePermissionResult {
         let currentStatus = checkPermissionStatus(permission: permission)
         
         if currentStatus == .granted {
@@ -41,7 +41,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         return try await __requestPermission(permission: permission)
     }
     
-    func __requestPermission(permission: GoodtimesPermission) async throws -> GoodtimesPermissionResult {
+    func __requestPermission(permission: KMPTemplatePermission) async throws -> KMPTemplatePermissionResult {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return await requestFamilyControlsPermission()
@@ -54,7 +54,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         }
     }
     
-    func checkPermissionStatus(permission: GoodtimesPermission) -> GoodtimesPermissionStatus {
+    func checkPermissionStatus(permission: KMPTemplatePermission) -> KMPTemplatePermissionStatus {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return checkFamilyControlsStatus()
@@ -69,7 +69,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
     
     // MARK: - Family Controls
     
-    private func checkFamilyControlsStatus() -> GoodtimesPermissionStatus {
+    private func checkFamilyControlsStatus() -> KMPTemplatePermissionStatus {
         let status = authorizationCenter.authorizationStatus
         logFamilyStatusIfNeeded(status)
         switch status {
@@ -84,7 +84,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         }
     }
     
-    private func requestFamilyControlsPermission() async -> GoodtimesPermissionResult {
+    private func requestFamilyControlsPermission() async -> KMPTemplatePermissionResult {
         do {
             let preStatus = authorizationCenter.authorizationStatus
             
@@ -167,8 +167,8 @@ class IOSPermissionManager: GoodtimesPermissionManager {
     
     // MARK: - Notifications
     
-    private func checkNotificationsStatus() -> GoodtimesPermissionStatus {
-        var status: GoodtimesPermissionStatus = .notDetermined
+    private func checkNotificationsStatus() -> KMPTemplatePermissionStatus {
+        var status: KMPTemplatePermissionStatus = .notDetermined
         let semaphore = DispatchSemaphore(value: 0)
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -189,7 +189,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         return status
     }
     
-    private func requestNotificationsPermission() async -> GoodtimesPermissionResult {
+    private func requestNotificationsPermission() async -> KMPTemplatePermissionResult {
         do {
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .badge, .sound])
@@ -208,7 +208,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
     
     // MARK: - Camera
     
-    private func checkCameraStatus() -> GoodtimesPermissionStatus {
+    private func checkCameraStatus() -> KMPTemplatePermissionStatus {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         switch status {
         case .notDetermined:
@@ -222,7 +222,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         }
     }
     
-    private func requestCameraPermission() async -> GoodtimesPermissionResult {
+    private func requestCameraPermission() async -> KMPTemplatePermissionResult {
         let granted = await AVCaptureDevice.requestAccess(for: .video)
         if granted {
             return .Granted.shared
@@ -235,7 +235,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
     
     // MARK: - Photo Library
     
-    private func checkPhotoLibraryStatus() -> GoodtimesPermissionStatus {
+    private func checkPhotoLibraryStatus() -> KMPTemplatePermissionStatus {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
         case .notDetermined:
@@ -249,7 +249,7 @@ class IOSPermissionManager: GoodtimesPermissionManager {
         }
     }
     
-    private func requestPhotoLibraryPermission() async -> GoodtimesPermissionResult {
+    private func requestPhotoLibraryPermission() async -> KMPTemplatePermissionResult {
         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         switch status {
         case .authorized, .limited:

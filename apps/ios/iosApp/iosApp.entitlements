@@ -10,7 +10,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.dangerfield.goodtimes</string>
+		<string>group.com.kmptemplate</string>
 	</array>
 </dict>
 </plist>

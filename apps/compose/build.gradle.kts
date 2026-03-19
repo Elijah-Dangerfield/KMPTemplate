@@ -1,11 +1,11 @@
 plugins {
-    id("goodtimes.application")
+    id("kmptemplate.application")
     id("co.touchlab.skie") version "0.10.8"
 
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes"
+    namespace = "com.kmptemplate"
 }
 
 kotlin {
@@ -22,8 +22,8 @@ kotlin {
             // Project dependencies
             api(projects.libraries.core)
             implementation(projects.libraries.ui)
-            implementation(projects.libraries.goodtimes)
-            implementation(projects.libraries.goodtimes.impl)
+            implementation(projects.libraries.kmptemplate)
+            implementation(projects.libraries.kmptemplate.impl)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.navigation.impl)
@@ -31,17 +31,13 @@ kotlin {
 
             implementation(projects.libraries.storage)
             implementation(projects.libraries.storage.impl)
-            implementation(projects.libraries.goodtimes.storage)
+            implementation(projects.libraries.kmptemplate.storage)
             implementation(projects.libraries.config)
             implementation(projects.libraries.config.impl)
-            implementation(projects.libraries.goodtimes.storage)
+            implementation(projects.libraries.kmptemplate.storage)
 
             implementation(projects.features.home)
             implementation(projects.features.home.impl)
-            implementation(projects.features.onboarding)
-            implementation(projects.features.onboarding.impl)
-            implementation(projects.features.tasks)
-            implementation(projects.features.tasks.impl)
 
             implementation(libs.atomicfu)
             

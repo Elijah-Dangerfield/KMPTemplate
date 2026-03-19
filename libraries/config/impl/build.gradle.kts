@@ -1,5 +1,5 @@
 plugins {
-    id("goodtimes.kotlin.multiplatform")
+    id("kmptemplate.kotlin.multiplatform")
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
@@ -10,7 +10,7 @@ moduleConfig {
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.config.impl"
+    namespace = "com.kmptemplate.libraries.config.impl"
 }
 
 kotlin {

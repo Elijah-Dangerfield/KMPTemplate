@@ -1,9 +1,9 @@
 plugins {
-    id("goodtimes.compose.multiplatform")
+    id("kmptemplate.compose.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.resources"
+    namespace = "com.kmptemplate.libraries.resources"
 }
 
 compose.resources {

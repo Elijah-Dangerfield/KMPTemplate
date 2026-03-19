@@ -5,7 +5,7 @@ plugins {
     `java-gradle-plugin`
 }
 
-group = "com.dangerfield.goodtimes.buildlogic"
+group = "com.kmptemplate.buildlogic"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -38,20 +38,20 @@ dependencies {
 gradlePlugin {
     plugins {
         register("kotlinMultiplatform") {
-            id = "goodtimes.kotlin.multiplatform"
-            implementationClass = "com.dangerfield.goodtimes.plugin.KotlinMultiplatformConventionPlugin"
+            id = "kmptemplate.kotlin.multiplatform"
+            implementationClass = "com.kmptemplate.plugin.KotlinMultiplatformConventionPlugin"
         }
         register("composeMultiplatform") {
-            id = "goodtimes.compose.multiplatform"
-            implementationClass = "com.dangerfield.goodtimes.plugin.ComposeMultiplatformConventionPlugin"
+            id = "kmptemplate.compose.multiplatform"
+            implementationClass = "com.kmptemplate.plugin.ComposeMultiplatformConventionPlugin"
         }
         register("feature") {
-            id = "goodtimes.feature"
-            implementationClass = "com.dangerfield.goodtimes.plugin.FeatureConventionPlugin"
+            id = "kmptemplate.feature"
+            implementationClass = "com.kmptemplate.plugin.FeatureConventionPlugin"
         }
         register("application") {
-            id = "goodtimes.application"
-            implementationClass = "com.dangerfield.goodtimes.plugin.ApplicationConventionPlugin"
+            id = "kmptemplate.application"
+            implementationClass = "com.kmptemplate.plugin.ApplicationConventionPlugin"
         }
     }
 }

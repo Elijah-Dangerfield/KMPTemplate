@@ -1,25 +1,23 @@
 plugins {
-    id("goodtimes.feature")
+    id("kmptemplate.feature")
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.features.home.impl"
+    namespace = "com.kmptemplate.features.home.impl"
 }
 
 kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.features.home)
-            implementation(projects.features.tasks)
-            implementation(projects.features.tasks.impl)
             implementation(projects.libraries.navigation)
 
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.ui)
-            implementation(projects.libraries.goodtimes)
+            implementation(projects.libraries.kmptemplate)
 
-            // Compose dependencies (navigation and lifecycle provided by goodtimes.feature plugin)
+            // Compose dependencies (navigation and lifecycle provided by kmptemplate.feature plugin)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

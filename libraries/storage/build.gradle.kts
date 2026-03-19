@@ -1,10 +1,10 @@
 plugins {
-    id("goodtimes.kotlin.multiplatform")
+    id("kmptemplate.kotlin.multiplatform")
     alias(libs.plugins.androidxRoom)
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.storage"
+    namespace = "com.kmptemplate.libraries.storage"
 }
 
 room {

@@ -1,5 +1,5 @@
 plugins {
-    id("goodtimes.compose.multiplatform")
+    id("kmptemplate.compose.multiplatform")
 }
 
 moduleConfig {
@@ -7,7 +7,7 @@ moduleConfig {
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.flowroutines"
+    namespace = "com.kmptemplate.libraries.flowroutines"
 }
 
 kotlin {

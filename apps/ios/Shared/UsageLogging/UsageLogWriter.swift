@@ -6,11 +6,11 @@ final class UsageLogWriter {
         static let nextRecordId = "usageLog.nextRecordId"
     }
 
-    private let queue = DispatchQueue(label: "com.goodtimes.usage.log.writer", qos: .utility)
+    private let queue = DispatchQueue(label: "com.kmptemplate.usage.log.writer", qos: .utility)
     private let fileURL: URL
     private let defaults: UserDefaults
     private let encoder = JSONEncoder()
-    private let logger = Logger(subsystem: "com.dangerfield.goodtimes.usage", category: "UsageLogWriter")
+    private let logger = Logger(subsystem: "com.kmptemplate.usage", category: "UsageLogWriter")
 
     init(fileManager: FileManager = .default, defaults: UserDefaults? = UserDefaults(suiteName: AppGroup.identifier)) throws {
         self.defaults = defaults ?? UserDefaults.standard

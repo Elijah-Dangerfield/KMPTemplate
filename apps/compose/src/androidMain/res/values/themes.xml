@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base app theme with SplashScreen API support -->
-    <style name="Theme.Goodtimes" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.KMPTemplate" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Splash screen background color (matches Parchment300) -->
         <item name="android:windowSplashScreenBackground">@color/splash_background</item>
         <!-- Status bar and nav bar colors -->

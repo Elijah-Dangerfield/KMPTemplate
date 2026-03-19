@@ -16,7 +16,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Goodtimes"
+rootProject.name = "KMPTemplate"
 
 dependencyResolutionManagement {
     repositories {
@@ -42,10 +42,6 @@ include(":apps:server")
 // Features
 include(":features:home")
 include(":features:home:impl")
-include(":features:onboarding")
-include(":features:onboarding:impl")
-include(":features:tasks")
-include(":features:tasks:impl")
 
 
 // Libraries
@@ -58,7 +54,7 @@ include(":libraries:navigation:impl")
 include(":libraries:resources")
 include(":libraries:storage")
 include(":libraries:storage:impl")
-include(":libraries:goodtimes")
-include(":libraries:goodtimes:impl")
-include(":libraries:goodtimes:storage")
+include(":libraries:kmptemplate")
+include(":libraries:kmptemplate:impl")
+include(":libraries:kmptemplate:storage")
 include(":libraries:ui")

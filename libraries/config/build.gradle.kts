@@ -1,9 +1,9 @@
 plugins {
-    id("goodtimes.kotlin.multiplatform")
+    id("kmptemplate.kotlin.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.config"
+    namespace = "com.kmptemplate.libraries.config"
 }
 
 

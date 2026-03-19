@@ -1,10 +1,10 @@
 plugins {
-    id("goodtimes.compose.multiplatform")
+    id("kmptemplate.compose.multiplatform")
     alias(libs.plugins.kotlinSerialization)
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.navigation.impl"
+    namespace = "com.kmptemplate.libraries.navigation.impl"
 }
 
 kotlin {
@@ -14,7 +14,7 @@ kotlin {
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.ui)
             implementation(projects.libraries.flowroutines)
-            implementation(projects.libraries.goodtimes)
+            implementation(projects.libraries.kmptemplate)
             api(libs.jetbrains.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
         }

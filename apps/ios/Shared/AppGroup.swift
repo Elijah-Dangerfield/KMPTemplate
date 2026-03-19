@@ -1,7 +1,7 @@
 import Foundation
 
 enum AppGroup {
-    static let identifier = "group.com.dangerfield.goodtimes"
+    static let identifier = "group.com.kmptemplate"
 
     static func containerURL(fileManager: FileManager = .default) throws -> URL {
         guard let containerURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: identifier) else {

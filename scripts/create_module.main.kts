@@ -48,7 +48,7 @@ enum class ModuleType(val displayName: String) {
 }
 
 fun main() {
-    printBlue("🚀 Good Times KMP Module Creator")
+    printBlue("🚀 KMP Template Module Creator")
     println()
     
     if (checkForHelp()) return
@@ -87,9 +87,9 @@ fun checkForHelp(): Boolean {
     
     if (isHelpRequest) {
         printBlue("""
-            Good Times KMP Module Creator
+            KMP Template Module Creator
             
-            This script creates new KMP modules for the Virtu project with proper structure and configuration.
+            This script creates new KMP modules for the KMP Template project with proper structure and configuration.
             
             Usage: ./create_module.main.kts [module-type] [module-name]
             
@@ -216,7 +216,7 @@ fun createModuleDirectory(config: ModuleConfig): File {
 }
 
 fun createSourceStructure(config: ModuleConfig, moduleDir: File) {
-    val packagePath = "com/dangerfield/goodtimes/${config.baseDir}/${config.fullName.replace(":", "/")}"
+    val packagePath = "com/dangerfield/virtu/${config.baseDir}/${config.fullName.replace(":", "/")}"
     
     // Create KMP source structure
     val sourceSets = listOf("commonMain", "androidMain", "iosMain", "jvmMain")
@@ -241,7 +241,7 @@ fun createSourceStructure(config: ModuleConfig, moduleDir: File) {
 }
 
 fun createMainSourceFile(config: ModuleConfig, kotlinDir: File) {
-    val packageName = "com.dangerfield.goodtimes.${config.baseDir}.${config.fullName.replace(":", ".")}"
+    val packageName = "com.kmptemplate.${config.baseDir}.${config.fullName.replace(":", ".")}"
     
     when (config.type) {
         ModuleType.FEATURE -> {
@@ -269,7 +269,7 @@ fun createFeatureRoute(config: ModuleConfig, kotlinDir: File, packageName: Strin
     val routeContent = """
 package $packageName
 
-import com.dangerfield.goodtimes.libraries.navigation.Route
+import com.kmptemplate.libraries.navigation.Route
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -285,7 +285,7 @@ fun createFeatureEntryPoint(config: ModuleConfig, kotlinDir: File, packageName: 
     // Determine the correct route package and class name
     val (routePackage, routeClass) = if (config.moduleName == "impl" && config.parentModule != null) {
         val parentCapitalized = config.parentModule.replaceFirstChar { it.uppercase() }
-        val parentPackage = "com.dangerfield.goodtimes.${config.baseDir}.${config.parentModule}"
+        val parentPackage = "com.kmptemplate.${config.baseDir}.${config.parentModule}"
         Pair(parentPackage, "${parentCapitalized}Route")
     } else {
         Pair(packageName, "${config.capitalizedName}Route")
@@ -306,11 +306,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-${routeImport}import com.dangerfield.goodtimes.libraries.navigation.FeatureEntryPoint
-import com.dangerfield.goodtimes.libraries.navigation.Router
-import com.dangerfield.goodtimes.libraries.navigation.screen
-import com.dangerfield.libraries.ui.components.Screen
-import com.dangerfield.libraries.ui.components.text.Text
+${routeImport}import com.kmptemplate.libraries.navigation.FeatureEntryPoint
+import com.kmptemplate.libraries.navigation.Router
+import com.kmptemplate.libraries.navigation.screen
+import com.kmptemplate.libraries.ui.components.Screen
+import com.kmptemplate.libraries.ui.components.text.Text
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
@@ -347,7 +347,7 @@ fun createFeatureViewModel(config: ModuleConfig, kotlinDir: File, packageName: S
     val viewModelContent = """
 package $packageName
 
-import com.dangerfield.goodtimes.libraries.flowroutines.SEAViewModel
+import com.kmptemplate.libraries.flowroutines.SEAViewModel
 import kotlinx.coroutines.delay
 import me.tatarka.inject.annotations.Inject
 
@@ -408,11 +408,11 @@ class ${config.capitalizedName}
 fun createBuildGradle(config: ModuleConfig, moduleDir: File) {
     val buildFile = File(moduleDir, "build.gradle.kts")
     val pluginId = when (config.type) {
-        ModuleType.FEATURE -> "goodtimes.feature"
-        ModuleType.LIBRARY -> "goodtimes.kotlin.multiplatform"
+        ModuleType.FEATURE -> "kmptemplate.feature"
+        ModuleType.LIBRARY -> "kmptemplate.kotlin.multiplatform"
     }
     
-    val namespace = "com.dangerfield.goodtimes.${config.baseDir}.${config.fullName.replace(":", ".")}"
+    val namespace = "com.kmptemplate.${config.baseDir}.${config.fullName.replace(":", ".")}"
     val storageConfiguration = if (config.shouldDependOnStorageApi()) "\nmoduleConfig.storage()\n" else ""
     
     val buildContent = """
@@ -445,7 +445,7 @@ fun getCommonDependencies(config: ModuleConfig): String {
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.flowroutines)
 
-            // Compose dependencies (navigation and lifecycle provided by goodtimes.feature plugin)
+            // Compose dependencies (navigation and lifecycle provided by kmptemplate.feature plugin)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

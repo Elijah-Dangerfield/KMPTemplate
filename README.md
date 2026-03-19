@@ -1,4 +1,4 @@
-# The App of Good Times
+# KMP Template
 
 A Kotlin Multiplatform project with a clean, modular architecture.
 

@@ -1,9 +1,9 @@
 plugins {
-    id("goodtimes.kotlin.multiplatform")
+    id("kmptemplate.kotlin.multiplatform")
 }
 
 android {
-    namespace = "com.dangerfield.goodtimes.libraries.storage.impl"
+    namespace = "com.kmptemplate.libraries.storage.impl"
 }
 
 moduleConfig.storage()
@@ -15,8 +15,8 @@ kotlin {
 
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
-            implementation(projects.libraries.goodtimes)
-            implementation(projects.libraries.goodtimes.storage)
+            implementation(projects.libraries.kmptemplate)
+            implementation(projects.libraries.kmptemplate.storage)
             implementation(libs.kotlinx.serialization.json)
         }
     }
