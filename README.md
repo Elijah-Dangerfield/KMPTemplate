@@ -1,6 +1,36 @@
 # KMP Template
 
-A Kotlin Multiplatform project with a clean, modular architecture using Compose Multiplatform, Room database, and the SEAViewModel pattern.
+A Kotlin Multiplatform template with a clean, modular architecture using Compose Multiplatform, Room database, and a base ViewModel that encourages unidirectional data flow.
+
+## Quick Start
+
+### Initialize Your Project
+
+**Run this first!** The init script renames all template placeholders to your project name:
+
+```shell
+cd scripts
+./init_project.main.kts
+```
+
+You'll be prompted for:
+- **App Name** (e.g., "My Awesome App") — display name
+- **Package Name** (e.g., "com.example.myapp") — package declarations
+
+The script handles all naming conventions automatically (PascalCase, camelCase, kebab-case, etc.).
+
+### Build & Run
+
+```shell
+# Android
+./gradlew :apps:compose:assembleDebug
+
+# iOS - compile Kotlin framework
+./gradlew :apps:compose:compileKotlinIosSimulatorArm64
+
+# iOS - or open in Xcode
+open apps/ios/iosApp.xcodeproj
+```
 
 ## Project Structure
 
@@ -15,37 +45,15 @@ libraries/<name>/impl/ # Implementations
 
 ### Architecture Rules
 
-- **Features cannot depend on other features** - keeps dependency graph acyclic
-- **Shared code belongs in libraries** - extract common functionality up
-- **Main modules expose interfaces only** - `impl` modules contain implementations
-
-## Getting Started
-
-### Android
-
-```shell
-./gradlew :apps:compose:assembleDebug
-```
-
-### iOS
-
-```shell
-# Compile Kotlin framework
-./gradlew :apps:compose:compileKotlinIosSimulatorArm64
-
-# Or open in Xcode and run
-open apps/ios/iosApp.xcodeproj
-```
+- **Features cannot depend on other features** — keeps dependency graph acyclic
+- **Shared code belongs in libraries** — extract common functionality up
+- **Main modules expose interfaces only** — `impl` modules contain implementations
 
 ### Creating New Modules
-
-Use the module creation script:
 
 ```shell
 ./scripts/create_module
 ```
-
-Convention plugins available:
 
 | Plugin | Use Case |
 |--------|----------|
@@ -55,9 +63,9 @@ Convention plugins available:
 
 ## Architecture Patterns
 
-### SEAViewModel
+### ViewModel (Unidirectional Data Flow)
 
-ViewModels follow the **State-Event-Action** pattern:
+ViewModels extend `SEAViewModel` which enforces **State-Event-Action** unidirectional data flow:
 
 ```kotlin
 class MyViewModel : SEAViewModel<State, Event, Action>(initialStateArg = State()) {
@@ -126,14 +134,13 @@ See [Swift-Kotlin Communication Patterns](docs/swift-kotlin-communication-patter
 
 - Use `Catching { }` from `libraries/core` instead of `runCatching`
 - Custom UI components go in `libraries/ui`—avoid using Material components directly
-- No comments in code—write self-documenting code instead
 
 ## Key Files
 
 | Purpose | Path |
 |---------|------|
 | App DI Component | `apps/compose/src/.../AppComponent.kt` |
-| SEAViewModel Base | `libraries/flowroutines/src/.../SEAViewModel.kt` |
+| Base ViewModel | `libraries/flowroutines/src/.../SEAViewModel.kt` |
 | iOS Entry Point | `apps/ios/iosApp/iOSApp.swift` |
 
 ---
