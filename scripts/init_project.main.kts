@@ -173,16 +173,24 @@ fun main() {
     
     try {
         // Step 1: Replace file contents
-        printBlue("📝 Step 1/3: Replacing file contents...")
+        printBlue("📝 Step 1/5: Replacing file contents...")
         replaceFileContents(rootDir, projectName, packageName, stats)
         
         // Step 2: Rename directories (deepest first to avoid path issues)
-        printBlue("📁 Step 2/3: Renaming directories...")
+        printBlue("📁 Step 2/5: Renaming directories...")
         renameDirectories(rootDir, projectName, packageName, stats)
         
         // Step 3: Rename files
-        printBlue("📄 Step 3/3: Renaming files...")
+        printBlue("📄 Step 3/5: Renaming files...")
         renameFiles(rootDir, projectName, stats)
+        
+        // Step 4: Reset git history
+        printBlue("🔄 Step 4/5: Resetting git history...")
+        resetGitHistory(rootDir, projectName)
+        
+        // Step 5: Rename project folder
+        printBlue("📂 Step 5/5: Renaming project folder...")
+        val newRootDir = renameProjectFolder(rootDir, projectName)
         
         println()
         printGreen("✅ Project initialization complete!")
@@ -193,12 +201,19 @@ fun main() {
         println("   Files renamed:     ${stats.filesRenamed}")
         println("   Total replacements: ${stats.replacementsMade}")
         println()
+        if (newRootDir != null && newRootDir != rootDir) {
+            printYellow("📍 Project moved to: ${newRootDir.absolutePath}")
+            println()
+        }
         printYellow("📝 Next steps:")
-        println("   1. Review the changes (git diff)")
-        println("   2. Sync Gradle files in your IDE")
+        println("   1. cd into your project folder: cd ${newRootDir?.name ?: projectName.pascalCase}")
+        println("   2. Open in your IDE and sync Gradle")
         println("   3. Build the project: ./gradlew build")
-        println("   4. Update the README.md with your project details")
-        println("   5. Delete this init script if you don't need it anymore")
+        println("   4. Update your app icons:")
+        println("      • iOS: apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/")
+        println("      • Android: apps/compose/src/androidMain/res/mipmap-*/")
+        println("      • Shared: libraries/resources/src/commonMain/composeResources/drawable/")
+        println("   5. Add your git remote: git remote add origin <your-repo-url>")
         println()
         printGreen("🎉 Happy coding with ${projectName.displayName}!")
         
@@ -206,6 +221,68 @@ fun main() {
         printRed("❌ Error during initialization: ${e.message}")
         e.printStackTrace()
         printYellow("⚠️  Some changes may have been partially applied. Check git status.")
+    }
+}
+
+fun resetGitHistory(rootDir: File, projectName: ProjectName) {
+    val gitDir = File(rootDir, ".git")
+    if (gitDir.exists()) {
+        gitDir.deleteRecursively()
+        printGreen("   ✓ Removed old git history")
+    }
+    
+    val result = ProcessBuilder("git", "init")
+        .directory(rootDir)
+        .redirectErrorStream(true)
+        .start()
+        .waitFor()
+    
+    if (result == 0) {
+        printGreen("   ✓ Initialized fresh git repository")
+        
+        ProcessBuilder("git", "add", ".")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+            .waitFor()
+            
+        ProcessBuilder("git", "commit", "-m", "Initial commit - ${projectName.displayName}")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+            .waitFor()
+            
+        printGreen("   ✓ Created initial commit")
+    } else {
+        printYellow("   ⚠ Could not initialize git (git may not be installed)")
+    }
+}
+
+fun renameProjectFolder(rootDir: File, projectName: ProjectName): File? {
+    val currentName = rootDir.name
+    val newName = projectName.pascalCase
+    
+    if (currentName == newName) {
+        printGreen("   ✓ Folder already named correctly: $newName")
+        return rootDir
+    }
+    
+    val parentDir = rootDir.parentFile ?: return rootDir
+    val newDir = File(parentDir, newName)
+    
+    if (newDir.exists()) {
+        printYellow("   ⚠ Cannot rename folder: ${newDir.absolutePath} already exists")
+        printYellow("     Please rename manually: mv \"$currentName\" \"$newName\"")
+        return rootDir
+    }
+    
+    return if (rootDir.renameTo(newDir)) {
+        printGreen("   ✓ Renamed folder: $currentName → $newName")
+        newDir
+    } else {
+        printYellow("   ⚠ Could not rename folder automatically")
+        printYellow("     Please rename manually: mv \"$currentName\" \"$newName\"")
+        rootDir
     }
 }
 

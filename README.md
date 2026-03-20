@@ -6,7 +6,7 @@ A Kotlin Multiplatform template with a clean, modular architecture using Compose
 
 ### Initialize Your Project
 
-**Run this first!** The init script renames all template placeholders to your project name:
+**Run this first!** The init script sets up your new project:
 
 ```shell
 cd scripts
@@ -17,7 +17,15 @@ You'll be prompted for:
 - **App Name** (e.g., "My Awesome App") — display name
 - **Package Name** (e.g., "com.example.myapp") — package declarations
 
-The script handles all naming conventions automatically (PascalCase, camelCase, kebab-case, etc.).
+The script will:
+- Rename all template placeholders (handles PascalCase, camelCase, kebab-case, etc.)
+- Reset git history and create a fresh initial commit
+- Rename the project folder to match your app name
+
+After running, update your app icons:
+- **iOS**: `apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/`
+- **Android**: `apps/compose/src/androidMain/res/mipmap-*/`
+- **Shared logos**: `libraries/resources/src/commonMain/composeResources/drawable/`
 
 ### Build & Run
 
