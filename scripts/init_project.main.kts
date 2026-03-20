@@ -112,15 +112,15 @@ val TEXT_FILE_EXTENSIONS = setOf(
     "xcconfig", "pbxproj", "xcscheme", "storyboard", "xib"
 )
 
-// Directories to skip during processing
+// Directories to skip during processing AND during copy
 val SKIP_DIRECTORIES = setOf(
-    ".git", ".gradle", ".idea", "build", "node_modules", ".kotlin", 
+    ".git", ".gradle", ".idea", "build", "node_modules", ".kotlin",
     "caches", "generated", "intermediates"
 )
 
-// Files to skip
+// Files to skip during content replacement
 val SKIP_FILES = setOf(
-    "init_project.main.kts", // Don't modify ourselves
+    "init_project.main.kts",
     "gradlew", "gradlew.bat",
     ".DS_Store"
 )
@@ -137,17 +137,16 @@ fun main() {
         ╔══════════════════════════════════════════════════════════════╗
         ║         🚀 KMP Template Project Initialization 🚀            ║
         ╠══════════════════════════════════════════════════════════════╣
-        ║  This script will help you set up your new project by       ║
-        ║  replacing all template placeholders with your project name ║
+        ║  Creates a fresh copy of the template with your project     ║
+        ║  name — the original template is left untouched.            ║
         ╚══════════════════════════════════════════════════════════════╝
     """.trimIndent())
     println()
-    
-    // Gather project information
+
     val projectName = getProjectName() ?: return
     val packageName = getPackageName(projectName) ?: return
-    
-    // Show summary and confirm
+    val destDir = getDestinationDir(projectName) ?: return
+
     println()
     printCyan("📋 Configuration Summary:")
     println("   Display Name:  ${projectName.displayName}")
@@ -156,57 +155,56 @@ fun main() {
     println("   lowercase:     ${projectName.lowercase}")
     println("   kebab-case:    ${projectName.kebabCase}")
     println("   Package:       $packageName")
+    println("   Destination:   ${File(destDir, projectName.pascalCase).absolutePath}")
     println()
-    
+
     print("Proceed with these settings? (Y/n): ")
     val confirm = readln().trim().lowercase()
     if (confirm.isNotEmpty() && confirm != "y" && confirm != "yes") {
         printYellow("👋 Initialization cancelled. Run again when ready!")
         return
     }
-    
+
     println()
     printBlue("🔄 Starting project initialization...")
-    
+
     val stats = ReplacementStats()
-    val rootDir = File(".").canonicalFile
-    
+    val templateDir = File(".").canonicalFile
+    val projectDir = File(destDir, projectName.pascalCase)
+
     try {
-        // Step 1: Replace file contents
-        printBlue("📝 Step 1/5: Replacing file contents...")
-        replaceFileContents(rootDir, projectName, packageName, stats)
-        
-        // Step 2: Rename directories (deepest first to avoid path issues)
-        printBlue("📁 Step 2/5: Renaming directories...")
-        renameDirectories(rootDir, projectName, packageName, stats)
-        
-        // Step 3: Rename files
-        printBlue("📄 Step 3/5: Renaming files...")
-        renameFiles(rootDir, projectName, stats)
-        
-        // Step 4: Reset git history
-        printBlue("🔄 Step 4/5: Resetting git history...")
-        resetGitHistory(rootDir, projectName)
-        
-        // Step 5: Rename project folder
-        printBlue("📂 Step 5/5: Renaming project folder...")
-        val newRootDir = renameProjectFolder(rootDir, projectName)
-        
+        printBlue("📋 Step 1/6: Copying template to ${projectDir.absolutePath}...")
+        copyTemplate(templateDir, projectDir)
+        printGreen("   ✓ Template copied")
+
+        printBlue("📝 Step 2/6: Replacing file contents...")
+        replaceFileContents(projectDir, projectName, packageName, stats)
+
+        printBlue("📁 Step 3/6: Renaming directories...")
+        renameDirectories(projectDir, projectName, packageName, stats)
+
+        printBlue("📄 Step 4/6: Renaming files...")
+        renameFiles(projectDir, projectName, stats)
+
+        printBlue("🧹 Step 5/6: Cleaning up template artifacts...")
+        cleanupTemplateArtifacts(projectDir, projectName)
+
+        printBlue("🔄 Step 6/6: Initializing git repository...")
+        resetGitHistory(projectDir, projectName)
+
         println()
         printGreen("✅ Project initialization complete!")
         println()
         printCyan("📊 Summary:")
-        println("   Files modified:    ${stats.filesModified}")
-        println("   Folders renamed:   ${stats.foldersRenamed}")
-        println("   Files renamed:     ${stats.filesRenamed}")
+        println("   Files modified:     ${stats.filesModified}")
+        println("   Folders renamed:    ${stats.foldersRenamed}")
+        println("   Files renamed:      ${stats.filesRenamed}")
         println("   Total replacements: ${stats.replacementsMade}")
         println()
-        if (newRootDir != null && newRootDir != rootDir) {
-            printYellow("📍 Project moved to: ${newRootDir.absolutePath}")
-            println()
-        }
+        printYellow("📍 Project created at: ${projectDir.absolutePath}")
+        println()
         printYellow("📝 Next steps:")
-        println("   1. cd into your project folder: cd ${newRootDir?.name ?: projectName.pascalCase}")
+        println("   1. Open the project: cd ${projectDir.absolutePath}")
         println("   2. Open in your IDE and sync Gradle")
         println("   3. Build the project: ./gradlew build")
         println("   4. Update your app icons:")
@@ -216,12 +214,88 @@ fun main() {
         println("   5. Add your git remote: git remote add origin <your-repo-url>")
         println()
         printGreen("🎉 Happy coding with ${projectName.displayName}!")
-        
+
     } catch (e: Exception) {
         printRed("❌ Error during initialization: ${e.message}")
         e.printStackTrace()
-        printYellow("⚠️  Some changes may have been partially applied. Check git status.")
+        printYellow("⚠️  Partially created project may exist at: ${projectDir.absolutePath}")
+        printYellow("     The original template was not modified.")
     }
+}
+
+fun copyTemplate(source: File, dest: File) {
+    dest.mkdirs()
+    source.listFiles()?.forEach { file ->
+        if (file.name in SKIP_DIRECTORIES) return@forEach
+        val target = File(dest, file.name)
+        if (file.isDirectory) {
+            copyTemplate(file, target)
+        } else {
+            file.copyTo(target, overwrite = false)
+        }
+    }
+}
+
+fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName) {
+    val toDelete = listOf(
+        "scripts/init_project.main.kts",
+        "scripts/rename_to_template.sh"
+    )
+    toDelete.forEach { relative ->
+        val file = File(projectDir, relative)
+        if (file.exists()) {
+            file.delete()
+            printGreen("   ✓ Removed $relative")
+        }
+    }
+
+    rewriteReadme(projectDir, projectName)
+    rewriteAgentsMd(projectDir, projectName)
+}
+
+fun rewriteReadme(projectDir: File, projectName: ProjectName) {
+    val readmeFile = File(projectDir, "README.md")
+    if (!readmeFile.exists()) return
+
+    var content = readmeFile.readText()
+
+    val initSectionHeader = "### Initialize Your Project"
+    val nextSection = "### Build & Run"
+    val startIdx = content.indexOf(initSectionHeader)
+    val endIdx = content.indexOf(nextSection)
+    if (startIdx != -1 && endIdx != -1 && endIdx > startIdx) {
+        content = content.removeRange(startIdx, endIdx)
+    }
+
+    content = content
+        .replace(
+            "# KMP Template\n\nA Kotlin Multiplatform template with",
+            "# ${projectName.displayName}\n\nA Kotlin Multiplatform app with"
+        )
+        .replace("## Quick Start\n\n### Build & Run", "## Build & Run")
+
+    readmeFile.writeText(content)
+    printGreen("   ✓ Rewrote README.md")
+}
+
+fun rewriteAgentsMd(projectDir: File, projectName: ProjectName) {
+    val agentsFile = File(projectDir, "AGENTS.md")
+    if (!agentsFile.exists()) return
+
+    var content = agentsFile.readText()
+
+    content = content
+        .replace(
+            "Guidelines for AI agents working in this KMP template repository.",
+            "Guidelines for AI agents working in the ${projectName.displayName} repository."
+        )
+        .replace(
+            "KMP (Kotlin Multiplatform) template with",
+            "KMP (Kotlin Multiplatform) app with"
+        )
+
+    agentsFile.writeText(content)
+    printGreen("   ✓ Rewrote AGENTS.md")
 }
 
 fun resetGitHistory(rootDir: File, projectName: ProjectName) {
@@ -230,60 +304,72 @@ fun resetGitHistory(rootDir: File, projectName: ProjectName) {
         gitDir.deleteRecursively()
         printGreen("   ✓ Removed old git history")
     }
-    
+
     val result = ProcessBuilder("git", "init")
         .directory(rootDir)
         .redirectErrorStream(true)
         .start()
         .waitFor()
-    
+
     if (result == 0) {
         printGreen("   ✓ Initialized fresh git repository")
-        
+
         ProcessBuilder("git", "add", ".")
             .directory(rootDir)
             .redirectErrorStream(true)
             .start()
             .waitFor()
-            
+
         ProcessBuilder("git", "commit", "-m", "Initial commit - ${projectName.displayName}")
             .directory(rootDir)
             .redirectErrorStream(true)
             .start()
             .waitFor()
-            
+
         printGreen("   ✓ Created initial commit")
     } else {
         printYellow("   ⚠ Could not initialize git (git may not be installed)")
     }
 }
 
-fun renameProjectFolder(rootDir: File, projectName: ProjectName): File? {
-    val currentName = rootDir.name
-    val newName = projectName.pascalCase
-    
-    if (currentName == newName) {
-        printGreen("   ✓ Folder already named correctly: $newName")
-        return rootDir
+fun getDestinationDir(projectName: ProjectName): File? {
+    val templateDir = File(".").canonicalFile
+    val suggestedDest = templateDir.parentFile?.absolutePath ?: System.getProperty("user.home")
+
+    println()
+    printCyan("""
+        📂 Where should the new project be created?
+
+        The project folder "${projectName.pascalCase}" will be created inside this directory.
+
+        Press Enter to use suggested: $suggestedDest
+    """.trimIndent())
+    println()
+    print("Destination directory [$suggestedDest]: ")
+
+    val input = readln().trim()
+
+    if (input.lowercase() in listOf("q", "quit", "exit")) {
+        printYellow("👋 Goodbye!")
+        return null
     }
-    
-    val parentDir = rootDir.parentFile ?: return rootDir
-    val newDir = File(parentDir, newName)
-    
-    if (newDir.exists()) {
-        printYellow("   ⚠ Cannot rename folder: ${newDir.absolutePath} already exists")
-        printYellow("     Please rename manually: mv \"$currentName\" \"$newName\"")
-        return rootDir
+
+    val destPath = input.ifEmpty { suggestedDest }
+    val destDir = File(destPath)
+
+    if (!destDir.exists()) {
+        printRed("❌ Directory does not exist: $destPath")
+        return null
     }
-    
-    return if (rootDir.renameTo(newDir)) {
-        printGreen("   ✓ Renamed folder: $currentName → $newName")
-        newDir
-    } else {
-        printYellow("   ⚠ Could not rename folder automatically")
-        printYellow("     Please rename manually: mv \"$currentName\" \"$newName\"")
-        rootDir
+
+    val projectDir = File(destDir, projectName.pascalCase)
+    if (projectDir.exists()) {
+        printRed("❌ A directory already exists at: ${projectDir.absolutePath}")
+        printYellow("   Choose a different destination or rename/remove the existing directory.")
+        return null
     }
+
+    return destDir
 }
 
 fun getProjectName(): ProjectName? {
@@ -358,6 +444,34 @@ fun getPackageName(projectName: ProjectName): String? {
     return packageName
 }
 
+fun buildReplacements(projectName: ProjectName, packageName: String): List<Pair<String, String>> {
+    return listOf(
+        // Package replacements (most specific first)
+        TEMPLATE_PACKAGE to packageName,
+
+        // Specific template-framing phrases (before generic name replacements)
+        "Guidelines for AI agents working in this KMP template repository." to
+                "Guidelines for AI agents working in the ${projectName.displayName} repository.",
+        "KMP (Kotlin Multiplatform) template with" to "KMP (Kotlin Multiplatform) app with",
+        "this KMP template repository" to "this ${projectName.displayName} repository",
+
+        // Name replacements in various formats
+        TEMPLATE_NAME.pascalCase to projectName.pascalCase,
+        TEMPLATE_NAME.camelCase to projectName.camelCase,
+        TEMPLATE_NAME.kebabCase to projectName.kebabCase,
+        TEMPLATE_NAME.snakeCase to projectName.snakeCase,
+        TEMPLATE_NAME.dotCase to projectName.dotCase,
+        TEMPLATE_NAME.lowercase to projectName.lowercase,
+        TEMPLATE_NAME.displayName to projectName.displayName,
+        
+        // Also handle "Kmp Template" and "kmp template" variations
+        "Kmp Template" to projectName.displayName,
+        "kmp template" to projectName.displayName.lowercase(),
+        "KmpTemplate" to projectName.pascalCase,
+        "kmptemplate" to projectName.lowercase
+    )
+}
+
 fun replaceFileContents(dir: File, projectName: ProjectName, packageName: String, stats: ReplacementStats) {
     dir.listFiles()?.forEach { file ->
         if (file.name in SKIP_FILES) return@forEach
@@ -406,28 +520,6 @@ fun replaceInFile(file: File, projectName: ProjectName, packageName: String, sta
         // Skip binary files or files we can't read
     }
     return false
-}
-
-fun buildReplacements(projectName: ProjectName, packageName: String): List<Pair<String, String>> {
-    return listOf(
-        // Package replacements (most specific first)
-        TEMPLATE_PACKAGE to packageName,
-        
-        // Name replacements in various formats
-        TEMPLATE_NAME.pascalCase to projectName.pascalCase,
-        TEMPLATE_NAME.camelCase to projectName.camelCase,
-        TEMPLATE_NAME.kebabCase to projectName.kebabCase,
-        TEMPLATE_NAME.snakeCase to projectName.snakeCase,
-        TEMPLATE_NAME.dotCase to projectName.dotCase,
-        TEMPLATE_NAME.lowercase to projectName.lowercase,
-        TEMPLATE_NAME.displayName to projectName.displayName,
-        
-        // Also handle "Kmp Template" and "kmp template" variations
-        "Kmp Template" to projectName.displayName,
-        "kmp template" to projectName.displayName.lowercase(),
-        "KmpTemplate" to projectName.pascalCase,
-        "kmptemplate" to projectName.lowercase
-    )
 }
 
 fun renameDirectories(dir: File, projectName: ProjectName, packageName: String, stats: ReplacementStats) {
@@ -524,4 +616,3 @@ fun getReplacedName(name: String, projectName: ProjectName): String {
 
 // Run the script
 main()
-

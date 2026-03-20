@@ -6,7 +6,7 @@ A Kotlin Multiplatform template with a clean, modular architecture using Compose
 
 ### Initialize Your Project
 
-**Run this first!** The init script sets up your new project:
+**Run this first!** The init script creates a fresh copy of the template with your project name — the original template is left untouched:
 
 ```shell
 cd scripts
@@ -16,11 +16,14 @@ cd scripts
 You'll be prompted for:
 - **App Name** (e.g., "My Awesome App") — display name
 - **Package Name** (e.g., "com.example.myapp") — package declarations
+- **Destination directory** — where to create the new project (defaults to the parent folder)
 
 The script will:
-- Rename all template placeholders (handles PascalCase, camelCase, kebab-case, etc.)
-- Reset git history and create a fresh initial commit
-- Rename the project folder to match your app name
+- Copy the template to `<destination>/<ProjectName>/`
+- Replace all template placeholders (handles PascalCase, camelCase, kebab-case, etc.)
+- Clean up template-only files (init script, rename script) from the copy
+- Update README and AGENTS.md to reflect the new project name
+- Initialize a fresh git repository with an initial commit
 
 After running, update your app icons:
 - **iOS**: `apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/`
