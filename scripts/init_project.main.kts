@@ -103,7 +103,7 @@ val TEMPLATE_NAME = ProjectName(
 )
 
 // Old package prefix to replace
-const val TEMPLATE_PACKAGE = "com.kmptemplate"
+val TEMPLATE_PACKAGE = "com.kmptemplate"
 
 // Extensions to process for content replacement
 val TEXT_FILE_EXTENSIONS = setOf(
