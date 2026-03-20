@@ -93,6 +93,16 @@ dialog<DialogRoute> { backStackEntry, dialogState -> ... }
 - iOS framework compiled from `apps/compose`, embedded as `ComposeApp.xcframework`
 - Swift types passed to Kotlin via `IosAppComponentFactory.create(...)`
 - Reference `apps/compose/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework/Headers/ComposeApp.h` for generated Swift interfaces
+- **Use `@ObjCName("TypeName", exact = true)` on Kotlin types used from Swift** to give stable names that won't change when project is renamed:
+  ```kotlin
+  @file:OptIn(ExperimentalObjCName::class)
+  import kotlin.experimental.ExperimentalObjCName
+  import kotlin.native.ObjCName
+  
+  @ObjCName("MyType", exact = true)
+  interface MyType { ... }
+  ```
+  Note: The `exact = true` parameter prevents module prefixes from being added. Without it, the Swift name would be `<ModuleName><ObjCName>` (e.g., `KmptemplateMyType`).
 
 ## Key Files
 

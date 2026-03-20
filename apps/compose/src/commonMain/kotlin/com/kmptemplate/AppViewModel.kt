@@ -43,7 +43,7 @@ class AppViewModel(
     override suspend fun handleAction(action: AppAction) {
         when (action) {
             AppAction.DetermineStartDestination -> {
-                // Always go to HomeRoute since onboarding was removed
+                // If you have onboarding or auth or other screens before home heres the place to change the landing
                 val destination: Route = HomeRoute()
                 
                 action.updateState { it.copy(startDestination = destination) }

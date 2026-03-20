@@ -11,8 +11,9 @@ import Foundation
 import UserNotifications
 import AVFoundation
 import Photos
+import UIKit
 
-class IOSPermissionManager: KMPTemplatePermissionManager {
+class IOSPermissionManager: PermissionManager {
 
     private let authorizationCenter = AuthorizationCenter.shared
     private let logger = KLog.shared
@@ -31,17 +32,23 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
         authorizationStatusCancellable?.cancel()
     }
     
-    func __ensurePermission(permission: KMPTemplatePermission) async throws -> KMPTemplatePermissionResult {
+    func openAppSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    func __ensurePermission(permission: Permission) async throws -> PermissionResult {
         let currentStatus = checkPermissionStatus(permission: permission)
         
         if currentStatus == .granted {
-            return .Granted.shared
+            return PermissionResultGranted.shared
         }
         
         return try await __requestPermission(permission: permission)
     }
     
-    func __requestPermission(permission: KMPTemplatePermission) async throws -> KMPTemplatePermissionResult {
+    func __requestPermission(permission: Permission) async throws -> PermissionResult {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return await requestFamilyControlsPermission()
@@ -51,10 +58,12 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
             return await requestCameraPermission()
         case .photoLibrary:
             return await requestPhotoLibraryPermission()
+        case .microphone:
+            return await requestMicrophonePermission()
         }
     }
     
-    func checkPermissionStatus(permission: KMPTemplatePermission) -> KMPTemplatePermissionStatus {
+    func checkPermissionStatus(permission: Permission) -> PermissionStatus {
         switch onEnum(of: permission) {
         case .appUsageStats:
             return checkFamilyControlsStatus()
@@ -64,12 +73,14 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
             return checkCameraStatus()
         case .photoLibrary:
             return checkPhotoLibraryStatus()
+        case .microphone:
+            return checkMicrophoneStatus()
         }
     }
     
     // MARK: - Family Controls
     
-    private func checkFamilyControlsStatus() -> KMPTemplatePermissionStatus {
+    private func checkFamilyControlsStatus() -> PermissionStatus {
         let status = authorizationCenter.authorizationStatus
         logFamilyStatusIfNeeded(status)
         switch status {
@@ -84,7 +95,7 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
         }
     }
     
-    private func requestFamilyControlsPermission() async -> KMPTemplatePermissionResult {
+    private func requestFamilyControlsPermission() async -> PermissionResult {
         do {
             let preStatus = authorizationCenter.authorizationStatus
             
@@ -101,22 +112,22 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
             
             switch resolvedStatus {
             case .approved:
-                return .Granted.shared
+                return PermissionResultGranted.shared
             case .denied:
                 // If denied after request, user can't request again through the app
-                return .Denied(canRequestAgain: false)
+                return PermissionResultDenied(canRequestAgain: false)
             case .notDetermined:
                 // Shouldn't happen, but treat as denied with retry
-                return .Denied(canRequestAgain: true)
+                return PermissionResultDenied(canRequestAgain: true)
             @unknown default:
-                return .Denied(canRequestAgain: true)
+                return PermissionResultDenied(canRequestAgain: true)
             }
         } catch {
             let message = "FamilyControls authorization request failed: \(error.localizedDescription)"
             logger.withTag(tag: "PermissionManager", ).e { message }
         
             // Error during request - user can try again
-            return .Denied(canRequestAgain: true)
+            return PermissionResultDenied(canRequestAgain: true)
         }
     }
 
@@ -167,8 +178,8 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
     
     // MARK: - Notifications
     
-    private func checkNotificationsStatus() -> KMPTemplatePermissionStatus {
-        var status: KMPTemplatePermissionStatus = .notDetermined
+    private func checkNotificationsStatus() -> PermissionStatus {
+        var status: PermissionStatus = .notDetermined
         let semaphore = DispatchSemaphore(value: 0)
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -189,26 +200,26 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
         return status
     }
     
-    private func requestNotificationsPermission() async -> KMPTemplatePermissionResult {
+    private func requestNotificationsPermission() async -> PermissionResult {
         do {
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .badge, .sound])
             
             if granted {
-                return .Granted.shared
+                return PermissionResultGranted.shared
             } else {
                 let settings = await UNUserNotificationCenter.current().notificationSettings()
                 let canRequestAgain = settings.authorizationStatus == .notDetermined
-                return .Denied(canRequestAgain: canRequestAgain)
+                return PermissionResultDenied(canRequestAgain: canRequestAgain)
             }
         } catch {
-            return .Denied(canRequestAgain: true)
+            return PermissionResultDenied(canRequestAgain: true)
         }
     }
     
     // MARK: - Camera
     
-    private func checkCameraStatus() -> KMPTemplatePermissionStatus {
+    private func checkCameraStatus() -> PermissionStatus {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         switch status {
         case .notDetermined:
@@ -222,20 +233,20 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
         }
     }
     
-    private func requestCameraPermission() async -> KMPTemplatePermissionResult {
+    private func requestCameraPermission() async -> PermissionResult {
         let granted = await AVCaptureDevice.requestAccess(for: .video)
         if granted {
-            return .Granted.shared
+            return PermissionResultGranted.shared
         } else {
             let status = AVCaptureDevice.authorizationStatus(for: .video)
             let canRequestAgain = status == .notDetermined
-            return .Denied(canRequestAgain: canRequestAgain)
+            return PermissionResultDenied(canRequestAgain: canRequestAgain)
         }
     }
     
     // MARK: - Photo Library
     
-    private func checkPhotoLibraryStatus() -> KMPTemplatePermissionStatus {
+    private func checkPhotoLibraryStatus() -> PermissionStatus {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
         case .notDetermined:
@@ -249,17 +260,45 @@ class IOSPermissionManager: KMPTemplatePermissionManager {
         }
     }
     
-    private func requestPhotoLibraryPermission() async -> KMPTemplatePermissionResult {
+    private func requestPhotoLibraryPermission() async -> PermissionResult {
         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         switch status {
         case .authorized, .limited:
-            return .Granted.shared
+            return PermissionResultGranted.shared
         case .denied, .restricted:
-            return .Denied(canRequestAgain: false)
+            return PermissionResultDenied(canRequestAgain: false)
         case .notDetermined:
-            return .Denied(canRequestAgain: true)
+            return PermissionResultDenied(canRequestAgain: true)
         @unknown default:
-            return .Denied(canRequestAgain: true)
+            return PermissionResultDenied(canRequestAgain: true)
+        }
+    }
+    
+    // MARK: - Microphone
+    
+    private func checkMicrophoneStatus() -> PermissionStatus {
+        let status = AVAudioSession.sharedInstance().recordPermission
+        switch status {
+        case .undetermined:
+            return .notDetermined
+        case .granted:
+            return .granted
+        case .denied:
+            return .denied
+        @unknown default:
+            return .notDetermined
+        }
+    }
+    
+    private func requestMicrophonePermission() async -> PermissionResult {
+        return await withCheckedContinuation { continuation in
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                if granted {
+                    continuation.resume(returning: PermissionResultGranted.shared)
+                } else {
+                    continuation.resume(returning: PermissionResultDenied(canRequestAgain: false))
+                }
+            }
         }
     }
 }

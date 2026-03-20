@@ -93,12 +93,12 @@ fun BugReportScreen(
             }
 
             Text(
-                text = "Help me understand what went wrong. I'm still learning.",
+                text = "Help us understand what went wrong. We would love to fix it!",
                 typography = AppTheme.typography.Body.B700,
                 color = AppTheme.colors.textSecondary
             )
 
-            VerticalSpacerD500()
+            VerticalSpacerD1000()
 
             OutlinedTextField(
                 value = state.message,

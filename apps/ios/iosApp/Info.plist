@@ -8,12 +8,8 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera access to scan your receipt.</string>
 	<key>NSFamilyControlsUsageDescription</key>
 	<string>We need access to Family Controls to monitor and manage screen time.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need photo library access to select a receipt image.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>We'd like to send you notifications to help you stay on track with your screen time goals.</string>
 	<key>UIBackgroundModes</key>
