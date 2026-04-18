@@ -145,7 +145,7 @@ fun main() {
 
     val projectName = getProjectName() ?: return
     val packageName = getPackageName(projectName) ?: return
-    val destDir = getDestinationDir(projectName) ?: return
+    val projectDir = getProjectDir(projectName) ?: return
 
     println()
     printCyan("📋 Configuration Summary:")
@@ -155,7 +155,7 @@ fun main() {
     println("   lowercase:     ${projectName.lowercase}")
     println("   kebab-case:    ${projectName.kebabCase}")
     println("   Package:       $packageName")
-    println("   Destination:   ${File(destDir, projectName.pascalCase).absolutePath}")
+    println("   Destination:   ${projectDir.absolutePath}")
     println()
 
     print("Proceed with these settings? (Y/n): ")
@@ -170,7 +170,6 @@ fun main() {
 
     val stats = ReplacementStats()
     val templateDir = File(".").canonicalFile
-    val projectDir = File(destDir, projectName.pascalCase)
 
     try {
         printBlue("📋 Step 1/6: Copying template to ${projectDir.absolutePath}...")
@@ -332,20 +331,22 @@ fun resetGitHistory(rootDir: File, projectName: ProjectName) {
     }
 }
 
-fun getDestinationDir(projectName: ProjectName): File? {
+fun getProjectDir(projectName: ProjectName): File? {
     val templateDir = File(".").canonicalFile
-    val suggestedDest = templateDir.parentFile?.absolutePath ?: System.getProperty("user.home")
+    val parentDir = templateDir.parentFile?.absolutePath ?: System.getProperty("user.home")
+    val suggestedPath = File(parentDir, projectName.pascalCase).absolutePath
 
     println()
     printCyan("""
         📂 Where should the new project be created?
 
-        The project folder "${projectName.pascalCase}" will be created inside this directory.
+        This is the full path to the new project folder. It will be created
+        if it does not already exist.
 
-        Press Enter to use suggested: $suggestedDest
+        Press Enter to use suggested: $suggestedPath
     """.trimIndent())
     println()
-    print("Destination directory [$suggestedDest]: ")
+    print("Project directory [$suggestedPath]: ")
 
     val input = readln().trim()
 
@@ -354,22 +355,20 @@ fun getDestinationDir(projectName: ProjectName): File? {
         return null
     }
 
-    val destPath = input.ifEmpty { suggestedDest }
-    val destDir = File(destPath)
+    val projectDir = File(input.ifEmpty { suggestedPath }).canonicalFile
 
-    if (!destDir.exists()) {
-        printRed("❌ Directory does not exist: $destPath")
+    if (projectDir.exists() && projectDir.listFiles()?.isNotEmpty() == true) {
+        printRed("❌ Directory already exists and is not empty: ${projectDir.absolutePath}")
+        printYellow("   Choose a different location or remove the existing directory.")
         return null
     }
 
-    val projectDir = File(destDir, projectName.pascalCase)
-    if (projectDir.exists()) {
-        printRed("❌ A directory already exists at: ${projectDir.absolutePath}")
-        printYellow("   Choose a different destination or rename/remove the existing directory.")
+    if (!projectDir.exists() && !projectDir.mkdirs()) {
+        printRed("❌ Could not create directory: ${projectDir.absolutePath}")
         return null
     }
 
-    return destDir
+    return projectDir
 }
 
 fun getProjectName(): ProjectName? {
