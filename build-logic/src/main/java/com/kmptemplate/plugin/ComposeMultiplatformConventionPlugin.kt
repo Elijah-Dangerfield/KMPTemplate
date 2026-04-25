@@ -5,6 +5,7 @@ import com.kmptemplate.ext.ConfigurationExtension
 import com.kmptemplate.util.configureAndroid
 import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.configureKotlinMultiplatform
+import com.kmptemplate.util.enforceModuleBoundaries
 import com.kmptemplate.util.libs
 import com.kmptemplate.util.optInKotlinMarkers
 import org.gradle.api.Plugin
@@ -63,6 +64,8 @@ class ComposeMultiplatformConventionPlugin : Plugin<Project> {
             if (extensions.findByName("moduleConfig") == null) {
                 extensions.create("moduleConfig", ConfigurationExtension::class.java)
             }
+
+            enforceModuleBoundaries()
         }
     }
     

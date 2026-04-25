@@ -8,13 +8,34 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>NSFamilyControlsUsageDescription</key>
-	<string>We need access to Family Controls to monitor and manage screen time.</string>
 	<key>NSUserNotificationsUsageDescription</key>
-	<string>We'd like to send you notifications to help you stay on track with your screen time goals.</string>
+	<string>We'd like to send you notifications.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>processing</string>
 	</array>
+	<!--
+	  Deep links. Uncomment + customize to receive them.
+
+	  Custom scheme (kmptemplate://...):
+
+	  <key>CFBundleURLTypes</key>
+	  <array>
+	      <dict>
+	          <key>CFBundleURLName</key>
+	          <string>com.kmptemplate</string>
+	          <key>CFBundleURLSchemes</key>
+	          <array>
+	              <string>kmptemplate</string>
+	          </array>
+	      </dict>
+	  </array>
+
+	  Universal Links (https://...) require an `Associated Domains`
+	  entitlement (`applinks:example.com`) plus an
+	  apple-app-site-association file at https://example.com/.well-known/.
+
+	  Either way, .onOpenURL in iOSApp.swift forwards to DeepLinkBridge.
+	-->
 </dict>
 </plist>

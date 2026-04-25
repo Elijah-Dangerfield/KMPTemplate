@@ -28,6 +28,8 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.google.play.review)
+            implementation(libs.google.play.review.ktx)
         }
 
         iosMain.dependencies {

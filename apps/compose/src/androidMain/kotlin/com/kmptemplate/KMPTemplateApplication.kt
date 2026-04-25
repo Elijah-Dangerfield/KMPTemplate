@@ -12,5 +12,8 @@ class KMPTemplateApplication : Application() {
         appComponent = AndroidAppComponent::class.create(this)
         appComponent.telemetry.initialize()
         appComponent.appEventDispatcher
+        // Eagerly start tracking the foreground Activity so bindings that
+        // need it (e.g. AndroidReviewPrompter) work the moment they're called.
+        appComponent.activityProvider
     }
 }

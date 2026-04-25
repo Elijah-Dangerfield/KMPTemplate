@@ -30,6 +30,16 @@ After running, update your app icons:
 - **Android**: `apps/compose/src/androidMain/res/mipmap-*/`
 - **Shared logos**: `libraries/resources/src/commonMain/composeResources/drawable/`
 
+### First-time setup
+
+See **[SETUP.md](SETUP.md)** for the full post-init checklist — GitHub secrets, store listings, the first-release manual-promotion gotcha, and more. Run through it before cutting your first release.
+
+Before your first commit:
+
+```shell
+./scripts/install_hooks.sh   # installs the Conventional Commits hook
+```
+
 ### Build & Run
 
 ```shell
@@ -56,9 +66,11 @@ libraries/<name>/impl/ # Implementations
 
 ### Architecture Rules
 
-- **Features cannot depend on other features** — keeps dependency graph acyclic
-- **Shared code belongs in libraries** — extract common functionality up
-- **Main modules expose interfaces only** — `impl` modules contain implementations
+These are enforced at configuration time by the convention plugins — a violating `implementation(project(...))` fails the Gradle sync.
+
+- **Only `:apps:*` may depend on `*:impl`.** Impl modules are DI wiring composed by the app, not consumed by other features or libraries.
+- **Feature `api` modules may not depend on other feature `api` modules.** api-to-api across features becomes a cycle the moment someone adds the reverse edge. Shared types go into a library. Sub-modules of the same feature (`:features:foo:storage` → `:features:foo`) are fine.
+- **Shared code belongs in libraries.** The `:libraries:storage` module is the one exception where `:impl` is shared — it owns the `AppDatabase`.
 
 ### Creating New Modules
 

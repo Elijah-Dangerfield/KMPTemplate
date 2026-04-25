@@ -5,6 +5,7 @@ import com.kmptemplate.ext.ConfigurationExtension
 import com.kmptemplate.util.configureAndroid
 import com.kmptemplate.util.configureKotlinMultiplatform
 import com.kmptemplate.util.configureKotlinInject
+import com.kmptemplate.util.enforceModuleBoundaries
 import com.kmptemplate.util.libs
 import com.kmptemplate.util.loadSupabaseMetadata
 import com.kmptemplate.util.loadVersionMetadata
@@ -72,6 +73,8 @@ class KotlinMultiplatformConventionPlugin : Plugin<Project> {
                 pluginManager.apply(libs.plugins.buildconfig.get().pluginId)
                 configureSharedBuildConfig(loadVersionMetadata())
             }
+
+            enforceModuleBoundaries()
         }
     }
 

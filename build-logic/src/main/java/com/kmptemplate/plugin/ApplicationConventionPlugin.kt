@@ -6,8 +6,10 @@ import com.kmptemplate.util.SharedConstants
 import com.kmptemplate.util.configureAndroid
 import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.configureKotlinMultiplatform
+import com.kmptemplate.util.enforceModuleBoundaries
 import com.kmptemplate.util.libs
 import com.kmptemplate.util.loadSupabaseMetadata
+import com.kmptemplate.util.verifyGitHooksInstalled
 import com.kmptemplate.util.loadVersionMetadata
 import com.kmptemplate.util.optInKotlinMarkers
 import com.kmptemplate.util.VersionMetadata
@@ -99,6 +101,9 @@ class ApplicationConventionPlugin : Plugin<Project> {
                 extensions.create("moduleConfig", ConfigurationExtension::class.java)
             }
             configureAppBuildConfig(versionMetadata)
+
+            verifyGitHooksInstalled()
+            enforceModuleBoundaries()
         }
     }
 

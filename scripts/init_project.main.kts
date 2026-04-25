@@ -118,6 +118,10 @@ val SKIP_DIRECTORIES = setOf(
     "caches", "generated", "intermediates"
 )
 
+// The template/ folder at the repo root is the init-time staging area
+// (SETUP.md + ci/). It is copied explicitly — the wholesale copy skips it.
+val TEMPLATE_STAGING_DIR = "template"
+
 // Files to skip during content replacement
 val SKIP_FILES = setOf(
     "init_project.main.kts",
@@ -145,6 +149,7 @@ fun main() {
 
     val projectName = getProjectName() ?: return
     val packageName = getPackageName(projectName) ?: return
+    val contactEmail = getContactEmail() ?: return
     val projectDir = getProjectDir(projectName) ?: return
 
     println()
@@ -172,23 +177,31 @@ fun main() {
     val templateDir = File(".").canonicalFile
 
     try {
-        printBlue("📋 Step 1/6: Copying template to ${projectDir.absolutePath}...")
+        printBlue("📋 Step 1/8: Copying template to ${projectDir.absolutePath}...")
         copyTemplate(templateDir, projectDir)
         printGreen("   ✓ Template copied")
 
-        printBlue("📝 Step 2/6: Replacing file contents...")
+        printBlue("📦 Step 2/8: Placing SETUP.md + asking about CI...")
+        placeSetupDoc(templateDir, projectDir)
+        val ciEnabled = maybeEnableCi(templateDir, projectDir)
+
+        printBlue("📝 Step 3/8: Replacing file contents...")
         replaceFileContents(projectDir, projectName, packageName, stats)
 
-        printBlue("📁 Step 3/6: Renaming directories...")
+        printBlue("📁 Step 4/8: Renaming directories...")
         renameDirectories(projectDir, projectName, packageName, stats)
 
-        printBlue("📄 Step 4/6: Renaming files...")
+        printBlue("📄 Step 5/8: Renaming files...")
         renameFiles(projectDir, projectName, stats)
 
-        printBlue("🧹 Step 5/6: Cleaning up template artifacts...")
-        cleanupTemplateArtifacts(projectDir, projectName)
+        printBlue("🔖 Step 6/8: Substituting CI placeholders...")
+        substitutePlaceholders(projectDir, projectName, contactEmail)
 
-        printBlue("🔄 Step 6/6: Initializing git repository...")
+        printBlue("🧹 Step 7/8: Cleaning up template artifacts...")
+        cleanupTemplateArtifacts(projectDir, projectName)
+        ensureExecutableBits(projectDir)
+
+        printBlue("🔄 Step 8/8: Initializing git repository...")
         resetGitHistory(projectDir, projectName)
 
         println()
@@ -202,15 +215,14 @@ fun main() {
         println()
         printYellow("📍 Project created at: ${projectDir.absolutePath}")
         println()
-        printYellow("📝 Next steps:")
-        println("   1. Open the project: cd ${projectDir.absolutePath}")
-        println("   2. Open in your IDE and sync Gradle")
-        println("   3. Build the project: ./gradlew build")
-        println("   4. Update your app icons:")
-        println("      • iOS: apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/")
-        println("      • Android: apps/compose/src/androidMain/res/mipmap-*/")
-        println("      • Shared: libraries/resources/src/commonMain/composeResources/drawable/")
-        println("   5. Add your git remote: git remote add origin <your-repo-url>")
+        printYellow("✅ Project initialized.")
+        printYellow("→ Open SETUP.md for the full action-item checklist")
+        printYellow("   (GH secrets, store setup, first-release notes).")
+        printYellow("→ Run ./scripts/install_hooks.sh before your first commit.")
+        println()
+        println("   Open the project:   cd ${projectDir.absolutePath}")
+        println("   Sync Gradle:        open in IDE")
+        println("   First build:        ./gradlew build")
         println()
         printGreen("🎉 Happy coding with ${projectName.displayName}!")
 
@@ -226,6 +238,11 @@ fun copyTemplate(source: File, dest: File) {
     dest.mkdirs()
     source.listFiles()?.forEach { file ->
         if (file.name in SKIP_DIRECTORIES) return@forEach
+        // template/ is a staging folder copied explicitly (SETUP.md always,
+        // CI conditionally via enableCi()). Don't ship the staging folder
+        // itself into the new project.
+        if (file.parentFile?.canonicalPath == source.canonicalPath &&
+            file.isDirectory && file.name == TEMPLATE_STAGING_DIR) return@forEach
         val target = File(dest, file.name)
         if (file.isDirectory) {
             copyTemplate(file, target)
@@ -233,6 +250,136 @@ fun copyTemplate(source: File, dest: File) {
             file.copyTo(target, overwrite = false)
         }
     }
+}
+
+/**
+ * Recursive file copy preserving directory structure. Skips SKIP_DIRECTORIES.
+ */
+fun copyRecursive(source: File, dest: File) {
+    if (source.isDirectory) {
+        dest.mkdirs()
+        source.listFiles()?.forEach { child ->
+            if (child.name in SKIP_DIRECTORIES) return@forEach
+            copyRecursive(child, File(dest, child.name))
+        }
+    } else {
+        dest.parentFile?.mkdirs()
+        source.copyTo(dest, overwrite = true)
+    }
+}
+
+/**
+ * Returns the template staging directory inside the project dir, if it exists
+ * (it gets copied there because its parent is the template root).
+ *
+ * Actually no — copyTemplate skips the template/ folder. So the staging source
+ * is the original template's `template/` folder. We read it from the template
+ * dir directly.
+ */
+/**
+ * File.copyTo doesn't preserve the executable bit, so any shell scripts and
+ * git hooks shipped in the template need +x applied explicitly after copy.
+ */
+fun ensureExecutableBits(projectDir: File) {
+    val execPaths = listOf(
+        "scripts/install_hooks.sh",
+        ".githooks/commit-msg",
+        ".githooks/post-commit",
+        "gradlew"
+    )
+    execPaths.forEach { rel ->
+        val f = File(projectDir, rel)
+        if (f.exists()) f.setExecutable(true, false)
+    }
+}
+
+fun placeSetupDoc(templateDir: File, projectDir: File) {
+    val setupSrc = File(templateDir, "$TEMPLATE_STAGING_DIR/SETUP.md")
+    if (!setupSrc.exists()) return
+    val setupDst = File(projectDir, "SETUP.md")
+    setupSrc.copyTo(setupDst, overwrite = true)
+    printGreen("   ✓ Placed SETUP.md in project root")
+}
+
+/**
+ * Asks whether to enable CI and, if yes, copies every file under
+ * template/ci/ into the project, preserving relative paths.
+ */
+fun maybeEnableCi(templateDir: File, projectDir: File): Boolean {
+    val ciSrc = File(templateDir, "$TEMPLATE_STAGING_DIR/ci")
+    if (!ciSrc.exists() || !ciSrc.isDirectory) return false
+
+    println()
+    printCyan("""
+        🚢 Enable CI / release automation?
+
+        This copies release-please, fastlane, GitHub Pages, and the Sentry
+        triage prompt into your project:
+
+          • .github/workflows/*.yml  (ci, release-please, release, etc.)
+          • apps/ios/Gemfile + apps/ios/fastlane/*
+          • pages/*.html, style.css, icons
+          • release-please-config.json, .release-please-manifest.json
+          • scripts/prompts/sentry-triage.md
+
+        You'll still need to set GitHub secrets and create store listings
+        before the pipeline will actually ship — see SETUP.md.
+
+        Say no if you want to wire this up later (or never). You can always
+        run the init script's CI-only opt-in manually later.
+    """.trimIndent())
+    println()
+    print("Enable CI? (y/N): ")
+    val answer = readln().trim().lowercase()
+    val enable = answer == "y" || answer == "yes"
+
+    if (!enable) {
+        printYellow("   → CI skipped. Re-run setup from template/ci/ later if you change your mind.")
+        return false
+    }
+
+    ciSrc.listFiles()?.forEach { child ->
+        val dst = File(projectDir, child.name)
+        copyRecursive(child, dst)
+    }
+    printGreen("   ✓ CI files installed")
+    return true
+}
+
+/**
+ * Substitute the {{APP_NAME}} / {{CONTACT_EMAIL}} / {{LAST_UPDATED}} /
+ * {{APP_TAGLINE}} / {{APP_DESCRIPTION}} placeholders that live inside the
+ * CI staging files. Runs after replaceFileContents so it applies to the
+ * already-copied, already-renamed content.
+ */
+fun substitutePlaceholders(projectDir: File, projectName: ProjectName, contactEmail: String) {
+    val today = java.time.LocalDate.now().toString()
+    val tagline = "${projectName.displayName} — official site."
+    val description = "${projectName.displayName} is a cross-platform app built with Kotlin Multiplatform and Compose."
+    val pairs = listOf(
+        "{{APP_NAME}}" to projectName.displayName,
+        "{{CONTACT_EMAIL}}" to contactEmail,
+        "{{LAST_UPDATED}}" to today,
+        "{{APP_TAGLINE}}" to tagline,
+        "{{APP_DESCRIPTION}}" to description
+    )
+
+    fun walk(f: File) {
+        if (f.isDirectory) {
+            if (f.name in SKIP_DIRECTORIES) return
+            f.listFiles()?.forEach(::walk)
+            return
+        }
+        if (!shouldProcessFile(f)) return
+        try {
+            var content = f.readText()
+            val original = content
+            for ((k, v) in pairs) content = content.replace(k, v)
+            if (content != original) f.writeText(content)
+        } catch (_: Exception) {}
+    }
+
+    walk(projectDir)
 }
 
 fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName) {
@@ -406,6 +553,27 @@ fun getProjectName(): ProjectName? {
     }
     
     return projectName
+}
+
+fun getContactEmail(): String? {
+    println()
+    printCyan("""
+        ✉️ Contact email
+
+        Shown in the privacy/terms pages and used as the default support
+        address. You can change it later by editing pages/*.html.
+
+        Press Enter to use a placeholder (you@example.com).
+    """.trimIndent())
+    println()
+    print("Contact email [you@example.com]: ")
+
+    val input = readln().trim()
+    if (input.lowercase() in listOf("q", "quit", "exit")) {
+        printYellow("👋 Goodbye!")
+        return null
+    }
+    return input.ifEmpty { "you@example.com" }
 }
 
 fun getPackageName(projectName: ProjectName): String? {
