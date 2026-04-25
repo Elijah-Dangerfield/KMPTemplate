@@ -35,6 +35,8 @@ kotlin {
             implementation(projects.libraries.config)
             implementation(projects.libraries.config.impl)
             implementation(projects.libraries.kmptemplate.storage)
+            implementation(projects.libraries.networking)
+            implementation(projects.libraries.networking.impl)
 
             implementation(projects.features.home)
             implementation(projects.features.home.impl)

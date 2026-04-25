@@ -2,8 +2,6 @@ import SwiftUI
 import UIKit
 import AuthenticationServices
 import ComposeApp
-import FamilyControls
-import ManagedSettings
 import AVFoundation
 import CoreMotion
 

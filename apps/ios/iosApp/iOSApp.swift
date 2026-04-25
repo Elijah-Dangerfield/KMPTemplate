@@ -6,12 +6,14 @@ import ComposeApp
 struct iOSApp: App {
     
     let permissionManager = IOSPermissionManager()
+    let reviewPrompter = IOSReviewPrompter()
     private let nativeViewFactory = IOSNativeViewFactory.shared
     private let iOSAppComponent: IosAppComponent
 
     init() {
         self.iOSAppComponent = create(
             permissionManager: permissionManager,
+            reviewPrompter: reviewPrompter,
             nativeViewFactory: nativeViewFactory
         )
         iOSAppComponent.telemetry.initialize()
@@ -25,6 +27,12 @@ struct iOSApp: App {
                 appComponent: iOSAppComponent,
                 nativeViewFactory: nativeViewFactory
             )
+            .onOpenURL { url in
+                // Forward URLs from custom-scheme links and Universal Links
+                // into the Kotlin DeepLinkBridge — App.kt collects from it
+                // and calls navController.handleDeepLink.
+                iOSAppComponent.deepLinkBridge.emit(url: url.absoluteString)
+            }
         }
     }
 }

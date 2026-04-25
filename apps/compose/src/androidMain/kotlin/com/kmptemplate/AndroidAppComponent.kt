@@ -1,6 +1,7 @@
 package com.kmptemplate
 
 import android.content.Context
+import com.kmptemplate.libraries.kmptemplate.impl.ActivityProvider
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.MergeComponent
@@ -15,4 +16,10 @@ abstract class AndroidAppComponent(
     @Provides
     fun context() = context
 
+    /**
+     * Eagerly accessed in [KMPTemplateApplication.onCreate] so the
+     * activity-lifecycle callback registration happens before the first
+     * Activity is created.
+     */
+    abstract val activityProvider: ActivityProvider
 }

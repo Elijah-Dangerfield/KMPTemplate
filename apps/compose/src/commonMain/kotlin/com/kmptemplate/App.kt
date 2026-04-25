@@ -7,15 +7,31 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavHostController
+import androidx.navigation.NavUri
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kmptemplate.libraries.core.Catching
+import com.kmptemplate.libraries.core.logOnFailure
+import com.kmptemplate.libraries.core.BuildInfo
+import com.kmptemplate.libraries.core.Platform
+import com.kmptemplate.libraries.core.logging.KLog
+import com.kmptemplate.libraries.navigation.AnimationType
+import com.kmptemplate.libraries.navigation.FeatureEntryPoint
+import com.kmptemplate.libraries.navigation.Route
+import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowHost
+import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowNavigator
+import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
+import com.kmptemplate.libraries.navigation.serializableType
+import com.kmptemplate.libraries.navigation.toEnterTransition
+import com.kmptemplate.libraries.navigation.toExitTransition
+import com.kmptemplate.libraries.navigation.toRouteOrNull
 import com.kmptemplate.libraries.ui.PreviewAppState
 import com.kmptemplate.libraries.ui.components.Screen
 import com.kmptemplate.libraries.ui.components.SnackbarDuration
@@ -28,42 +44,35 @@ import com.kmptemplate.libraries.ui.snackbar.showDebugSnackBar
 import com.kmptemplate.libraries.ui.system.LocalAppState
 import com.kmptemplate.libraries.ui.system.LocalBuildInfo
 import com.kmptemplate.libraries.ui.system.LocalClock
-import com.kmptemplate.libraries.core.BuildInfo
-import com.kmptemplate.libraries.core.logging.KLog
-import com.kmptemplate.libraries.navigation.AnimationType
-import com.kmptemplate.libraries.navigation.FeatureEntryPoint
-import com.kmptemplate.libraries.navigation.NavigationOptions
-import com.kmptemplate.libraries.navigation.Route
-import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowHost
-import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowNavigator
-import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
-import com.kmptemplate.libraries.navigation.screen
-import com.kmptemplate.libraries.navigation.serializableType
-import com.kmptemplate.libraries.navigation.toEnterTransition
-import com.kmptemplate.libraries.navigation.toExitTransition
-import com.kmptemplate.libraries.navigation.toRouteOrNull
 import com.kmptemplate.system.AppThemeProvider
-import kotlinx.coroutines.flow.collectLatest
 import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun App(appComponent: AppComponent) {
     val appViewModel = appComponent.appViewModel
-    val state by appViewModel.stateFlow.collectAsStateWithLifecycle()
     val floatingWindowNavigator = remember { FloatingWindowNavigator() }
     val navController = rememberNavController(floatingWindowNavigator)
     val appRecomposeLogger = remember { KLog.withTag("AppRecompose") }
-    val splashRoute = remember { SplashRoute() }
     val router = remember { appComponent.delegatingRouter }
     val dialogHostState = rememberDialogHostState()
-    
+
     val shakeHandler = remember { appComponent.shakeHandler }
-    
+    val deepLinkBridge = remember { appComponent.deepLinkBridge }
+
     DisposableEffect(shakeHandler) {
         shakeHandler.start()
         onDispose {
             shakeHandler.stop()
+        }
+    }
+
+    LaunchedEffect(navController, deepLinkBridge) {
+        deepLinkBridge.urls.collect { url ->
+            Catching {
+                val request = NavDeepLinkRequest.Builder.fromUri(NavUri(url)).build()
+                navController.handleDeepLink(request)
+            }.logOnFailure { "Failed to handle deep link: $url" }
         }
     }
 
@@ -105,11 +114,11 @@ fun App(appComponent: AppComponent) {
                     navController = navController,
                     floatingWindowNavigator = floatingWindowNavigator,
                     featureEntryPoints = appComponent.featureEntryPoints,
-                    startDestination = splashRoute,
+                    startDestination = appViewModel.startDestination,
                     router = router,
-                    appViewModel = appViewModel,
-                    destinationRoute = state.startDestination,
                 )
+
+                SplashGate()
 
                 DialogHost(
                     modifier = Modifier.matchParentSize(),
@@ -125,10 +134,8 @@ private fun AppNavigation(
     navController: NavHostController,
     floatingWindowNavigator: FloatingWindowNavigator,
     featureEntryPoints: Set<FeatureEntryPoint>,
-    startDestination: Any,
+    startDestination: Route,
     router: DelegatingRouter,
-    appViewModel: AppViewModel,
-    destinationRoute: Route?,
 ) {
 
     Screen(
@@ -198,32 +205,11 @@ private fun AppNavigation(
                     typeOf<AnimationType>() to serializableType<AnimationType>()
                 )
             ) {
-                // Register splash screen with access to destination and router
-                screen<SplashRoute>(
-                    typeMap = mapOf(typeOf<AnimationType>() to serializableType<AnimationType>())
-                ) {
-                    SplashScreen(
-                        destinationRoute = destinationRoute,
-                        onNavigate = { route ->
-                            router.navigate(
-                                route = route,
-                                options = NavigationOptions(
-                                    clearBackStack = true,
-                                    launchSingleTop = true
-                                )
-                            )
-                        }
-                    )
-                }
-                
-                // Register all other feature entry points
-                featureEntryPoints
-                    .filterNot { it is SplashScreenEntryPoint }
-                    .forEach { entryPoint ->
-                        with(entryPoint) {
-                            buildNavGraph(router)
-                        }
+                featureEntryPoints.forEach { entryPoint ->
+                    with(entryPoint) {
+                        buildNavGraph(router)
                     }
+                }
             }
 
             FloatingWindowHost(floatingWindowNavigator)
@@ -231,4 +217,21 @@ private fun AppNavigation(
             router.Bind(navController)
         },
     )
+}
+
+/**
+ * Isolates the splash-overlay's `hasShownSplash` state read into its own composable
+ * so that flipping it cannot recompose `App` and, in particular, cannot cause
+ * `AppNavigation` / `NavHost` to rebuild its graph — which was previously pushing
+ * a second copy of the start destination onto the back stack.
+ *
+ * Only renders on iOS. Android uses the native splash API instead.
+ */
+@Composable
+private fun SplashGate() {
+    if (BuildInfo.platform != Platform.iOS) return
+    var hasShownSplash by rememberSaveable { mutableStateOf(false) }
+    if (!hasShownSplash) {
+        SplashOverlay(onComplete = { hasShownSplash = true })
+    }
 }

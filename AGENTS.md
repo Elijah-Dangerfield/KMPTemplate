@@ -27,7 +27,28 @@ libraries/<name>/      # Interfaces
 libraries/<name>/impl/ # Implementations
 ```
 
-**Rules:** Features never depend on features. Shared code → libraries. Main modules expose interfaces only; impl modules contain implementations.
+**Rules** — enforced at Gradle configuration by the convention plugins:
+
+- Only `:apps:*` may depend on `*:impl`. Impls are DI wiring composed by the app, not consumed by other modules.
+- Feature `impl` modules may depend on another feature's `api`. Feature `api` modules may **not** depend on other feature `api`s (api-to-api is a cycle risk — shared types go in a library).
+- Sub-modules of the same feature (`:features:foo:storage` → `:features:foo`) are allowed.
+- `:libraries:storage:impl` is the one shared impl — it owns the `AppDatabase`.
+
+Shared code → libraries. Main modules expose interfaces only; impl modules contain implementations.
+
+## Conventional Commits (required)
+
+Every commit (and every PR title — PRs are squash-merged) must follow [Conventional Commits](https://www.conventionalcommits.org/). Release-please derives the next version bump from commit history.
+
+| Type | When | Version bump |
+| --- | --- | --- |
+| `feat:` | User-visible new capability | minor |
+| `fix:` | Bug fix | patch |
+| `perf:` | Perf improvement, user-visible | patch |
+| `feat!:` / `BREAKING CHANGE:` | Breaking change | major |
+| `refactor:`, `style:`, `test:`, `docs:`, `ci:`, `build:`, `chore:`, `revert:` | No user impact | none |
+
+A local `.githooks/commit-msg` hook enforces this on every commit. The Gradle build fails with an install-hooks message if the hook isn't wired — run `./scripts/install_hooks.sh`.
 
 ## Convention Plugins
 

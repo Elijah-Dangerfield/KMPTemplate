@@ -1,6 +1,7 @@
 package com.kmptemplate
 
 import com.kmptemplate.libraries.kmptemplate.impl.AppEventDispatcher
+import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
 import com.kmptemplate.libraries.kmptemplate.Telemetry
 import com.kmptemplate.libraries.navigation.FeatureEntryPoint
@@ -18,6 +19,7 @@ interface AppComponent {
     val delegatingRouter: DelegatingRouter
     val telemetry: Telemetry
     val shakeHandler: ShakeHandler
+    val deepLinkBridge: DeepLinkBridge
     
     /**
      * Eagerly initialized to start observing app lifecycle events.
