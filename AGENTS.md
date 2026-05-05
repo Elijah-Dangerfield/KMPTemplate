@@ -101,6 +101,35 @@ bottomSheet<SheetRoute> { backStackEntry, sheetState -> ... }
 dialog<DialogRoute> { backStackEntry, dialogState -> ... }
 ```
 
+**Use `bottomSheet<>` for transient picker / overlay UIs** (a settings list, a "select an item" sheet) rather than pushing a full screen. The backstack stays one entry deep, the underlying screen is visible under a scrim, and `sheetState.dismiss()` is a clean exit. Reach for full `screen<>` only when the destination is its own context (settings page, detail view).
+
+**Open external URLs via `Router.openWebLink(url)`** — don't roll your own platform `Intent.ACTION_VIEW` / `UIApplication.shared.open` plumbing. The implementation is in `libraries/navigation/impl/.../{Android,Ios,Jvm}WebLinkLauncher.kt` and is already wired into the DI graph and the `Router` interface.
+
+## App-wide state
+
+`AppData` (in `libraries/<projectid>/.../AppCache.kt`) is a `@Serializable` data class persisted via `CacheFactory.persistent`. Add fields here for things like:
+
+- Onboarding flags (`hasUserOnboarded`)
+- User-facing setting toggles
+- Counters / lightweight telemetry (`feedbacksGiven`, `bugsReported`)
+
+Don't roll a new persistent cache for a single boolean — extend `AppData`. Round-trip is automatic via `versionedJsonSerializer` (missing fields fall back to defaults, so adding a field is non-breaking). For an example wrapper that exposes `StateFlow<Boolean>` for Compose, see how a feature-level store reads `AppCache.updates` and writes via `appCache.update { it.copy(...) }`.
+
+## Cross-cutting state in Compose
+
+When something (a service, a setting, a theme value) is needed by every composable in a subtree but doesn't belong on the screen-level ViewModel, prefer a `staticCompositionLocalOf` over threading parameters. Provide it once at the subtree root:
+
+```kotlin
+val LocalMyService = staticCompositionLocalOf<MyService> { NoopMyService }
+
+// At the screen root:
+CompositionLocalProvider(LocalMyService provides realService) {
+    HorizontalPager(...) { … }
+}
+```
+
+Default it to a noop, never `error("not provided")`. This keeps `@Preview` and unit tests trivial — they get the noop automatically.
+
 ## Coding Guidelines
 
 - Code like a staff engineer
