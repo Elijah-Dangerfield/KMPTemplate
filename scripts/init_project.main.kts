@@ -248,6 +248,12 @@ fun copyTemplate(source: File, dest: File) {
             copyTemplate(file, target)
         } else {
             file.copyTo(target, overwrite = false)
+            // File.copyTo doesn't preserve POSIX permissions. Restore the
+            // executable bit for shell scripts and gradlew so the new project
+            // is immediately runnable without `chmod +x`.
+            if (file.canExecute()) {
+                target.setExecutable(true, false)
+            }
         }
     }
 }
