@@ -1,4 +1,5 @@
 require "base64"
+require "fileutils"
 require "securerandom"
 require "tmpdir"
 
@@ -170,6 +171,15 @@ def build_and_upload(distribute_external:, submit_to_app_store:)
   end
 
   if submit_to_app_store
+    # App Store review requires a non-empty "What's New" on every submission
+    # past the first. `skip_metadata: true` skips the entire metadata upload
+    # path, so whatsNew stays blank on ASC and `submit_for_review` errors
+    # with: "You must provide a value for the attribute 'whatsNew'". Build
+    # a minimal metadata folder containing only release_notes.txt for each
+    # ASC locale — deliver uploads what's in the folder and leaves all other
+    # fields untouched. Cleaned up in the ensure block below.
+    metadata_path = build_release_notes_metadata(changelog)
+
     deliver(
       api_key: api_key,
       app_version: marketing_version,
@@ -179,7 +189,7 @@ def build_and_upload(distribute_external:, submit_to_app_store:)
       phased_release: true,
       force: true,
       skip_binary_upload: true,
-      skip_metadata: true,
+      metadata_path: metadata_path,
       skip_screenshots: true,
       precheck_include_in_app_purchases: false,
       submission_information: {
@@ -192,6 +202,9 @@ def build_and_upload(distribute_external:, submit_to_app_store:)
   upload_sentry_release(marketing_version, build_number)
 ensure
   File.delete(asc_key_path) if defined?(asc_key_path) && asc_key_path && File.exist?(asc_key_path)
+  if defined?(metadata_path) && metadata_path && File.directory?(metadata_path)
+    FileUtils.rm_rf(metadata_path)
+  end
   if defined?(keychain_created) && keychain_created
     begin
       delete_keychain(name: CI_KEYCHAIN_NAME)
@@ -199,6 +212,17 @@ ensure
       UI.important("Failed to delete keychain #{CI_KEYCHAIN_NAME}: #{e.message}")
     end
   end
+end
+
+# Returns a path to a temp directory containing a minimal deliver metadata
+# tree — only release_notes.txt populated — so submit_for_review has a
+# whatsNew value while leaving every other ASC field alone.
+def build_release_notes_metadata(changelog)
+  dir = File.join(Dir.tmpdir, "deliver-metadata-#{SecureRandom.hex(4)}")
+  locale_dir = File.join(dir, "en-US")
+  FileUtils.mkdir_p(locale_dir)
+  File.write(File.join(locale_dir, "release_notes.txt"), changelog.to_s)
+  dir
 end
 
 def read_marketing_version
