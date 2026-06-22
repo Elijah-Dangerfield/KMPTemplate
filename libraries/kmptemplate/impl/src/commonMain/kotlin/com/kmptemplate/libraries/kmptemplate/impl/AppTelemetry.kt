@@ -11,6 +11,7 @@ import com.kmptemplate.libraries.kmptemplate.Telemetry
 import com.kmptemplate.libraries.kmptemplate.impl.logging.KermitLogTree
 import com.kmptemplate.libraries.kmptemplate.impl.logging.SentryLogTree
 import io.sentry.kotlin.multiplatform.Sentry
+import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.protocol.SentryId
 import io.sentry.kotlin.multiplatform.protocol.User
 import io.sentry.kotlin.multiplatform.protocol.UserFeedback
@@ -131,7 +132,32 @@ private class ConfiguredTelemetry(
         }
 
         val typeTag = if (isBugReport) "bug_report" else "feedback"
-        val sentryId = eventId?.let { runCatching { SentryId(it) }.getOrNull() } ?: SentryId.EMPTY_ID
+
+        // User feedback must reference a real Sentry event — Sentry drops feedback
+        // attached to an empty/unknown event id. Reuse a caller-supplied id when
+        // present, otherwise capture a real event so the feedback actually lands.
+        val providedId = eventId
+            ?.let { runCatching { SentryId(it) }.getOrNull() }
+            ?.takeUnless { it.toString() == SentryId.EMPTY_ID.toString() }
+
+        val sentryId = providedId ?: Sentry.captureMessage(
+            if (isBugReport) "Bug report: $payload" else "User feedback: $payload",
+        ) { scope ->
+            scope.level = if (isBugReport) SentryLevel.WARNING else SentryLevel.INFO
+            scope.setTag("feedback_type", typeTag)
+            if (isBugReport && errorCode != null) {
+                scope.setTag("error_code", errorCode.toString())
+            }
+        }
+
+        if (sentryId.toString() == SentryId.EMPTY_ID.toString()) {
+            logger.w {
+                it.tag("feedback_type", typeTag)
+                "Could not create a Sentry event for feedback; dropped"
+            }
+            return
+        }
+
         val feedback = UserFeedback(sentryId).apply {
             comments = buildString {
                 if (isBugReport && errorCode != null) {
