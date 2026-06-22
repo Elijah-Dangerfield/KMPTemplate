@@ -109,7 +109,11 @@ val TEMPLATE_PACKAGE = "com.kmptemplate"
 val TEXT_FILE_EXTENSIONS = setOf(
     "kt", "kts", "java", "xml", "json", "yaml", "yml", "md", "txt",
     "properties", "gradle", "swift", "h", "m", "plist", "entitlements",
-    "xcconfig", "pbxproj", "xcscheme", "storyboard", "xib"
+    "xcconfig", "pbxproj", "xcscheme", "storyboard", "xib",
+    // Server: fly.toml app name + version catalog. (Dockerfile/.env are
+    // extensionless and server config is project-agnostic, so they don't
+    // carry the project name.)
+    "toml", "sql"
 )
 
 // Directories to skip during processing AND during copy

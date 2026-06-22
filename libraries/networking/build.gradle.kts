@@ -16,3 +16,6 @@ kotlin {
         }
     }
 }
+
+tasks.matching { it.name.contains("kspCommonMainKotlinMetadata", ignoreCase = true) }
+    .configureEach { enabled = false }

@@ -1,16 +1,16 @@
-package com.kmptemplate.libraries.networking.impl
+package com.kmptemplate.libraries.networking
 
-import com.kmptemplate.libraries.networking.AuthTokenProvider
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 
 /**
- * Default no-op binding so `:libraries:networking:impl` is self-contained for
- * apps without auth. When you add real auth, bind your own implementation with
+ * Default [AuthTokenProvider] binding so an app without auth works out of the
+ * box (every request goes out unauthenticated). It lives in this api module —
+ * not `:impl` — so an auth library can reference it in
  * `@ContributesBinding(AppScope::class, replaces = [NoOpAuthTokenProvider::class])`
- * and it'll take over.
+ * without crossing the impl-module boundary. See `:libraries:identity:impl`.
  */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)

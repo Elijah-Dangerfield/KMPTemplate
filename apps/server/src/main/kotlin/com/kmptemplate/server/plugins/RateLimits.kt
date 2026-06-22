@@ -1,0 +1,53 @@
+package com.kmptemplate.server.plugins
+
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.ratelimit.RateLimit
+import io.ktor.server.plugins.ratelimit.RateLimitName
+import io.ktor.server.request.header
+import io.ktor.server.request.path
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+
+/**
+ * Rate limiting. A global per-IP bucket guards every route; named buckets are
+ * registered for routes that want a tighter cap — opt in with
+ * `rateLimit(RateLimitName(PROFILE_WRITE_LIMIT)) { … }` (see MeRoutes' PATCH).
+ *
+ * Keying is per-IP: the limiter runs before auth's `validate`, so the JWT `sub`
+ * isn't available yet. `/_health` is excluded so health probes don't drain the
+ * bucket. Limits are deliberately loose — they catch hot loops and trivial
+ * abuse, not concerted DoS (your edge/CDN owns that).
+ */
+const val PROFILE_WRITE_LIMIT = "profile-write"
+
+fun Application.installRateLimits() {
+    install(RateLimit) {
+        global {
+            rateLimiter(limit = 600, refillPeriod = 1.minutes)
+            requestKey { call -> call.clientIp() }
+            requestWeight { call, _ -> if (call.request.path().startsWith("/_health")) 0 else 1 }
+        }
+
+        register(RateLimitName(PROFILE_WRITE_LIMIT)) {
+            // Writes with a server-side uniqueness constraint (PATCH /v1/me) get
+            // a tighter cap so name-squatting bots are expensive; a real user
+            // still has plenty of retries.
+            rateLimiter(limit = 30, refillPeriod = 1.hours)
+            requestKey { call -> call.clientIp() }
+        }
+    }
+}
+
+/**
+ * Best-effort client IP. Trusts the standard reverse-proxy headers (Fly's
+ * `Fly-Client-IP` first, then `X-Forwarded-For`, then the socket). Order
+ * matters: the wrong choice makes everyone share the edge IP and the limiter
+ * degenerates to one global bucket.
+ */
+internal fun io.ktor.server.application.ApplicationCall.clientIp(): String {
+    request.header("Fly-Client-IP")?.takeIf { it.isNotBlank() }?.let { return it }
+    request.header("X-Forwarded-For")?.split(',')?.firstOrNull()?.trim()
+        ?.takeIf { it.isNotBlank() }?.let { return it }
+    return request.local.remoteHost
+}
