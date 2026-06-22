@@ -41,6 +41,7 @@ fun Project.enforceModuleBoundaries() {
 }
 
 private fun Project.checkImplDependency(self: String, dep: String) {
+    if (dep == self) return
     if (!dep.endsWith(":impl")) return
     val api = dep.removeSuffix(":impl")
     throw GradleException(
