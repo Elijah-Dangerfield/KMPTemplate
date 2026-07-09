@@ -8,7 +8,7 @@ import kotlin.experimental.ExperimentalObjCName
  * Camera guidance state from the native camera preview.
  */
 @OptIn(ExperimentalObjCName::class)
-@ObjCName("VirtuCameraGuidanceState", exact = true)
+@ObjCName("KMPTemplateCameraGuidanceState", exact = true)
 enum class CameraGuidanceState {
     Ready,           // Good to capture
     TiltedTooMuch,   // Phone is tilted, suggest holding flat
@@ -17,7 +17,7 @@ enum class CameraGuidanceState {
 }
 
 @OptIn(ExperimentalObjCName::class)
-@ObjCName("VirtuNativeViewFactory", exact = true)
+@ObjCName("KMPTemplateNativeViewFactory", exact = true)
 interface NativeViewFactory {
 
     @Throws(Exception::class)
@@ -58,14 +58,14 @@ interface NativeViewFactory {
 val LocalNativeViewFactory = staticCompositionLocalOf<NativeViewFactory?> { null }
 
 @OptIn(ExperimentalObjCName::class)
-@ObjCName("VirtuNativeAppleSignInButtonKind", exact = true)
+@ObjCName("KMPTemplateNativeAppleSignInButtonKind", exact = true)
 enum class NativeAppleSignInButtonKind {
     SignIn,
     ContinueFlow
 }
 
 @OptIn(ExperimentalObjCName::class)
-@ObjCName("VirtuNativeAppleSignInButtonStyle", exact = true)
+@ObjCName("KMPTemplateNativeAppleSignInButtonStyle", exact = true)
 enum class NativeAppleSignInButtonStyle {
     Black,
     White,
