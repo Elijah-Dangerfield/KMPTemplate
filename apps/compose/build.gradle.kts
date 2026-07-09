@@ -1,6 +1,6 @@
 plugins {
     id("kmptemplate.application")
-    id("co.touchlab.skie") version "0.10.8"
+    id("co.touchlab.skie") version "0.10.12"
 
 }
 
