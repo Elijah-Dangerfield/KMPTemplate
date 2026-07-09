@@ -5,15 +5,15 @@ import ComposeApp
 import AVFoundation
 import CoreMotion
 
-final class IOSNativeViewFactory: VirtuNativeViewFactory {
+final class IOSNativeViewFactory: KMPTemplateNativeViewFactory {
 
     static let shared = IOSNativeViewFactory()
     private let decoder = JSONDecoder()
     private let logger = KLog.shared.withTag(tag:"NativeViewFactory")
 
     func createAppleSignInButton(
-        kind: VirtuNativeAppleSignInButtonKind,
-        style: VirtuNativeAppleSignInButtonStyle,
+        kind: KMPTemplateNativeAppleSignInButtonKind,
+        style: KMPTemplateNativeAppleSignInButtonStyle,
         cornerRadius: Float,
         onTap: @escaping () -> Void
     ) throws -> UIView {
@@ -143,7 +143,7 @@ final class AppleSignInButtonHost: UIView {
     }
 }
 
-private extension VirtuNativeAppleSignInButtonKind {
+private extension KMPTemplateNativeAppleSignInButtonKind {
     var buttonType: ASAuthorizationAppleIDButton.ButtonType {
         switch self {
         case .signIn:
@@ -154,7 +154,7 @@ private extension VirtuNativeAppleSignInButtonKind {
     }
 }
 
-private extension VirtuNativeAppleSignInButtonStyle {
+private extension KMPTemplateNativeAppleSignInButtonStyle {
     var buttonStyle: ASAuthorizationAppleIDButton.Style {
         switch self {
         case .black:

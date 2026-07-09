@@ -109,7 +109,11 @@ val TEMPLATE_PACKAGE = "com.kmptemplate"
 val TEXT_FILE_EXTENSIONS = setOf(
     "kt", "kts", "java", "xml", "json", "yaml", "yml", "md", "txt",
     "properties", "gradle", "swift", "h", "m", "plist", "entitlements",
-    "xcconfig", "pbxproj", "xcscheme", "storyboard", "xib"
+    "xcconfig", "pbxproj", "xcscheme", "storyboard", "xib",
+    // Server: fly.toml app name + version catalog. (Dockerfile/.env are
+    // extensionless and server config is project-agnostic, so they don't
+    // carry the project name.)
+    "toml", "sql"
 )
 
 // Directories to skip during processing AND during copy
@@ -641,6 +645,7 @@ fun buildReplacements(projectName: ProjectName, packageName: String): List<Pair<
         "Kmp Template" to projectName.displayName,
         "kmp template" to projectName.displayName.lowercase(),
         "KmpTemplate" to projectName.pascalCase,
+        "Kmptemplate" to projectName.pascalCase,
         "kmptemplate" to projectName.lowercase
     )
 }
@@ -665,7 +670,14 @@ fun replaceFileContents(dir: File, projectName: ProjectName, packageName: String
 fun shouldProcessFile(file: File): Boolean {
     val extension = file.extension.lowercase()
     return extension in TEXT_FILE_EXTENSIONS || file.name in listOf(
-        "Podfile", "Gemfile", "Makefile", "Dockerfile", "gradlew"
+        // fastlane's files are extensionless — missing Appfile here shipped a
+        // project whose TestFlight uploads looked up com.kmptemplate.KMPTemplate
+        // on ASC and failed (found via Cards, 2026-07-09).
+        "Podfile", "Gemfile", "Makefile", "Dockerfile", "gradlew",
+        "Appfile", "Fastfile", "Matchfile", "Deliverfile",
+        // .env files resolve to extension "example"/"env" — the server's
+        // .env.example carries the project name in OTEL_SERVICE_NAME.
+        ".env", ".env.example",
     )
 }
 
@@ -696,6 +708,13 @@ fun replaceInFile(file: File, projectName: ProjectName, packageName: String, sta
 }
 
 fun renameDirectories(dir: File, projectName: ProjectName, packageName: String, stats: ReplacementStats) {
+    // Package directories FIRST: com/kmptemplate must become the full package
+    // path (com/your/pkg) before the generic name pass below renames it to
+    // com/<lowercase> and leaves directories out of sync with the package
+    // declarations rewritten by replaceFileContents (found via Cards, 2026-07-09:
+    // dirs were com/cards while packages were com.dangerfield.cards).
+    renamePackageDirectories(dir, packageName, stats)
+
     // Collect all directories first, then sort by depth (deepest first)
     val allDirs = mutableListOf<File>()
     collectDirectories(dir, allDirs)
@@ -713,8 +732,6 @@ fun renameDirectories(dir: File, projectName: ProjectName, packageName: String, 
         }
     }
     
-    // Also handle package directory structure
-    renamePackageDirectories(dir, packageName, stats)
 }
 
 fun collectDirectories(dir: File, collected: MutableList<File>) {
@@ -782,6 +799,7 @@ fun getReplacedName(name: String, projectName: ProjectName): String {
     result = result.replace(TEMPLATE_NAME.snakeCase, projectName.snakeCase)
     result = result.replace(TEMPLATE_NAME.lowercase, projectName.lowercase)
     result = result.replace("KmpTemplate", projectName.pascalCase)
+    result = result.replace("Kmptemplate", projectName.pascalCase)
     result = result.replace("kmptemplate", projectName.lowercase)
     
     return result

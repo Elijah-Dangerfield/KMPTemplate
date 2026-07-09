@@ -12,11 +12,11 @@ androidx-work = "2.9.1"
 atomicfu = "0.29.0"
 composeMultiplatform = "1.9.3"
 compottie="2.0.2"
-configurationAnnotations = "0.10.8"
+configurationAnnotations = "0.10.12"
 buildconfig = "5.5.0"
 junit = "4.13.2"
 kermit = "2.0.8"
-kotlin = "2.2.21"
+kotlin = "2.3.21"
 kotlinxSerializationJson = "1.9.0"
 ksp = "2.3.0"
 kotlinInject = "0.8.0"
@@ -24,6 +24,17 @@ kotlinx-serialization = "1.9.0"
 kotlinxCoroutinesCore = "1.10.2"
 kotlinxDatetime = "0.7.1"
 ktor = "3.3.3"
+logback = "1.5.6"
+exposed = "0.56.0"
+postgres = "42.7.4"
+hikari = "5.1.0"
+flyway = "10.20.0"
+testcontainers = "1.20.4"
+auth0Jwt = "4.4.0"
+auth0JwksRsa = "0.22.1"
+sentryJvm = "7.18.1"
+opentelemetry = "1.45.0"
+opentelemetryInstrumentation = "2.11.0-alpha"
 jetbrainsNavigationCompose = "2.9.1"
 kotlinInjectAnvil = "0.1.6"
 composeIcons = "1.1.1"
@@ -32,7 +43,7 @@ sqlite = "2.6.2"
 datastore = "1.2.0"
 roomGradlePlugin = "2.8.4"
 sentryKmp = "0.22.0"
-supabaseKt = "3.2.6"
+supabaseKt = "3.6.0"
 lifecycleProcess = "2.10.0"
 
 [libraries]
@@ -63,6 +74,44 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 ktor-serverCore = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-serverNetty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor" }
+ktor-serverContentNegotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-serverCors = { module = "io.ktor:ktor-server-cors-jvm", version.ref = "ktor" }
+ktor-serverStatusPages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
+ktor-serverCallLogging = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor" }
+ktor-serverCallId = { module = "io.ktor:ktor-server-call-id-jvm", version.ref = "ktor" }
+ktor-serverAuth = { module = "io.ktor:ktor-server-auth-jvm", version.ref = "ktor" }
+ktor-serverAuthJwt = { module = "io.ktor:ktor-server-auth-jwt-jvm", version.ref = "ktor" }
+ktor-serverRateLimit = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+# Observability (server): Sentry error reporting + OpenTelemetry traces/logs/metrics.
+# All env-gated — no-op (Sentry) or stdout (OTel) until configured.
+sentry-jvm = { module = "io.sentry:sentry", version.ref = "sentryJvm" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry" }
+opentelemetry-sdk-logs = { module = "io.opentelemetry:opentelemetry-sdk-logs", version.ref = "opentelemetry" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
+opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry" }
+opentelemetry-extension-kotlin = { module = "io.opentelemetry:opentelemetry-extension-kotlin", version.ref = "opentelemetry" }
+opentelemetry-logback-appender = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0", version.ref = "opentelemetryInstrumentation" }
+opentelemetry-ktor = { module = "io.opentelemetry.instrumentation:opentelemetry-ktor-3.0", version.ref = "opentelemetryInstrumentation" }
+
+# Supabase JWT verification. java-jwt is what ktor-server-auth-jwt sits on; we
+# use it directly to build the verifier. jwks-rsa fetches Supabase's public
+# signing keys from the project JWKS endpoint (cached + rate-limited).
+auth0-jwt = { module = "com.auth0:java-jwt", version.ref = "auth0Jwt" }
+auth0-jwksRsa = { module = "com.auth0:jwks-rsa", version.ref = "auth0JwksRsa" }
+
+# Server persistence: Postgres + HikariCP + Exposed DSL + Flyway migrations.
+postgres-jdbc = { module = "org.postgresql:postgresql", version.ref = "postgres" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-javaTime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+testcontainers-postgres = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 coil = { module = "io.coil-kt.coil3:coil-compose", version = "3.3.0" }
@@ -75,6 +124,10 @@ ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotia
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# Supabase auth (client). The server does NOT use this — it verifies JWTs via
+# JWKS (see :apps:server). Only the GoTrue/auth module is needed client-side.
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabaseKt" }
 
 google-play-review = { module = "com.google.android.play:review", version = "2.0.2" }
 google-play-review-ktx = { module = "com.google.android.play:review-ktx", version = "2.0.2" }
@@ -114,6 +167,7 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidxRoom = { id = "androidx.room", version.ref = "room" }
