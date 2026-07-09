@@ -158,7 +158,7 @@ Default it to a noop, never `error("not provided")`. This keeps `@Preview` and u
   @ObjCName("MyType", exact = true)
   interface MyType { ... }
   ```
-  Note: The `exact = true` parameter prevents module prefixes from being added. Without it, the Swift name would be `<ModuleName><ObjCName>` (e.g., `KmptemplateMyType`).
+  Note: The `exact = true` parameter prevents module prefixes from being added. Without it, the Swift name would be `<ModuleName><ObjCName>` (e.g., `ComposeAppMyType`).
 
 ## Key Files
 

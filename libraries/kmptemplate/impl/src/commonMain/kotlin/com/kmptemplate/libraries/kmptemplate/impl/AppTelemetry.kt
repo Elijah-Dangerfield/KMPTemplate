@@ -219,7 +219,10 @@ data class SentryRuntimeConfig(
                 Platform.iOS -> if (buildInfo.isDebug) IOS_DEBUG_DSN_PLACEHOLDER else IOS_RELEASE_DSN_PLACEHOLDER
             }
             val environment = "${buildInfo.releaseChannel}-$platformTag-$buildTypeTag"
-            val release = "kmptemplatee@${buildInfo.versionName}+${buildInfo.buildNumber}"
+            // Must stay in lockstep with upload_sentry_release in
+            // apps/ios/fastlane/Fastfile — Sentry attaches events to releases
+            // by exact string match.
+            val release = "kmptemplate@${buildInfo.versionName}+${buildInfo.buildNumber}"
             val tracesSampleRate = if (buildInfo.isDebug) 1.0 else 0.15
             val profilesSampleRate = if (buildInfo.isDebug) 1.0 else 0.05
             val breadcrumbLevel = if (buildInfo.isDebug) LogLevel.Debug else LogLevel.Info

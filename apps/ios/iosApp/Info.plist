@@ -8,6 +8,14 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!--
+	  Without this key the generated plist defaults CFBundleName to
+	  $(PRODUCT_NAME), and App Store delivery rejects names that are
+	  already taken by another app (ITMS-90129). Keep it set to the
+	  app's display name; it must be unique on the App Store.
+	-->
+	<key>CFBundleName</key>
+	<string>KMP Template</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>We'd like to send you notifications.</string>
 	<key>UIBackgroundModes</key>

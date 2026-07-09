@@ -81,7 +81,7 @@ And under **Settings → Secrets and variables → Actions → Variables** (not 
 Before `release.yml` can ship:
 
 1. **Play Console** → Create app → fill out store listing, data-safety form, content rating, pricing/distribution. Create at least one internal track tester.
-2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details.
+2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details. Note: Apple checks the binary's bundle name / display name for uniqueness at *delivery* time (ITMS-90129), not here — if your app name is a common word, the first upload may bounce; pick a more distinctive `CFBundleName`/`CFBundleDisplayName` in `apps/ios` and re-upload.
 3. **TestFlight** external group: create a group named `External Testers` (or change `TESTFLIGHT_EXTERNAL_GROUP` in `release.yml`).
 4. Privacy policy + terms of service URLs — the `pages/` folder generates these; once Pages is enabled they're at `https://<you>.github.io/<repo>/privacy.html` etc. Paste the URLs into both store listings.
 
