@@ -669,7 +669,11 @@ fun replaceFileContents(dir: File, projectName: ProjectName, packageName: String
 fun shouldProcessFile(file: File): Boolean {
     val extension = file.extension.lowercase()
     return extension in TEXT_FILE_EXTENSIONS || file.name in listOf(
-        "Podfile", "Gemfile", "Makefile", "Dockerfile", "gradlew"
+        // fastlane's files are extensionless — missing Appfile here shipped a
+        // project whose TestFlight uploads looked up com.kmptemplate.KMPTemplate
+        // on ASC and failed (found via Cards, 2026-07-09).
+        "Podfile", "Gemfile", "Makefile", "Dockerfile", "gradlew",
+        "Appfile", "Fastfile", "Matchfile", "Deliverfile",
     )
 }
 
