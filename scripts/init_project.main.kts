@@ -645,6 +645,7 @@ fun buildReplacements(projectName: ProjectName, packageName: String): List<Pair<
         "Kmp Template" to projectName.displayName,
         "kmp template" to projectName.displayName.lowercase(),
         "KmpTemplate" to projectName.pascalCase,
+        "Kmptemplate" to projectName.pascalCase,
         "kmptemplate" to projectName.lowercase
     )
 }
@@ -674,6 +675,9 @@ fun shouldProcessFile(file: File): Boolean {
         // on ASC and failed (found via Cards, 2026-07-09).
         "Podfile", "Gemfile", "Makefile", "Dockerfile", "gradlew",
         "Appfile", "Fastfile", "Matchfile", "Deliverfile",
+        // .env files resolve to extension "example"/"env" — the server's
+        // .env.example carries the project name in OTEL_SERVICE_NAME.
+        ".env", ".env.example",
     )
 }
 
@@ -704,6 +708,13 @@ fun replaceInFile(file: File, projectName: ProjectName, packageName: String, sta
 }
 
 fun renameDirectories(dir: File, projectName: ProjectName, packageName: String, stats: ReplacementStats) {
+    // Package directories FIRST: com/kmptemplate must become the full package
+    // path (com/your/pkg) before the generic name pass below renames it to
+    // com/<lowercase> and leaves directories out of sync with the package
+    // declarations rewritten by replaceFileContents (found via Cards, 2026-07-09:
+    // dirs were com/cards while packages were com.dangerfield.cards).
+    renamePackageDirectories(dir, packageName, stats)
+
     // Collect all directories first, then sort by depth (deepest first)
     val allDirs = mutableListOf<File>()
     collectDirectories(dir, allDirs)
@@ -721,8 +732,6 @@ fun renameDirectories(dir: File, projectName: ProjectName, packageName: String, 
         }
     }
     
-    // Also handle package directory structure
-    renamePackageDirectories(dir, packageName, stats)
 }
 
 fun collectDirectories(dir: File, collected: MutableList<File>) {
@@ -790,6 +799,7 @@ fun getReplacedName(name: String, projectName: ProjectName): String {
     result = result.replace(TEMPLATE_NAME.snakeCase, projectName.snakeCase)
     result = result.replace(TEMPLATE_NAME.lowercase, projectName.lowercase)
     result = result.replace("KmpTemplate", projectName.pascalCase)
+    result = result.replace("Kmptemplate", projectName.pascalCase)
     result = result.replace("kmptemplate", projectName.lowercase)
     
     return result
