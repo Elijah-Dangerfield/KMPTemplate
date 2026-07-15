@@ -6,6 +6,7 @@ import com.kmptemplate.util.SharedConstants
 import com.kmptemplate.util.configureAndroid
 import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.configureKotlinMultiplatform
+import com.kmptemplate.util.configureReleaseSigning
 import com.kmptemplate.util.enforceModuleBoundaries
 import com.kmptemplate.util.libs
 import com.kmptemplate.util.loadSupabaseMetadata
@@ -87,12 +88,15 @@ class ApplicationConventionPlugin : Plugin<Project> {
                     }
                 }
 
+                val releaseSigning = configureReleaseSigning(this)
+
                 buildTypes {
                     debug {
                         applicationIdSuffix = ".debug"
                     }
                     release {
                         isMinifyEnabled = false
+                        signingConfig = releaseSigning ?: signingConfigs.getByName("debug")
                     }
                 }
             }
