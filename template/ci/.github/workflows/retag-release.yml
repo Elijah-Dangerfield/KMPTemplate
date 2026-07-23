@@ -117,7 +117,7 @@ jobs:
           set -e
           git tag "$TAG" origin/main
           git push origin "$TAG"
-          echo "Pushed $TAG at $(git rev-parse $TAG)"
+          echo "Pushed $TAG at $(git rev-parse "$TAG")"
 
       - name: Cancel auto-triggered release.yml run
         # The tag push we just did fires release.yml via its `push: tags:`

@@ -55,7 +55,7 @@ jobs:
         run: |
           if [ ! -d /Applications/Xcode.app ]; then
             echo "::error::/Applications/Xcode.app is missing on runner"
-            ls /Applications | grep -i xcode || true
+            find /Applications -maxdepth 1 -iname '*xcode*' || true
             exit 1
           fi
           sudo xcode-select -s /Applications/Xcode.app

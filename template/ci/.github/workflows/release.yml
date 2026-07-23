@@ -148,7 +148,7 @@ jobs:
       - name: Locate AAB
         id: aab
         run: |
-          AAB=$(ls apps/compose/build/outputs/bundle/release/*.aab | head -n 1)
+          AAB=$(find apps/compose/build/outputs/bundle/release -name '*.aab' | head -n 1)
           echo "path=$AAB" >> "$GITHUB_OUTPUT"
 
       - name: Detect first-release vs subsequent (Play Console)
@@ -188,9 +188,11 @@ jobs:
           EDIT_ID=$(echo "$EDIT_JSON" | python3 -c 'import json,sys;d=json.load(sys.stdin);print(d.get("id",""))' 2>/dev/null || true)
           if [ -z "$EDIT_ID" ]; then
             echo "Could not create edit (new app or missing permission) — treating as first release"
-            echo "track=internal" >> "$GITHUB_OUTPUT"
-            echo "status=completed" >> "$GITHUB_OUTPUT"
-            echo "is_first_release=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "track=internal"
+              echo "status=completed"
+              echo "is_first_release=true"
+            } >> "$GITHUB_OUTPUT"
             rm -f "$SA_JSON"
             exit 0
           fi
@@ -200,14 +202,18 @@ jobs:
           rm -f "$SA_JSON"
           if [ "$HAS_RELEASE" = "yes" ]; then
             echo "Existing production track found — using production (staged 10%)"
-            echo "track=production" >> "$GITHUB_OUTPUT"
-            echo "status=inProgress" >> "$GITHUB_OUTPUT"
-            echo "is_first_release=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "track=production"
+              echo "status=inProgress"
+              echo "is_first_release=false"
+            } >> "$GITHUB_OUTPUT"
           else
             echo "::warning::No production release found on Play — first release. Routing to internal track. Manually promote in Play Console before the next release."
-            echo "track=internal" >> "$GITHUB_OUTPUT"
-            echo "status=completed" >> "$GITHUB_OUTPUT"
-            echo "is_first_release=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "track=internal"
+              echo "status=completed"
+              echo "is_first_release=true"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: Render release notes for Play
@@ -321,7 +327,7 @@ jobs:
         run: |
           if [ ! -d /Applications/Xcode.app ]; then
             echo "::error::/Applications/Xcode.app is missing on runner"
-            ls /Applications | grep -i xcode || true
+            find /Applications -maxdepth 1 -iname '*xcode*' || true
             exit 1
           fi
           sudo xcode-select -s /Applications/Xcode.app
