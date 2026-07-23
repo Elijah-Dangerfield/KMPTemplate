@@ -105,6 +105,10 @@ Anonymous-first Supabase auth. Sessions are never minted implicitly: onboarding 
 - **Session persistence is OS-encrypted** (Keychain on iOS via the Swift `IOSSecureSessionStorage`, `EncryptedSharedPreferences` on Android) with a file mirror for anonymous sessions so a TestFlight Keychain wipe can't strand a guest.
 - The browser-OAuth redirect is `kmptemplate://login-callback` (the scheme renames with the project); `App.kt` hands it to `completeOAuthRedirect`, never the nav graph.
 
+## Triggered sync (`UserScopedSyncer`)
+
+Repositories that mirror server state don't invent their own refresh timing. Implement one idempotent `sync(): Result<Unit>`, contribute to the `UserScopedSyncer` multibinding (see `ExampleUserScopedSyncer` for the two-line registration recipe), and `UserScopedSyncCoordinator` runs it on every edge that matters: account became active (sign-in, cold-boot resolve, switch, claim), warm foreground, and connectivity regained — with exponential retry that parks as success while offline (re-armed by the reconnect edge). The level-keyed `runWhen` core means a subscriber can't miss an edge that fired before it attached. For offline *writes*, use the outbox pattern instead — `docs/practices/outbox.md`.
+
 ## Server (`:apps:server`)
 
 A Ktor + Postgres backend with Supabase JWT auth. It reuses the client's conventions—kotlin-inject + anvil DI (`ServerScope` / `ServerComponent`), the `domain/` interface + `data/` impl split, one `fun Route.xRoutes(deps)` per resource—and degrades gracefully (boots with no DB / no Supabase). It's a plain JVM module, so it applies plugins directly rather than via a convention plugin.
