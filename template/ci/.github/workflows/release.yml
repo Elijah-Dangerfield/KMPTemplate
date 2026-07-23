@@ -36,7 +36,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release (e.g. v1.2.3). Required if not triggered by a tag push.'
+        description: 'Tag to release (e.g. v1.2.3). Required if not triggered by a tag push. Builds the commit the tag points at, NOT main — to ship current main under an existing version, use the Retag release workflow instead.'
         required: false
         type: string
       skip_app_store:
@@ -46,6 +46,11 @@ on:
         type: boolean
       skip_play_store:
         description: 'Skip Play Store submission (Android AAB artifact only)'
+        required: false
+        default: false
+        type: boolean
+      skip_ios:
+        description: 'Skip the iOS job entirely — re-run Android alone after a partial failure without the ~90m iOS build'
         required: false
         default: false
         type: boolean
@@ -77,13 +82,36 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+  build-number:
+    name: Resolve build number
+    needs: resolve-tag
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.n.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-tag.outputs.tag }}
+          fetch-depth: 0
+      - id: n
+        # Commit count at the release tag — the SAME monotonic value beta.yml
+        # and the iOS Fastfile already use for the in-app BuildInfo.versionCode,
+        # so min-version / force-upgrade config compares like-for-like across
+        # iOS and Android. It also keeps Android's store versionCode above the
+        # beta builds already on the Play internal track (which use this same
+        # count); github.run_number regressed below them and Play rejected the
+        # rollout. Needs fetch-depth: 0 or the count is 1 on a shallow clone.
+        run: echo "value=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+
   android:
     name: Android AAB + Play submit
-    # Gate on iOS passing so a "Google shipped, Apple didn't" split can't
-    # happen again — we either release both platforms for a given tag or
-    # neither. If iOS fails, use workflow_dispatch with skip_app_store:true
-    # to retry iOS alone, or land a fix and let the next release carry it.
-    needs: [resolve-tag, ios]
+    # Gate on iOS so a "Google shipped, Apple didn't" split can't happen by
+    # accident: Android runs only when iOS SUCCEEDED or was intentionally
+    # skipped (skip_ios). If iOS fails, Android is skipped too. To re-run
+    # Android alone after a partial failure, dispatch with skip_ios:true
+    # (skips the ~90m iOS build); to retry iOS alone, use skip_play_store:true.
+    needs: [resolve-tag, build-number, ios]
+    if: ${{ always() && needs.resolve-tag.result == 'success' && needs.build-number.result == 'success' && (needs.ios.result == 'success' || needs.ios.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     outputs:
@@ -98,9 +126,13 @@ jobs:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       SENTRY_ORG: ${{ vars.SENTRY_ORG }}
       SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
-      VERSION_CODE_OVERRIDE: ${{ github.run_number }}
-      BUILD_NUMBER_OVERRIDE: ${{ github.run_number }}
-      RELEASE_CHANNEL_OVERRIDE: prod
+      VERSION_CODE_OVERRIDE: ${{ needs.build-number.outputs.value }}
+      BUILD_NUMBER_OVERRIDE: ${{ needs.build-number.outputs.value }}
+      RELEASE_CHANNEL_OVERRIDE: store
+      GRAFANA_OTLP_BASE_URL: ${{ secrets.GRAFANA_OTLP_BASE_URL }}
+      GRAFANA_OTLP_INSTANCE_ID: ${{ secrets.GRAFANA_OTLP_INSTANCE_ID }}
+      GRAFANA_LOGS_WRITE_TOKEN: ${{ secrets.GRAFANA_LOGS_WRITE_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
     steps:
       - name: Checkout
@@ -165,6 +197,9 @@ jobs:
           set -e
           SA_JSON="$(mktemp)"
           printf '%s' "$PLAY_SERVICE_ACCOUNT_JSON" > "$SA_JSON"
+          # Exported so the inline python can read it via os.environ['SA_JSON']
+          # (same KeyError trap as the iOS job's KEY_PATH).
+          export SA_JSON
           TOKEN=$(python3 - <<'PY'
           import base64, json, os, time, urllib.request, urllib.parse, hmac, hashlib
           sa=json.load(open(os.environ['SA_JSON']))
@@ -227,6 +262,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Resolve R8 mapping (upload only if minify produced one)
+        # Release builds ship with minify off (see ApplicationConventionPlugin),
+        # so no mapping.txt exists and there is nothing to de-obfuscate. Pass the
+        # path only when the file is actually there; otherwise leave it empty so
+        # the Play upload skips the mapping instead of failing with ENOENT. When
+        # R8 is enabled later this starts uploading the mapping automatically.
+        id: mapping
+        run: |
+          MF=apps/compose/build/outputs/mapping/release/mapping.txt
+          if [ -f "$MF" ]; then
+            echo "path=$MF" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No R8 mapping.txt (minify is off) — skipping mapping upload."
+            echo "path=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Submit to Play Console
         # Track + status are resolved above: `internal` + `completed` on the
         # very first release (Play won't accept an automated production upload
@@ -244,7 +295,7 @@ jobs:
           status: ${{ steps.play_track.outputs.status || 'completed' }}
           userFraction: ${{ steps.play_track.outputs.track == 'production' && '0.10' || '' }}
           whatsNewDirectory: apps/compose/build/play-release-notes
-          mappingFile: apps/compose/build/outputs/mapping/release/mapping.txt
+          mappingFile: ${{ steps.mapping.outputs.path }}
           # debugSymbols omitted — no native (.so) libraries are shipped.
 
       - name: Warn on missing Play credentials
@@ -254,10 +305,15 @@ jobs:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
 
       - name: Create Sentry release + upload mapping/debug files
+        # Post-upload metadata only (Sentry release + mappings/dSYMs). By the
+        # time this runs the AAB is already committed to Play, so a Sentry
+        # hiccup (bad org/project, API blip) must NOT mark a shipped release as
+        # failed. continue-on-error surfaces it as a warning instead.
         if: env.SENTRY_AUTH_TOKEN != ''
+        continue-on-error: true
         run: |
           set -e
-          RELEASE="kmptemplate@${{ needs.resolve-tag.outputs.version }}+${{ github.run_number }}"
+          RELEASE="kmptemplate@${{ needs.resolve-tag.outputs.version }}+${{ needs.build-number.outputs.value }}"
           npx --yes @sentry/cli releases new "$RELEASE"
           npx --yes @sentry/cli releases set-commits "$RELEASE" --auto || true
           if [ -f apps/compose/build/outputs/mapping/release/mapping.txt ]; then
@@ -288,7 +344,12 @@ jobs:
 
   ios:
     name: iOS TestFlight external + App Store submit
-    needs: resolve-tag
+    needs: [resolve-tag, build-number]
+    if: ${{ !inputs.skip_ios }}
+    # Standard runner (7GB) with a 10g daemon heap: the K/N release-LTO link
+    # spills into macOS swap instead of OOMing. See beta.yml's ios job for the
+    # sizing history; macos-26-xlarge (14GB) works but bills per minute even on
+    # public repos.
     runs-on: macos-26
     timeout-minutes: 90
 
@@ -305,6 +366,17 @@ jobs:
       TESTFLIGHT_EXTERNAL_GROUP: External Testers
       FASTLANE_SKIP_UPDATE_CHECK: "1"
       FASTLANE_HIDE_CHANGELOG: "1"
+      # In-app BuildInfo.* only (the store CFBundleVersion is a timestamp set by
+      # fastlane). Without these the KMP framework bakes in versions.properties'
+      # buildNumber=1 / channel=dev, so prod iOS would show "(1) · dev" in
+      # Settings. Read by loadVersionMetadata during the framework build.
+      VERSION_CODE_OVERRIDE: ${{ needs.build-number.outputs.value }}
+      BUILD_NUMBER_OVERRIDE: ${{ needs.build-number.outputs.value }}
+      RELEASE_CHANNEL_OVERRIDE: store
+      GRAFANA_OTLP_BASE_URL: ${{ secrets.GRAFANA_OTLP_BASE_URL }}
+      GRAFANA_OTLP_INSTANCE_ID: ${{ secrets.GRAFANA_OTLP_INSTANCE_ID }}
+      GRAFANA_LOGS_WRITE_TOKEN: ${{ secrets.GRAFANA_LOGS_WRITE_TOKEN }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
     steps:
       - name: Checkout
@@ -425,6 +497,10 @@ jobs:
           fi
           KEY_PATH=$(mktemp)
           printf '%s' "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_PATH"
+          # Exported (not just a shell var) so the inline python below can read
+          # it via os.environ['KEY_PATH'] — a bare assignment isn't in the
+          # subprocess environment and fails with KeyError.
+          export KEY_PATH
           TOKEN=$(python3 - <<PY
           import base64, json, os, time
           from cryptography.hazmat.primitives import hashes, serialization
@@ -485,14 +561,25 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      # Must be exported BEFORE the pre-build link so both Gradle invocations
+      # (pre-build + xcodebuild's embedAndSign) bake identical metadata — a
+      # mismatch re-links the framework from scratch. The Fastfile fills this
+      # via ||= for local runs.
+      - name: Export version name for the KMP framework
+        run: |
+          V=$(grep '^MARKETING_VERSION' apps/ios/Configuration/Config.xcconfig | cut -d= -f2 | tr -d ' ')
+          echo "VERSION_NAME_OVERRIDE=$V" >> "$GITHUB_ENV"
+
       - name: Pre-build KMP release framework
         # Runs the same Kotlin/Native link task Xcode will invoke during the
         # archive (via embedAndSignAppleFrameworkForXcode). Running it first
         # from a plain Gradle invocation means the Gradle build cache + daemon
         # are populated by the time xcodebuild delegates to `./gradlew`, so
         # the Xcode build phase finds the framework UP-TO-DATE instead of
-        # re-linking (the longest step on a cold run).
-        run: ./gradlew :apps:compose:linkReleaseFrameworkIosArm64
+        # re-linking (the longest step on a cold run). The K/N compiler runs
+        # inside the Gradle daemon, so the daemon heap IS the compiler heap —
+        # see beta.yml's identical step for the OOM history that sized this.
+        run: ./gradlew :apps:compose:linkReleaseFrameworkIosArm64 -Dorg.gradle.jvmargs=-Xmx10g
 
       - name: Build + release iOS
         working-directory: apps/ios
