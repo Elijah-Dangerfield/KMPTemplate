@@ -1,12 +1,16 @@
-# Fly.io configuration for the server. Hand-written (not `fly launch`).
+# Fly.io configuration for the DEV server. Hand-written (not `fly launch`).
 #
 # Deploy from the repo root:  fly deploy --config apps/server/fly.toml
-# Set secrets:                fly secrets set KEY=VALUE -a kmptemplate-server
-# Logs:                       fly logs -a kmptemplate-server
+# Set secrets:                fly secrets set KEY=VALUE -a kmptemplate-server-dev
+# Logs:                       fly logs -a kmptemplate-server-dev
+#
+# Production (kmptemplate-server-prod) lives in fly.prod.toml — same shape,
+# its own app name + secrets. The `-dev`/`-prod` suffix convention is
+# load-bearing: the server derives its environment tag from FLY_APP_NAME.
 #
 # Rename `app` to your own Fly app before the first deploy.
 
-app = 'kmptemplate-server'
+app = 'kmptemplate-server-dev'
 primary_region = 'iad'   # pick the region closest to your database
 
 [build]

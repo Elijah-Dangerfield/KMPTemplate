@@ -68,9 +68,16 @@ data class SentryConfig(
     companion object {
         fun fromEnv(env: Env): SentryConfig = SentryConfig(
             dsn = env["SENTRY_DSN"],
-            environment = env["SENTRY_ENVIRONMENT"] ?: "dev",
+            // Fly sets FLY_APP_NAME; the convention is a `-prod`-suffixed prod
+            // app beside the dev one (see fly.prod.toml), so any app name
+            // ending in `-prod` → prod, anything else (dev app, local) → dev.
+            // Override with SENTRY_ENVIRONMENT when needed.
+            environment = env["SENTRY_ENVIRONMENT"] ?: environmentFromFlyAppName(env),
             release = env["SENTRY_RELEASE"],
         )
+
+        internal fun environmentFromFlyAppName(env: Env): String =
+            if (env["FLY_APP_NAME"]?.endsWith("-prod") == true) "prod" else "dev"
     }
 }
 
@@ -91,7 +98,11 @@ data class ObservabilityConfig(
             otlpEndpoint = env["OTEL_EXPORTER_OTLP_ENDPOINT"],
             otlpHeaders = env["OTEL_EXPORTER_OTLP_HEADERS"],
             serviceName = env["OTEL_SERVICE_NAME"] ?: "kmptemplate-server",
-            environment = env["OTEL_DEPLOYMENT_ENVIRONMENT"] ?: env["SENTRY_ENVIRONMENT"] ?: "dev",
+            // Match Sentry's environment derivation so a single env tag groups
+            // traces + errors consistently.
+            environment = env["OTEL_DEPLOYMENT_ENVIRONMENT"]
+                ?: env["SENTRY_ENVIRONMENT"]
+                ?: SentryConfig.environmentFromFlyAppName(env),
             release = env["OTEL_SERVICE_VERSION"] ?: env["SENTRY_RELEASE"],
         )
     }
