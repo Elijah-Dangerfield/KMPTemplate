@@ -106,10 +106,18 @@ data class ObservabilityConfig(
  *
  * Nullable: with no `SUPABASE_URL` the server boots without authenticated routes
  * (the `/v1/me` endpoint isn't mounted). Set it to enable auth.
+ *
+ * [serviceRoleKey] is the project's service_role JWT, required for Admin API
+ * calls (e.g. `DELETE /auth/v1/admin/users/<id>` for account deletion).
+ * Optional because most routes don't need it — endpoints that do (see
+ * `DELETE /v1/me`) respond 503 NotConfigured when it isn't set, so
+ * non-deletion deployments stay functional. Treat as a root password: never
+ * log it, never return it from any endpoint.
  */
 data class SupabaseConfig(
     /** e.g. `https://abcdefgh.supabase.co`. */
     val projectUrl: String,
+    val serviceRoleKey: String? = null,
 ) {
     /** Issuer the Auth service stamps on every JWT it issues. */
     val expectedIssuer: String get() = "$projectUrl/auth/v1"
@@ -119,7 +127,12 @@ data class SupabaseConfig(
 
     companion object {
         fun fromEnv(env: Env): SupabaseConfig? =
-            env["SUPABASE_URL"]?.trimEnd('/')?.let { SupabaseConfig(projectUrl = it) }
+            env["SUPABASE_URL"]?.trimEnd('/')?.let {
+                SupabaseConfig(
+                    projectUrl = it,
+                    serviceRoleKey = env["SUPABASE_SERVICE_ROLE_KEY"],
+                )
+            }
     }
 }
 

@@ -29,6 +29,11 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.logback.classic)
 
+    // Outbound HTTP (Supabase Admin API client)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.contentNegotiation)
+
     // Auth — verify Supabase-issued JWTs (JWKS / ES256).
     implementation(libs.ktor.serverAuth)
     implementation(libs.ktor.serverAuthJwt)
@@ -70,6 +75,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.ktor.client.contentNegotiation)
+    testImplementation(libs.ktor.client.mock)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.testcontainers.postgres)
 }

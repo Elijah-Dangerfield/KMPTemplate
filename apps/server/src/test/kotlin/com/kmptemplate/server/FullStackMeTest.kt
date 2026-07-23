@@ -49,7 +49,7 @@ class FullStackMeTest : DatabaseTest() {
     @Test
     fun getMe_createsAndReturnsProfile_throughRealGraph() = runTest {
         val userId = seedAuthUser()
-        val component = ServerComponent::class.create(database)
+        val component = ServerComponent::class.create(database, null)
 
         testApplication {
             application { installApp(component, JwtVerification.Static(verifier)) }

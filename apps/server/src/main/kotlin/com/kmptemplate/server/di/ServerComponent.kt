@@ -1,5 +1,6 @@
 package com.kmptemplate.server.di
 
+import com.kmptemplate.server.config.SupabaseConfig
 import com.kmptemplate.server.db.Database
 import com.kmptemplate.server.domain.ExampleSource
 import com.kmptemplate.server.domain.ModerationRepository
@@ -35,6 +36,11 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 abstract class ServerComponent(
     @get:Provides val database: Database,
+    /**
+     * Null when Supabase isn't configured — consumers degrade (the admin
+     * client answers NotConfigured) instead of failing at construction.
+     */
+    @get:Provides val supabaseConfig: SupabaseConfig? = null,
 ) {
     abstract val exampleSource: ExampleSource
     abstract val profileRepository: ProfileRepository
