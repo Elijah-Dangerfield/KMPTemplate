@@ -2,9 +2,17 @@
 
 Action items after running `./scripts/init_project.main.kts`. Work through these in order. Tick off as you go.
 
+**Hour 1 — a running app:**
 - [ ] [Local dev](#local-dev) — hooks + first build
+- [ ] [Supabase auth](#supabase-auth-hour-1) — project, providers, redirect URLs
+- [ ] [Server deploy](#server-deploy-flyio) — dev Fly app + secrets + `/_health`
+
+**Day 1 — pipelines + visibility:**
 - [ ] [GitHub secrets](#github-secrets-only-if-you-enabled-ci) (only if you enabled CI)
-- [ ] [Repo settings](#repo-settings) — Pages, Actions, branch protection
+- [ ] [Repo settings](#repo-settings) — Pages, Actions, branch protection, the `production` Environment
+- [ ] [Day-1 verification](#day-1-verification) — prove telemetry + deploys actually work
+
+**Before shipping:**
 - [ ] [Store listings](#store-listings) — Play Console + App Store Connect
 - [ ] [First release](#first-release) — the manual-promotion gotcha
 - [ ] [App icons](#app-icons)
@@ -238,3 +246,35 @@ often the dialog actually shows. Don't show your own UI before/after.
 ---
 
 See `docs/release-automation.md` for the full pipeline runbook.
+
+---
+
+## Day-1 verification
+
+Prove the observability + deploy story end to end while everything is fresh.
+Each check has a definitive pass signal; if one fails, fix it now — these are
+the tools you'll be debugging with later.
+
+1. **Server is live.**
+   ```sh
+   curl https://<your-app>-server-dev.fly.dev/_health
+   ```
+   Expected: `{"ok":true}`.
+2. **Client → server round trip.** Launch the app (device or simulator),
+   complete onboarding as a guest. Expected: a new user in Supabase →
+   Authentication → Users with `is_anonymous = true`, and a row in the
+   `profiles` table.
+3. **Find your session in Loki** (if Grafana is wired). In Grafana → Explore →
+   Loki, query your client logs by the app's service name and filter
+   `session_id="<id>"` — grab the id from the app's debug shake dialog or
+   logcat (`Session started`). Expected: the `app.launched` event and your
+   request logs, and the SAME `session_id` on the server's request logs.
+4. **Trigger a test crash → Sentry.** Debug builds: shake → QA dialog → the
+   test-crash affordance (or add a temporary `error()` behind a button).
+   Expected: the event in Sentry within a minute, tagged with `session_id`,
+   `commit_sha`, and a trace link that opens Tempo.
+5. **Config round trip.** Open the admin console (`/admin` on the dev
+   server, paste your `ADMIN_API_TOKEN`), flip `upgrade.maintenanceMessage`
+   to a test string, foreground the app twice (refresh is throttled).
+   Expected: the value changes in the QA config dashboard; the audit tab
+   records your change.

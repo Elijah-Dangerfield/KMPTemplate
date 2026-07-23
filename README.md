@@ -1,6 +1,26 @@
 # KMP Template
 
-A Kotlin Multiplatform template with a clean, modular architecture using Compose Multiplatform, Room database, and a base ViewModel that encourages unidirectional data flow.
+A Kotlin Multiplatform template with the production systems already wired — not a hello-world scaffold. It carries the hardened patterns of a shipped KMP app (Compose Multiplatform client, Ktor server on Fly.io, Supabase auth) so a new project starts at "day 30", not day 0.
+
+## What you get, working, on day one
+
+**Client (Android + iOS from one codebase)**
+- Anonymous-first **Supabase auth**: guest creation in onboarding, email/password + Sign in with Apple + browser OAuth, encrypted session storage (Keychain / EncryptedSharedPreferences), session self-heal, blocking screens for expired sessions and banned accounts
+- **Offline detection that tells the truth** — OS connectivity combined with witnessed request reachability, driving an offline banner and a `ConnectivityRegained` event
+- **Triggered sync**: implement one idempotent `sync()`, register it, and it runs on sign-in, foreground, and reconnect with retry — plus an offline-write outbox pattern with a shipped reference
+- **Remote config end-to-end**: typed `ConfiguredValue`s, offline-first fetch with kill-switch flags (`upgrade.maintenanceMode`, forced-upgrade), QA overrides, and a hosted **admin console** (Kotlin/JS) with targeting rules, audit log, and prod confirm-by-typing
+- **Telemetry that answers pages**: one `session_id` pivots Sentry issues, Grafana Loki logs, and Tempo traces; structured `logEvent`s ship over OTLP with disk-buffered durability; MetricKit exit reports on iOS
+- **Dev tooling**: shake for the QA dialog, on-device Wiretap network inspector (debug-only, noop artifact in store builds), a living design-system catalog, in-app review prompting with sane eligibility gates
+
+**Server (Ktor + Postgres, deploys to Fly.io)**
+- Supabase JWT verification, ban gate (403 envelope the client understands), player reports (Google Play UGC compliance), account deletion (`DELETE /v1/me`), remote-config source + admin API, session-correlated tracing/logging
+- Boots gracefully with zero config (limited mode) and ships a docker-compose local stack
+- Two environments: dev auto-deploys on merge, prod behind an approval gate
+
+**Process**
+- CI from the first push: build + unit/server/integration test jobs, release-please versioning, TestFlight/Play release pipelines, detekt with a custom user-facing-strings rule, conventional-commit hooks
+- An **integration harness** that drives the real client stack against the real server over a real Postgres — in a unit test
+- Docs that assume nothing: `SETUP.md` runbook from init to first release, practice guides for testing, observability, app events, and outboxes
 
 ## Quick Start
 
@@ -26,27 +46,12 @@ For automation there is a non-interactive mode where all flags are required toge
   --email you@example.com --dir ../MyApp --ci=yes --yes
 ```
 
-The script will:
-- Copy the template to `<destination>/<ProjectName>/`
-- Replace all template placeholders (handles PascalCase, camelCase, kebab-case, etc.)
-- Clean up template-only files (init script, rename script) from the copy
-- Update README and AGENTS.md to reflect the new project name
-- Initialize a fresh git repository with an initial commit
+The script copies the template, rewrites every naming variant (PascalCase, camelCase, kebab-case, the OAuth URL scheme, CI env vars), removes template-only files, and leaves you a fresh git repo with one initial commit.
 
 After running, update your app icons:
 - **iOS**: `apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/`
 - **Android**: `apps/compose/src/androidMain/res/mipmap-*/`
 - **Shared logos**: `libraries/resources/src/commonMain/composeResources/drawable/`
-
-### First-time setup
-
-See **[SETUP.md](SETUP.md)** for the full post-init checklist — GitHub secrets, store listings, the first-release manual-promotion gotcha, and more. Run through it before cutting your first release.
-
-Before your first commit:
-
-```shell
-./scripts/install_hooks.sh   # installs the Conventional Commits hook
-```
 
 ### Build & Run
 
@@ -59,6 +64,25 @@ Before your first commit:
 
 # iOS - or open in Xcode
 open apps/ios/iosApp.xcodeproj
+
+# Server (boots in limited mode with zero config)
+./gradlew :apps:server:run
+
+# Server with a local Postgres
+docker compose -f apps/server/docker-compose.yml up -d
+
+# Everything the CI gate runs
+./gradlew testDebugUnitTest :apps:server:test :apps:integration:testDebugUnitTest
+```
+
+### First-time setup
+
+See **[SETUP.md](SETUP.md)** for the hour-1/day-1 runbook — Supabase project + auth providers, Fly dev/prod apps, GitHub secrets, Sentry/Grafana keys, store listings, and the first-release manual-promotion gotcha. Each step has the command and the expected output.
+
+Before your first commit:
+
+```shell
+./scripts/install_hooks.sh   # installs the Conventional Commits + detekt hooks
 ```
 
 ## Project Structure
@@ -66,113 +90,30 @@ open apps/ios/iosApp.xcodeproj
 ```
 apps/compose/          # KMP entry point (Android + iOS)
 apps/ios/              # Swift/Xcode wrapper
+apps/server/           # Ktor + Postgres backend (Fly.io)
+apps/admin/            # Kotlin/JS remote-config admin console
+apps/integration/      # End-to-end harness (real client ↔ real server ↔ real DB)
 features/<name>/       # Routes and public API
 features/<name>/impl/  # Screens and ViewModels
 libraries/<name>/      # Interfaces
 libraries/<name>/impl/ # Implementations
 ```
 
-### Architecture Rules
+Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/navigation patterns, and every convention live in **[AGENTS.md](AGENTS.md)** — it's written for AI agents and humans alike and is the single source of truth for how code here is shaped.
 
-These are enforced at configuration time by the convention plugins — a violating `implementation(project(...))` fails the Gradle sync.
+## Doc map
 
-- **Only `:apps:*` may depend on `*:impl`.** Impl modules are DI wiring composed by the app, not consumed by other features or libraries.
-- **Feature `api` modules may not depend on other feature `api` modules.** api-to-api across features becomes a cycle the moment someone adds the reverse edge. Shared types go into a library. Sub-modules of the same feature (`:features:foo:storage` → `:features:foo`) are fine.
-- **Shared code belongs in libraries.** The `:libraries:storage` module is the one exception where `:impl` is shared — it owns the `AppDatabase`.
-
-### Creating New Modules
-
-```shell
-./scripts/create_module
-```
-
-| Plugin | Use Case |
-|--------|----------|
-| `kmptemplate.kotlin.multiplatform` | Pure Kotlin modules |
-| `kmptemplate.compose.multiplatform` | Kotlin + Compose UI |
-| `kmptemplate.feature` | Feature modules |
-
-## Architecture Patterns
-
-### ViewModel (Unidirectional Data Flow)
-
-ViewModels extend `SEAViewModel` which enforces **State-Event-Action** unidirectional data flow:
-
-```kotlin
-class MyViewModel : SEAViewModel<State, Event, Action>(initialStateArg = State()) {
-    override suspend fun handleAction(action: Action) {
-        when (action) {
-            is Action.Load -> action.updateState { it.copy(loading = true) }
-            is Action.Submit -> {
-                // Do work, then send one-shot event
-                sendEvent(Event.NavigateBack)
-            }
-        }
-    }
-}
-```
-
-- **State**: Immutable data class representing UI state
-- **Event**: One-shot side effects (navigation, toasts, etc.)
-- **Action**: The only way to mutate state via `action.updateState { }`
-
-### Dependency Injection
-
-Uses [kotlin-inject-anvil](https://github.com/amzn/kotlin-inject-anvil):
-
-```kotlin
-// Bind implementation to interface
-@ContributesBinding(AppScope::class)
-@SingleIn(AppScope::class)
-@Inject
-class MyRepositoryImpl : MyRepository
-
-// Multibinding for feature entry points
-@ContributesBinding(AppScope::class, multibinding = true)
-class MyFeatureEntryPoint : FeatureEntryPoint
-```
-
-### Navigation
-
-Routes are `@Serializable` data classes extending `Route`:
-
-```kotlin
-@Serializable
-data class ProfileRoute(val userId: String) : Route
-
-// Register in FeatureEntryPoint.buildNavGraph()
-screen<ProfileRoute> { backStackEntry -> 
-    ProfileScreen(userId = backStackEntry.toRoute<ProfileRoute>().userId)
-}
-```
-
-Supports `screen`, `bottomSheet`, and `dialog` destinations.
-
-## iOS Integration
-
-The iOS app embeds a Kotlin framework compiled from `apps/compose`. Swift types can be passed into Kotlin's DI graph via `IosAppComponentFactory.create(...)`.
-
-When exposing Kotlin types to Swift, use `@ObjCName` for stable naming:
-
-```kotlin
-@ObjCName("MyType", exact = true)
-interface MyType { ... }
-```
-
-See [Swift-Kotlin Communication Patterns](docs/swift-kotlin-communication-patterns.md) for detailed guidance.
-
-## Coding Guidelines
-
-- Use `Catching { }` from `libraries/core` instead of `runCatching`
-- Custom UI components go in `libraries/ui`—avoid using Material components directly
-
-## Key Files
-
-| Purpose | Path |
-|---------|------|
-| App DI Component | `apps/compose/src/.../AppComponent.kt` |
-| Base ViewModel | `libraries/flowroutines/src/.../SEAViewModel.kt` |
-| iOS Entry Point | `apps/ios/iosApp/iOSApp.swift` |
+| Doc | What it covers |
+|---|---|
+| [SETUP.md](SETUP.md) | Init → running app → first release, step by step |
+| [AGENTS.md](AGENTS.md) | Architecture, conventions, auth model, sync, testing rules |
+| [docs/practices/testing.md](docs/practices/testing.md) | Which layer catches which bug; fakes; the integration harness |
+| [docs/practices/observability.md](docs/practices/observability.md) | The session_id pivot; finding one session across Sentry/Loki/Tempo |
+| [docs/practices/app-events.md](docs/practices/app-events.md) | The structured-event registry + `logEvent` discipline |
+| [docs/practices/outbox.md](docs/practices/outbox.md) | Offline writes that must not be lost |
+| [apps/server/DEPLOY.md](apps/server/DEPLOY.md) | Fly.io two-environment deployment |
+| [apps/admin/README.md](apps/admin/README.md) | The remote-config admin console |
+| [docs/swift-kotlin-communication-patterns.md](docs/swift-kotlin-communication-patterns.md) | Exposing Kotlin to Swift and vice versa |
 
 ---
 
