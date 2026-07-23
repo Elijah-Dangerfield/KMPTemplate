@@ -14,6 +14,21 @@ kotlin {
 
             implementation(projects.libraries.core)
         }
+
+        commonTest.dependencies {
+            implementation(projects.libraries.flowroutines.testing)
+            implementation(projects.libraries.core)
+        }
+
+        // Engines are `api` so the platform-specific offline-error
+        // classification (OfflineErrors.android/ios) can see the concrete
+        // engine exception types.
+        androidMain.dependencies {
+            api(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            api(libs.ktor.client.darwin)
+        }
     }
 }
 
