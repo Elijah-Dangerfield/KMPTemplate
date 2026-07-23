@@ -27,14 +27,10 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
-import com.kmptemplate.libraries.core.logging.KLog
 import kotlinx.serialization.Serializable
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
@@ -92,6 +88,15 @@ class NetworkClientImpl(
             // notice it. Keepalive is per-engine; see
             // installWebSocketKeepalive for the OkHttp trap.
             installWebSocketKeepalive()
+            if (BuildInfo.isDebug) {
+                // Wiretap's WS capture — sockets run through this
+                // authenticated client, so this surfaces every sent/received
+                // frame + connect/close in the same inspector as HTTP.
+                // Installed AFTER WebSockets so it can wrap the raw session
+                // before WebSockets transforms it. Debug-only + noop in
+                // release, same as the HTTP capture.
+                installWebSocketInspector()
+            }
         }
     }
 
@@ -155,15 +160,14 @@ private fun HttpClientConfig<*>.applyCommonConfig(
         headers.append(ClientHeaders.HEADER_SESSION_ID, h.sessionId)
     }
     if (BuildInfo.isDebug) {
-        install(Logging) {
-            level = LogLevel.INFO
-            logger = object : Logger {
-                private val log = KLog.withTag("Network")
-                override fun log(message: String) {
-                    log.d { message }
-                }
-            }
-        }
+        // WiretapKMP — captures every request/response through this client
+        // into the on-device inspector (shake → "Network inspector"). Debug
+        // builds link the real plugin; release builds link the noop (and
+        // never enter this branch anyway). Applied to both the plain and
+        // authenticated clients since they share this config. Platform-gated
+        // (see installNetworkInspector) so host-JVM unit tests, where
+        // Wiretap's DI isn't bootstrapped, don't install + crash on it.
+        installNetworkInspector()
     }
     expectSuccess = true
 }

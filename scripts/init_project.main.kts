@@ -782,6 +782,11 @@ fun buildReplacements(projectName: ProjectName, packageName: String): List<Pair<
         "this KMP template repository" to "this ${projectName.displayName} repository",
 
         // Name replacements in various formats
+        // SCREAMING case first (env vars like KMPTEMPLATE_WIRETAP_IOS — the
+        // wiretap noop switch read by libraries/networking/impl, the staged
+        // beta/release workflows, and the staged Fastfile must all agree
+        // post-rename).
+        TEMPLATE_NAME.lowercase.uppercase() to projectName.snakeCase.uppercase(),
         TEMPLATE_NAME.pascalCase to projectName.pascalCase,
         TEMPLATE_NAME.camelCase to projectName.camelCase,
         TEMPLATE_NAME.kebabCase to projectName.kebabCase,

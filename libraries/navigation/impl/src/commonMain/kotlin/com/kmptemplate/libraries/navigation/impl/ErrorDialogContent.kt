@@ -71,7 +71,7 @@ internal fun ErrorDialog(
                     Spacer(modifier = Modifier.height(Dimension.D600))
                     Button(
                         size = ButtonSize.Medium,
-                        type = ButtonType.Tertiary,
+                        type = ButtonType.Secondary,
                         onClick = { onReportToDeveloper() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
