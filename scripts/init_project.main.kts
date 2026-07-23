@@ -611,28 +611,39 @@ fun resetGitHistory(rootDir: File, projectName: ProjectName) {
         printGreen("   ✓ Removed old git history")
     }
 
-    val result = ProcessBuilder("git", "init")
+    // DISCARD the child's output instead of leaving the default pipe: nothing
+    // reads that pipe, and the initial commit of a full project prints enough
+    // (one line per file) to fill the 64KB buffer — the child then blocks
+    // writing and waitFor() deadlocks. Found the hard way via a hung smoke run.
+    fun git(vararg args: String): Int = ProcessBuilder("git", *args)
         .directory(rootDir)
         .redirectErrorStream(true)
+        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
         .start()
         .waitFor()
+
+    val result = git("init")
 
     if (result == 0) {
         printGreen("   ✓ Initialized fresh git repository")
 
-        ProcessBuilder("git", "add", ".")
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
-            .waitFor()
+        git("add", ".")
 
-        ProcessBuilder("git", "commit", "-m", "Initial commit - ${projectName.displayName}")
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
-            .waitFor()
+        // Explicit identity + no signing so the commit succeeds on machines
+        // with no global git identity (CI runners) and never blocks on a
+        // host's signing agent.
+        val commit = git(
+            "-c", "user.name=Template Init",
+            "-c", "user.email=init@localhost",
+            "-c", "commit.gpgsign=false",
+            "commit", "-m", "Initial commit - ${projectName.displayName}",
+        )
 
-        printGreen("   ✓ Created initial commit")
+        if (commit == 0) {
+            printGreen("   ✓ Created initial commit")
+        } else {
+            printYellow("   ⚠ git commit failed (exit $commit) — commit manually after init")
+        }
     } else {
         printYellow("   ⚠ Could not initialize git (git may not be installed)")
     }
