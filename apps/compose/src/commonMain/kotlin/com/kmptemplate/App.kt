@@ -61,6 +61,15 @@ fun App(appComponent: AppComponent) {
     val shakeHandler = remember { appComponent.shakeHandler }
     val deepLinkBridge = remember { appComponent.deepLinkBridge }
 
+    // Boot-warm every @AutoInit singleton. Resolving the Set forces each
+    // contributor to construct, running their `init {}` blocks —
+    // AppEventDispatcher attaches its lifecycle observer, connectivity
+    // watchers arm, etc. Wrapped in `remember` so this resolves exactly once
+    // per composition lifetime, even though App() recomposes. See [AutoInit]
+    // for the contract. (Android also resolves this in Application.onCreate,
+    // before the first Activity; resolving twice is a no-op.)
+    remember { appComponent.autoInits }
+
     DisposableEffect(shakeHandler) {
         shakeHandler.start()
         onDispose {

@@ -1,6 +1,6 @@
 package com.kmptemplate
 
-import com.kmptemplate.libraries.kmptemplate.impl.AppEventDispatcher
+import com.kmptemplate.libraries.core.AutoInit
 import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
 import com.kmptemplate.libraries.kmptemplate.Telemetry
@@ -22,10 +22,20 @@ interface AppComponent {
     val deepLinkBridge: DeepLinkBridge
     
     /**
-     * Eagerly initialized to start observing app lifecycle events.
-     * This ensures sessions are created on foreground entry.
+     * Singletons that need to construct at app boot rather than lazily
+     * on first injection. Anvil populates this set via the
+     * `@ContributesBinding(... AutoInit::class, multibinding = true)`
+     * annotation on each implementer — see [AutoInit] for the
+     * contract and when to opt in.
+     *
+     * The set is resolved once on first composition in `App.kt` (and in
+     * `Application.onCreate` on Android); the act of resolving forces
+     * every contributor to construct, which runs each implementer's
+     * `init {}` block. That's how
+     * [com.kmptemplate.libraries.kmptemplate.impl.AppEventDispatcher]
+     * registers its lifecycle listener at boot.
      */
-    val appEventDispatcher: AppEventDispatcher
+    val autoInits: Set<AutoInit>
 
     @Provides
     fun provideClock(): Clock = Clock.System

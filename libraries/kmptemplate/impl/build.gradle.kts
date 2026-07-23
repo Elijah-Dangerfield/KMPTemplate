@@ -26,6 +26,14 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
 
+        commonTest.dependencies {
+            implementation(projects.libraries.kmptemplate)
+            // :libraries:core for AutoInit (AppEventDispatcher's supertype —
+            // the test compiler has to load it to type-check the class).
+            implementation(projects.libraries.core)
+            implementation(projects.libraries.flowroutines.testing)
+        }
+
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.google.play.review)

@@ -75,6 +75,24 @@ class MyImpl : MyInterface
 
 No expect/actual for platform impls—bind different implementations per platform. iOS impls written in Swift get passed into the DI graph via `IosAppComponentFactory.create(...)`.
 
+### Boot-time construction: the `AutoInit` marker
+
+Kotlin-inject singletons are constructed lazily on first injection, so a repo that nobody touches until a deep nav target stays cold — a hydrate-from-disk or listener-registering `init {}` doesn't run until something injects the class.
+
+For singletons where the warm path matters (app-lifecycle dispatchers, disk-backed repositories, anything whose `init {}` is load-bearing), implement [`AutoInit`](libraries/core/src/commonMain/kotlin/com/kmptemplate/libraries/core/AutoInit.kt) and contribute a second binding via multibinding:
+
+```kotlin
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = MyRepository::class)
+@ContributesBinding(AppScope::class, boundType = AutoInit::class, multibinding = true)
+@Inject
+class MyRepositoryImpl(...) : MyRepository, AutoInit
+```
+
+The `Set<AutoInit>` is resolved at app start (`Application.onCreate` on Android, `iOSApp.init` on iOS, `App.kt` remember-block on first composition). Resolving the set forces every contributor to construct, which runs their `init {}` — that's where hydrate-from-disk and lifecycle-listener registration happen.
+
+**Opt in** when there's first-touch latency the user notices, an `init {}` that registers a listener, or a cache that needs its observer running before the user can navigate. **Skip** for debug-only / QA-menu singletons and anything whose `init {}` is empty. Forgetting the marker is a perf regression, not a correctness one — the class still works lazily — so the bigger risk is overuse making boot slow.
+
 ## Server (`:apps:server`)
 
 A Ktor + Postgres backend with Supabase JWT auth. It reuses the client's conventions—kotlin-inject + anvil DI (`ServerScope` / `ServerComponent`), the `domain/` interface + `data/` impl split, one `fun Route.xRoutes(deps)` per resource—and degrades gracefully (boots with no DB / no Supabase). It's a plain JVM module, so it applies plugins directly rather than via a convention plugin.
