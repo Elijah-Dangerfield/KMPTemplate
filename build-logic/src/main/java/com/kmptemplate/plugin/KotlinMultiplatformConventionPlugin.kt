@@ -8,11 +8,13 @@ import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.enforceModuleBoundaries
 import com.kmptemplate.util.libs
 import com.kmptemplate.util.loadSupabaseMetadata
+import com.kmptemplate.util.loadTelemetryMetadata
 import com.kmptemplate.util.loadVersionMetadata
 import com.kmptemplate.util.optInKotlinMarkers
 import com.kmptemplate.util.VersionMetadata
 import com.kmptemplate.util.writeCommonMetadata
 import com.kmptemplate.util.writeSupabaseMetadata
+import com.kmptemplate.util.writeTelemetryMetadata
 import com.github.gmazzo.buildconfig.BuildConfigExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -88,6 +90,7 @@ class KotlinMultiplatformConventionPlugin : Plugin<Project> {
             }
             writeCommonMetadata(metadata)
             writeSupabaseMetadata(supabaseMetadata)
+            writeTelemetryMetadata(loadTelemetryMetadata())
         }
     }
 }

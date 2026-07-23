@@ -14,10 +14,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavUri
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kmptemplate.libraries.core.Catching
 import com.kmptemplate.libraries.core.logOnFailure
@@ -37,6 +39,7 @@ import com.kmptemplate.libraries.navigation.serializableType
 import com.kmptemplate.libraries.navigation.toEnterTransition
 import com.kmptemplate.libraries.navigation.toExitTransition
 import com.kmptemplate.libraries.navigation.toRouteOrNull
+import com.kmptemplate.libraries.kmptemplate.Telemetry
 import com.kmptemplate.libraries.ui.components.Screen
 import com.kmptemplate.libraries.ui.components.SnackbarDuration
 import com.kmptemplate.libraries.ui.components.dialog.DialogHost
@@ -148,6 +151,7 @@ fun App(appComponent: AppComponent) {
                         featureEntryPoints = appComponent.featureEntryPoints,
                         startDestination = route,
                         router = router,
+                        telemetry = appComponent.telemetry,
                     )
                 }
 
@@ -194,6 +198,22 @@ fun App(appComponent: AppComponent) {
     }
 }
 
+/**
+ * The simple class name of a destination's route, for telemetry tagging.
+ *
+ * Type-safe nav stores the route as its serializer name — the fully-qualified
+ * class name followed by argument placeholders, e.g.
+ * `com.kmptemplate.features.home.HomeRoute?tab={tab}`. We strip the args and
+ * the package to get just `HomeRoute`, keeping the tag low-cardinality and
+ * readable. Returns null for unnamed/graph destinations.
+ */
+private fun NavDestination.routeClassNameOrNull(): String? =
+    route
+        ?.substringBefore('/')
+        ?.substringBefore('?')
+        ?.substringAfterLast('.')
+        ?.takeIf { it.isNotBlank() }
+
 @Composable
 private fun AppNavigation(
     navController: NavHostController,
@@ -201,7 +221,20 @@ private fun AppNavigation(
     featureEntryPoints: Set<FeatureEntryPoint>,
     startDestination: Route,
     router: DelegatingRouter,
+    telemetry: Telemetry,
 ) {
+    // Tag every crash/error with the route the user is currently on. Sheets
+    // and dialogs are real destinations on this same back stack (see
+    // `bottomSheet`/`dialog` nav builders), so an open sheet wins over the
+    // screen beneath it — exactly the granularity we want for triage. Pushed
+    // from a LaunchedEffect keyed on the name so we only touch the Sentry
+    // scope when the route actually changes, not on every recomposition.
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRouteName = currentBackStackEntry?.destination?.routeClassNameOrNull()
+    LaunchedEffect(currentRouteName) {
+        currentRouteName?.let { telemetry.setCurrentRoute(it) }
+    }
+
     // Remember the graph-builder lambda so recompositions of AppNavigation
     // hand NavHost the SAME builder instance. A fresh lambda each pass makes
     // NavHost treat the graph as changed and re-push the start destination

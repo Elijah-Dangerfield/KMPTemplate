@@ -24,4 +24,10 @@ actual object BuildInfo {
 
     actual val buildNumber: Int
         get() = KMPTemplateBuildConfig.BUILD_NUMBER
+
+    actual val commitSha: String
+        get() = KMPTemplateBuildConfig.COMMIT_SHA
+
+    actual val commitBranch: String
+        get() = KMPTemplateBuildConfig.COMMIT_BRANCH
 }
