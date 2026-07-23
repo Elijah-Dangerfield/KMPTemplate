@@ -3,38 +3,60 @@ package com.kmptemplate.libraries.config.impl.data
 import com.kmptemplate.libraries.core.logging.KLog
 import com.kmptemplate.libraries.config.AppConfigMap
 import com.kmptemplate.libraries.config.impl.model.BasicMapAppConfig
+import com.kmptemplate.libraries.config.impl.serialization.ConfigJsonConverter
 import com.kmptemplate.libraries.core.Catching
+import com.kmptemplate.libraries.core.flatMap
 import com.kmptemplate.libraries.flowroutines.DispatcherProvider
-import kotlinx.coroutines.delay
+import com.kmptemplate.libraries.networking.AuthTokenProvider
+import com.kmptemplate.libraries.networking.NetworkClient
+import com.kmptemplate.libraries.networking.retry.RetryPolicy
+import com.kmptemplate.libraries.networking.unauthedCall
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Fetches the app config tree from the app server.
+ *
+ * Returns a sparse JSON object whose keys are the dotted [com.kmptemplate.libraries.config.ConfiguredValue.path]s
+ * that the server wants to override. Anything missing falls back to the
+ * client-side default declared on the [com.kmptemplate.libraries.config.ConfiguredValue].
+ *
+ * The call stays **unauthenticated** so the kill-switch / forced-upgrade flags
+ * still load when auth is down or before the first sign-in. But when a session
+ * token is already on hand we attach it best-effort (a non-blocking peek — no
+ * [AuthTokenProvider.awaitReady]), so the server can resolve the user id for
+ * per-user targeting + rollout bucketing. No token → no header → the server
+ * targets on the install-id / client-context axes instead.
+ */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RemoteConfigRemoteDataSource @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val networkClient: NetworkClient,
+    private val authTokenProvider: AuthTokenProvider,
+    private val converter: ConfigJsonConverter,
 ) : RemoteConfigDataSource {
 
-    private val logger = KLog.withTag("DummyConfigDataSource")
+    private val logger = KLog.withTag("RemoteConfigDataSource")
 
     override suspend fun getConfig(): Catching<AppConfigMap> = withContext(dispatcherProvider.io) {
-        delay(1.seconds)
-        Catching {
-            val dynamicValue = Random.nextInt(0, 100)
-            logger.d { "Returning dummy config value=$dynamicValue" }
-            BasicMapAppConfig(
-                mapOf(
-                    "featureFlags" to mapOf(
-                        "dummyFlag" to true
-                    ),
-                    "refreshToken" to dynamicValue
-                )
-            )
+        val token = authTokenProvider.accessToken()
+        networkClient.unauthedCall(
+            description = "appConfig.fetch",
+            retry = RetryPolicy.idempotent(),
+        ) { client ->
+            client.get("/v1/app-config") {
+                if (token != null) header(HttpHeaders.Authorization, "Bearer $token")
+            }.body<String>()
         }
+            .flatMap { raw -> converter.decodeToMap(raw).map { BasicMapAppConfig(it) } }
+            .onSuccess { logger.d { "Fetched remote app config" } }
     }
 }

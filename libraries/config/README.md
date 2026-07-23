@@ -1,130 +1,84 @@
-# Config API Module
+# :libraries:config
 
-This module centralizes application configuration, feature flags, and experiment toggles for every platform that depends on the Virtu shared code. It provides:
+Remote config / feature flags for the client. The API module defines the
+`ConfiguredValue` convention and the repository interfaces; `:libraries:config:impl`
+owns fetching, caching, and QA overrides.
 
-- A strongly typed way to access configuration values (`ConfiguredValue`, `AppConfigMap`).
-- Experiment support with control/test values and debug-only flags (`Experiment`).
-- Streams for observing config changes at runtime (`AppConfigFlow`).
-- Override plumbing for QA and local debugging (`ConfigOverrideRepository`).
-- Helpers for safely parsing nested config documents (`MapExt`).
+## The one convention: injectable `ConfiguredValue` subclasses
 
-## Core concepts
-
-### `AppConfigMap`
-
-Represents a snapshot of the merged configuration. It exposes typed accessors:
-
-```kotlin
-def configVersion(): Int = config.intValue(ConfigValues.ConfigVersion)
-```
-
-- Looks up values using dot-delimited paths.
-- Honors `ConfiguredValue.debugOverride` while running in debug builds.
-- Falls back to the provided default when a value is missing or fails to cast.
-- Provides `experiment()` for toggles defined via `Experiment` objects.
-
-### `ConfiguredValue<T>`
-
-Defines a single configuration entry with metadata:
-
-- `displayName` and optional `description` for QA dashboards.
-- `path` (defaults to the lower-camel-case class name) used inside the config map.
-- `default` fallback value.
-- `showInQADashboard` and `debugOverride` flags to surface values or force a local override.
-
-Subclass it as an `object` and reference it through `AppConfigMap.value(...)` or the numeric helpers (`intValue`, `longValue`, etc.).
-
-### `Experiment<T>`
-
-Models a feature experiment. Each experiment declares:
-
-- `id`, which becomes the `experiments.{id}` path in the config document.
-- `control` and `test` values plus an optional `default` override.
-- `isDebugOnly` to prevent non-debug builds from reading debug experiments.
-
-The `AppConfigMap.experiment()` helper enforces the debug-only rule and returns the configured bucket value or the default.
-
-### `AppConfigRepository`
-
-Abstraction for any source of truth (remote config service, bundled JSON, etc.). Responsibilities:
-
-- `config()` returns the latest known map synchronously.
-- `configStream()` exposes a cold `Flow<AppConfigMap>` that emits updates.
-
-### `AppConfigFlow`
-
-A thin wrapper around `AppConfigRepository.configStream()` so you can inject `Flow<AppConfigMap>` directly. Use it anywhere reactive updates are required (e.g., feature screens reacting to live flag changes).
-
-### `ConfigOverrideRepository`
-
-Stores QA/debug overrides. Typical implementations keep overrides in local storage, merge them ahead of the remote config, and expose a stream so the UI can update when QA edits values.
-
-### `ConfigOverride`
-
-Simple value object that associates a fully qualified config `path` with a strongly typed `value`.
-
-### `EnsureAppConfigLoaded`
-
-`fun interface` used to guarantee initial config fetch before sensitive flows start. Implementations usually combine remote fetch, override hydration, and error handling wrapped in a `Catching<Unit>`.
-
-### `MapExt`
-
-Utility extensions used by the module:
-
-- `Map.getValueForPath` recursively traverses nested maps and performs type-safe casting with helpful debug logging via `Catching`.
-- `plusIf`/`plusIfNotNull` helpers for building maps conditionally.
-- `mergeWith` and `List<Map>.toMergedMap()` for combining layered configs (e.g., defaults + remote + overrides).
-
-## Typical data flow
-
-1. `AppConfigRepository` fetches the remote/bundled document as a nested map.
-2. `ConfigOverrideRepository` applies local overrides and merges them using `mergeWith`.
-3. The merged map is wrapped in an `AppConfigMap` implementation.
-4. `AppConfigFlow` exposes a `Flow<AppConfigMap>` for consumers that need live updates.
-5. Call sites read typed values through `AppConfigMap.value(...)`, `intValue(...)`, or `experiment(...)`.
-
-## Defining a new config value
+Every flag is its own injectable class, contributed into the app graph's
+`Set<QaConfigValue>` multibinding so it appears in the QA menu automatically.
+The typed bases in `TypedConfiguredValues.kt` (`FlagConfigValue`,
+`IntConfigValue`, `LongConfigValue`, `DoubleConfigValue`, `StringConfigValue`)
+fill in `resolveValue` for scalars, so a concrete flag only declares
+`name` / `path` / `default`:
 
 ```kotlin
-object MaxLoginAttempts : ConfiguredValue<Int>() {
-    override val displayName = "Max Login Attempts"
-    override val path = "auth.maxLoginAttempts"
-    override val default = 5
-    override val debugOverride = 10 // optional
+@Inject
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = QaConfigValue::class, multibinding = true)
+class GoogleSignInEnabled(appConfigMap: AppConfigMap) : FlagConfigValue(appConfigMap) {
+    override val name = "Google sign-in enabled"
+    override val path = "identity.googleSignInEnabled"
+    override val default = false
 }
 
-class LoginViewModel @Inject constructor(private val config: AppConfigMap) {
-    fun lockAccount(tries: Int) = tries >= config.intValue(MaxLoginAttempts)
+@Inject
+class SignInViewModel(googleSignInEnabled: GoogleSignInEnabled) {
+    val showGoogle = googleSignInEnabled()   // invoke() resolves the current value
 }
 ```
 
-## Defining an experiment
+Metadata on `ConfiguredValue` drives the QA menu: `group` (defaults to the
+first path segment), `allowedValues` (renders a chip selector for enum-like
+strings), `showInQADashboard` (default true), `description`, and a
+debug-build-only `debugOverride`.
 
-```kotlin
-object OnboardingRevamp : Experiment<Boolean>() {
-    override val displayName = "Onboarding Revamp"
-    override val id = "onboarding_revamp"
-    override val control = false
-    override val test = true
-    override val isDebugOnly = false
-    override fun resolveValue(): Boolean = control
-}
+For structured payloads (a level ladder, a reward table) subclass
+`JsonConfigValue<T>` with a `@Serializable` model and a serializer. It resolves
+one path to a JSON subtree and falls back to the bundled `default` on any
+decode failure, so a bad remote value can never brick the client. JSON values
+hide from the QA dashboard by default.
 
-if (config.experiment(OnboardingRevamp)) {
-    showNewFlow()
-} else {
-    showLegacyFlow()
-}
-```
+## Resolution order
 
-## Working with overrides
+`AppConfigMap` is the merged snapshot a flag reads from. Highest wins:
 
-- Use `ConfigOverrideRepository.addOverride(...)` to persist QA edits.
-- Merge overrides ahead of remote values using `Map.mergeWith` utilities to guarantee the most recent override wins.
-- Because overrides emit via `getOverridesFlow()`, UI panels can observe and reflect live edits without restarting the app.
+1. QA override (`ConfigOverrideRepository`, persisted locally, editable from
+   the QA menu)
+2. `debugOverride` (debug builds only)
+3. Server value from `GET /v1/app-config` (a sparse tree keyed by dotted
+   `ConfiguredValue.path`)
+4. The in-code `default`
 
-## Error handling and debugging
+An empty server response is legitimate: the client always works on defaults
+alone.
 
-- `MapExt` conversions wrap casting logic in `Catching`, logging failures via `logOnFailure` and throwing in debug builds (`throwIfDebug`) to surface misconfigured paths early.
-- `Experiment.isDebugOnly` ensures debug experiments never leak to production.
-- Use `debugOverride` on `ConfiguredValue` objects for quick local testing without editing the remote config.
+## Offline-first, throttled-foreground refresh
+
+`OfflineFirstAppConfigRepository` (impl) persists the last fetched tree via
+`CacheFactory`, so the first frame never blocks on the network. It refetches on
+every app foreground (cold boot included), gated by `ConfigRefreshThrottleMs`
+(itself a config value: 5 min default in code, set to 0 in the dev database so
+flag flips show up on the next foreground). Fetches carry a 5s timeout. If a
+fetch fails and there is no cached snapshot, the bundled
+`fallback_app_config.json` is persisted so subscribers still get a usable map;
+with a cached snapshot, failures are logged and the cache stays.
+
+The fetch is unauthenticated (kill-switch flags must load before sign-in), but
+attaches a bearer token best-effort when one is on hand so the server can do
+per-user targeting and rollout bucketing.
+
+## Observing changes
+
+- `AppConfigMap` for point-in-time reads (what the typed bases use).
+- `AppConfigFlow` / `AppConfigRepository.configStream()` for reactive
+  consumers that need to react to a mid-session override edit.
+
+## Server side
+
+The tree comes from the server's `app_config_values` + `app_config_rules`
+tables (see `apps/server`), managed through the admin console in `apps/admin`.
+When you add a scalar flag, also add it to
+`apps/admin/config-manifest-registry.json` so the admin tool knows the in-code
+default it is overriding.
