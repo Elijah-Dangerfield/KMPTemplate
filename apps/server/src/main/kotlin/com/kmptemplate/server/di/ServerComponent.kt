@@ -2,11 +2,17 @@ package com.kmptemplate.server.di
 
 import com.kmptemplate.server.config.SupabaseConfig
 import com.kmptemplate.server.db.Database
+import com.kmptemplate.server.domain.AppConfigAdminRepository
+import com.kmptemplate.server.domain.AppConfigManifestRepository
+import com.kmptemplate.server.domain.AppConfigSource
 import com.kmptemplate.server.domain.ExampleSource
 import com.kmptemplate.server.domain.ModerationRepository
 import com.kmptemplate.server.domain.PlayerReportRepository
 import com.kmptemplate.server.domain.ProfileRepository
 import com.kmptemplate.server.domain.SupabaseAdminClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.MergeComponent
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
@@ -48,6 +54,9 @@ abstract class ServerComponent(
     abstract val moderationRepository: ModerationRepository
     abstract val playerReportRepository: PlayerReportRepository
     abstract val supabaseAdminClient: SupabaseAdminClient
+    abstract val appConfigSource: AppConfigSource
+    abstract val appConfigAdminRepository: AppConfigAdminRepository
+    abstract val appConfigManifestRepository: AppConfigManifestRepository
 
     /**
      * Wall-clock source. Singleton so every component sees the same "now".
@@ -55,4 +64,15 @@ abstract class ServerComponent(
      */
     @Provides
     fun provideClock(): Clock = Clock.System
+
+    /**
+     * Long-lived application scope for server-owned background work (e.g. the
+     * fire-and-forget config-change webhook). SupervisorJob so one failure
+     * doesn't cascade. Singleton — the process owns exactly one and never
+     * cancels it (it dies with the process).
+     */
+    @Provides
+    @SingleIn(ServerScope::class)
+    fun provideServerCoroutineScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
 }

@@ -1,12 +1,17 @@
 package com.kmptemplate.server
 
+import com.kmptemplate.server.config.AdminConfig
 import com.kmptemplate.server.config.ServerConfig
 import com.kmptemplate.server.data.InMemoryExampleSource
+import com.kmptemplate.server.data.WebhookConfigChangeNotifier
 import com.kmptemplate.server.db.Database
 import com.kmptemplate.server.di.ServerComponent
 import com.kmptemplate.server.di.create
+import com.kmptemplate.server.domain.ConfigChangeNotifier
 import com.kmptemplate.server.plugins.BanGate
 import com.kmptemplate.server.plugins.JwtVerification
+import com.kmptemplate.server.plugins.SUPABASE_JWT_AUTH
+import com.kmptemplate.server.plugins.installAdminWeb
 import com.kmptemplate.server.plugins.installAuthentication
 import com.kmptemplate.server.plugins.installCors
 import com.kmptemplate.server.plugins.installHttpServerTracing
@@ -17,11 +22,14 @@ import com.kmptemplate.server.plugins.installSentry
 import com.kmptemplate.server.plugins.installSerialization
 import com.kmptemplate.server.plugins.installStatusPages
 import com.kmptemplate.server.plugins.installWebSockets
+import com.kmptemplate.server.routes.appConfigRoutes
+import com.kmptemplate.server.routes.configAdminRoutes
 import com.kmptemplate.server.routes.exampleRoutes
 import com.kmptemplate.server.routes.healthRoutes
 import com.kmptemplate.server.routes.meRoutes
 import com.kmptemplate.server.routes.playerReportRoutes
 import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.routing
 import org.slf4j.LoggerFactory
 
@@ -74,7 +82,23 @@ fun Application.module(config: ServerConfig) {
     // mode simply runs without it — same null-safe degradation as everything
     // else here.
     val banGate = component?.let { BanGate(it.moderationRepository, config.accessControl.appealUrl) }
-    installApp(component, verification, banGate)
+    installApp(
+        component = component,
+        verification = verification,
+        banGate = banGate,
+        adminConfig = config.admin,
+        configChangeNotifier = component?.let {
+            WebhookConfigChangeNotifier(
+                webhookUrl = config.configChange.webhookUrl,
+                environment = config.observability.environment,
+                scope = it.provideServerCoroutineScope(),
+            )
+        } ?: ConfigChangeNotifier {},
+    )
+
+    // The hosted admin console (static bundle at /admin). Outside installApp so
+    // integration tests don't need a bundle on disk.
+    installAdminWeb(config.admin.webDir)
 }
 
 /**
@@ -89,6 +113,8 @@ fun Application.installApp(
     component: ServerComponent?,
     verification: JwtVerification?,
     banGate: BanGate? = null,
+    adminConfig: AdminConfig = AdminConfig(apiToken = null),
+    configChangeNotifier: ConfigChangeNotifier = ConfigChangeNotifier {},
 ) {
     installSerialization()
     installCors()
@@ -100,6 +126,32 @@ fun Application.installApp(
     routing {
         healthRoutes()
         exampleRoutes(component?.exampleSource ?: InMemoryExampleSource())
+        if (component != null) {
+            // Optional auth: the config fetch must work pre-session (it carries
+            // the kill-switch / forced-upgrade flags), but when the client does
+            // present a Supabase JWT we resolve the user id so per-user targeting
+            // + rollout bucketing key off it. No token → principal null → still
+            // served. Without Supabase configured there's no JWT plugin at all,
+            // so the route mounts bare and every caller resolves anonymously.
+            if (verification != null) {
+                authenticate(SUPABASE_JWT_AUTH, optional = true) {
+                    appConfigRoutes(component.appConfigSource)
+                }
+            } else {
+                appConfigRoutes(component.appConfigSource)
+            }
+            // Admin API is inert without a token: requireAdmin 401s every call
+            // when ADMIN_API_TOKEN is unset, so mounting is gated for clarity,
+            // not security.
+            if (!adminConfig.apiToken.isNullOrBlank()) {
+                configAdminRoutes(
+                    config = adminConfig,
+                    repository = component.appConfigAdminRepository,
+                    manifestRepository = component.appConfigManifestRepository,
+                    notifier = configChangeNotifier,
+                )
+            }
+        }
         if (component != null && verification != null) {
             meRoutes(component.profileRepository, component.supabaseAdminClient)
             playerReportRoutes(component.playerReportRepository)

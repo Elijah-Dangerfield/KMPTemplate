@@ -23,6 +23,8 @@ data class ServerConfig(
     val sentry: SentryConfig,
     val observability: ObservabilityConfig,
     val accessControl: AccessControlConfig,
+    val admin: AdminConfig,
+    val configChange: ConfigChangeConfig,
 ) {
     companion object {
         fun fromEnv(env: Env = Env()): ServerConfig = ServerConfig(
@@ -32,6 +34,48 @@ data class ServerConfig(
             sentry = SentryConfig.fromEnv(env),
             observability = ObservabilityConfig.fromEnv(env),
             accessControl = AccessControlConfig.fromEnv(env),
+            admin = AdminConfig.fromEnv(env),
+            configChange = ConfigChangeConfig.fromEnv(env),
+        )
+    }
+}
+
+/**
+ * Token-gated admin endpoints (the config admin API under `/v1/admin/config`).
+ * The caller is a machine or the admin console, not a Supabase user, so these
+ * routes take an `X-Admin-Token` header instead of a JWT. With [apiToken]
+ * unset the admin routes aren't mounted — the server runs with remote config
+ * read-only.
+ */
+data class AdminConfig(
+    val apiToken: String?,
+    /**
+     * Directory holding the prebuilt admin console bundle served at `/admin`.
+     * The default matches the repo layout for local `:apps:server:run`
+     * (workingDir = rootDir); the Docker image overrides it. Missing dir →
+     * `/admin` simply isn't served.
+     */
+    val webDir: String = "apps/server/admin-web",
+) {
+    companion object {
+        fun fromEnv(env: Env): AdminConfig = AdminConfig(
+            apiToken = env["ADMIN_API_TOKEN"],
+            webDir = env["ADMIN_WEB_DIR"] ?: "apps/server/admin-web",
+        )
+    }
+}
+
+/**
+ * Where to announce config changes. [webhookUrl] is a Slack-compatible incoming
+ * webhook; null/blank disables notifications (the default). Set
+ * `CONFIG_CHANGE_WEBHOOK_URL` to turn it on.
+ */
+data class ConfigChangeConfig(
+    val webhookUrl: String?,
+) {
+    companion object {
+        fun fromEnv(env: Env): ConfigChangeConfig = ConfigChangeConfig(
+            webhookUrl = env["CONFIG_CHANGE_WEBHOOK_URL"]?.takeIf { it.isNotBlank() },
         )
     }
 }
