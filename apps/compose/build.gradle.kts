@@ -37,6 +37,7 @@ kotlin {
             implementation(projects.libraries.kmptemplate.storage)
             implementation(projects.libraries.networking)
             implementation(projects.libraries.networking.impl)
+            implementation(projects.libraries.telemetry.impl)
             implementation(projects.libraries.identity)
             implementation(projects.libraries.identity.impl)
 

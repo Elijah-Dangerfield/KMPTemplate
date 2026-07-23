@@ -76,6 +76,10 @@ if (!serverOnly) {
     include(":libraries:resources")
     include(":libraries:storage")
     include(":libraries:storage:impl")
+    // No api sibling on purpose: the public surface is the `logEvent`
+    // extension in :libraries:core; this impl only hosts the experimental
+    // opentelemetry-kotlin dependency + the GrafanaLogTree wiring.
+    include(":libraries:telemetry:impl")
     include(":libraries:kmptemplate")
     include(":libraries:kmptemplate:impl")
     include(":libraries:kmptemplate:storage")

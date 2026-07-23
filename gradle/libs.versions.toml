@@ -36,6 +36,10 @@ auth0JwksRsa = "0.22.1"
 sentryJvm = "7.18.1"
 opentelemetry = "1.45.0"
 opentelemetryInstrumentation = "2.11.0-alpha"
+# KMP client-side OTel (io.opentelemetry.kotlin) — experimental, pinned exactly.
+# Distinct from the server's JVM `opentelemetry` entries above.
+opentelemetryKotlin = "0.5.0"
+okio = "3.9.1"
 jetbrainsNavigationCompose = "2.9.1"
 kotlinInjectAnvil = "0.1.6"
 composeIcons = "1.1.1"
@@ -96,6 +100,14 @@ opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref
 opentelemetry-sdk-logs = { module = "io.opentelemetry:opentelemetry-sdk-logs", version.ref = "opentelemetry" }
 opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
 opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry" }
+otel-kotlin-api = { module = "io.opentelemetry.kotlin:api", version.ref = "opentelemetryKotlin" }
+otel-kotlin-sdk-api = { module = "io.opentelemetry.kotlin:sdk-api", version.ref = "opentelemetryKotlin" }
+otel-kotlin-implementation = { module = "io.opentelemetry.kotlin:implementation", version.ref = "opentelemetryKotlin" }
+otel-kotlin-exporters-core = { module = "io.opentelemetry.kotlin:exporters-core", version.ref = "opentelemetryKotlin" }
+otel-kotlin-exporters-otlp = { module = "io.opentelemetry.kotlin:exporters-otlp", version.ref = "opentelemetryKotlin" }
+otel-kotlin-exporters-persistence = { module = "io.opentelemetry.kotlin:exporters-persistence", version.ref = "opentelemetryKotlin" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 opentelemetry-extension-kotlin = { module = "io.opentelemetry:opentelemetry-extension-kotlin", version.ref = "opentelemetry" }
 opentelemetry-logback-appender = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0", version.ref = "opentelemetryInstrumentation" }
 opentelemetry-ktor = { module = "io.opentelemetry.instrumentation:opentelemetry-ktor-3.0", version.ref = "opentelemetryInstrumentation" }
@@ -130,6 +142,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
