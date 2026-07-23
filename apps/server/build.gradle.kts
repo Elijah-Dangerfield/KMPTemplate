@@ -78,6 +78,7 @@ dependencies {
     testImplementation(libs.ktor.client.contentNegotiation)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.opentelemetry.sdk.testing)
     testImplementation(libs.testcontainers.postgres)
 }
 

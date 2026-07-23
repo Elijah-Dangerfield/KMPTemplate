@@ -5,8 +5,10 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopPreparing
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.common.Attributes
+import io.opentelemetry.context.Context
 import io.opentelemetry.exporter.logging.LoggingMetricExporter
 import io.opentelemetry.exporter.logging.LoggingSpanExporter
 import io.opentelemetry.exporter.logging.SystemOutLogRecordExporter
@@ -17,15 +19,20 @@ import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppen
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.logs.SdkLoggerProvider
 import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor
+import io.opentelemetry.sdk.logs.export.LogRecordExporter
 import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.export.MetricExporter
 import io.opentelemetry.sdk.metrics.export.MetricReader
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader
 import io.opentelemetry.sdk.resources.Resource
+import io.opentelemetry.sdk.trace.ReadWriteSpan
+import io.opentelemetry.sdk.trace.ReadableSpan
 import io.opentelemetry.sdk.trace.SdkTracerProvider
+import io.opentelemetry.sdk.trace.SpanProcessor
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor
+import io.opentelemetry.sdk.trace.export.SpanExporter
 import org.slf4j.LoggerFactory
 import java.time.Duration as JavaDuration
 
@@ -77,7 +84,19 @@ fun Application.installOpenTelemetry(config: ObservabilityConfig): OpenTelemetry
     return installed
 }
 
-private fun buildOpenTelemetrySdk(config: ObservabilityConfig): OpenTelemetrySdk {
+/**
+ * Builds (but does not register) an [OpenTelemetrySdk] for [config].
+ * Test-friendly seam: tests that swap in
+ * [io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter] (or its
+ * log counterpart) build their SDK directly and inject it where needed
+ * without touching the global slot.
+ */
+fun buildOpenTelemetrySdk(
+    config: ObservabilityConfig,
+    spanExporter: SpanExporter? = null,
+    logRecordExporter: LogRecordExporter? = null,
+    metricReader: MetricReader? = null,
+): OpenTelemetrySdk {
     val resource = Resource.getDefault().merge(
         Resource.create(
             Attributes.builder()
@@ -89,27 +108,30 @@ private fun buildOpenTelemetrySdk(config: ObservabilityConfig): OpenTelemetrySdk
     )
     val otlp = !config.otlpEndpoint.isNullOrBlank()
 
-    val spanExporter = defaultSpanExporter(config)
+    val resolvedSpanExporter = spanExporter ?: defaultSpanExporter(config)
     val tracerProvider = SdkTracerProvider.builder()
         .setResource(resource)
+        // Runs first: copy correlation baggage onto every span (root + children)
+        // as it starts, before the export processor sees it.
+        .addSpanProcessor(BaggageAttributeSpanProcessor(CORRELATION_BAGGAGE_KEYS))
         .addSpanProcessor(
-            if (otlp) BatchSpanProcessor.builder(spanExporter).build()
-            else SimpleSpanProcessor.create(spanExporter),
+            if (spanExporter == null && otlp) BatchSpanProcessor.builder(resolvedSpanExporter).build()
+            else SimpleSpanProcessor.create(resolvedSpanExporter),
         )
         .build()
 
-    val logExporter = defaultLogRecordExporter(config)
+    val resolvedLogExporter = logRecordExporter ?: defaultLogRecordExporter(config)
     val loggerProvider = SdkLoggerProvider.builder()
         .setResource(resource)
         .addLogRecordProcessor(
-            if (otlp) BatchLogRecordProcessor.builder(logExporter).build()
-            else SimpleLogRecordProcessor.create(logExporter),
+            if (logRecordExporter == null && otlp) BatchLogRecordProcessor.builder(resolvedLogExporter).build()
+            else SimpleLogRecordProcessor.create(resolvedLogExporter),
         )
         .build()
 
     val meterProvider = SdkMeterProvider.builder()
         .setResource(resource)
-        .registerMetricReader(defaultMetricReader(config))
+        .registerMetricReader(metricReader ?: defaultMetricReader(config))
         .build()
 
     return OpenTelemetrySdk.builder()
@@ -160,4 +182,39 @@ internal fun parseOtlpHeaders(raw: String?): List<Pair<String, String>> {
         if (eq <= 0) return@mapNotNull null
         pair.substring(0, eq).trim() to java.net.URLDecoder.decode(pair.substring(eq + 1).trim(), Charsets.UTF_8)
     }
+}
+
+/**
+ * Correlation ids carried in OTel Baggage for the duration of a request (set
+ * in [Application.installHttpServerTracing]) and copied onto every span by
+ * [BaggageAttributeSpanProcessor]. Same keys as the Sentry tags and Loki log
+ * fields, so one query string works across all three systems.
+ */
+internal val CORRELATION_BAGGAGE_KEYS: List<String> = listOf("session_id", "install_id")
+
+/**
+ * Copies the given baggage entries onto every span as it starts — including
+ * child spans that manual [withSpan] chains create, which the per-request
+ * HTTP-span attribute extractor can't reach (span attributes don't inherit;
+ * baggage propagates through the OTel context, so a processor is the canonical
+ * way to land a per-request value on the whole trace tree).
+ *
+ * onStart only; cheap string copies. Pairs with the baggage population in
+ * [Application.installHttpServerTracing].
+ */
+internal class BaggageAttributeSpanProcessor(
+    private val keys: List<String>,
+) : SpanProcessor {
+    override fun isStartRequired(): Boolean = true
+
+    override fun onStart(parentContext: Context, span: ReadWriteSpan) {
+        val baggage = Baggage.fromContext(parentContext)
+        keys.forEach { key ->
+            baggage.getEntryValue(key)?.let { span.setAttribute(key, it) }
+        }
+    }
+
+    override fun isEndRequired(): Boolean = false
+
+    override fun onEnd(span: ReadableSpan) = Unit
 }
