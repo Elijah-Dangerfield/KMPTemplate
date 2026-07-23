@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavUri
 import androidx.navigation.compose.NavHost
@@ -137,6 +138,19 @@ private fun AppNavigation(
     startDestination: Route,
     router: DelegatingRouter,
 ) {
+    // Remember the graph-builder lambda so recompositions of AppNavigation
+    // hand NavHost the SAME builder instance. A fresh lambda each pass makes
+    // NavHost treat the graph as changed and re-push the start destination
+    // onto the back stack.
+    val graph: NavGraphBuilder.() -> Unit = remember(featureEntryPoints, router) {
+        {
+            featureEntryPoints.forEach { entryPoint ->
+                with(entryPoint) {
+                    buildNavGraph(router)
+                }
+            }
+        }
+    }
 
     Screen(
         snackbarHost = {
@@ -203,14 +217,9 @@ private fun AppNavigation(
                 },
                 typeMap = mapOf(
                     typeOf<AnimationType>() to serializableType<AnimationType>()
-                )
-            ) {
-                featureEntryPoints.forEach { entryPoint ->
-                    with(entryPoint) {
-                        buildNavGraph(router)
-                    }
-                }
-            }
+                ),
+                builder = graph
+            )
 
             FloatingWindowHost(floatingWindowNavigator)
 

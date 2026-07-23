@@ -18,7 +18,10 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
  * an email/OAuth identity to the same id — progress is preserved.
  */
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+// Explicit boundType: without it kotlin-inject-anvil binds against the
+// class's single supertype by inference, which silently changes (or breaks
+// the build) the moment this class gains a second interface.
+@ContributesBinding(AppScope::class, boundType = AuthRepository::class)
 @Inject
 class SupabaseAuthRepository(
     private val supabaseClient: () -> SupabaseClient,

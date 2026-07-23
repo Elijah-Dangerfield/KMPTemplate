@@ -3,6 +3,7 @@ package com.kmptemplate.server.db
 import com.kmptemplate.server.config.DatabaseConfig
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database as ExposedDatabase
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -30,7 +31,13 @@ class Database private constructor(
      * dispatcher-agnostic.
      */
     suspend fun <T> transaction(block: suspend () -> T): T =
-        newSuspendedTransaction(db = exposed) { block() }
+        // Pin the transaction (and Exposed's connection open/commit/close) to
+        // the IO dispatcher rather than inheriting the caller's. In production
+        // this keeps blocking JDBC off the Netty event loop; under `runTest`
+        // it keeps that work off the virtual TestDispatcher, so Exposed's
+        // connection-cleanup coroutines don't outlive the test scope and leak
+        // as UncaughtExceptionsBeforeTest into the next test.
+        newSuspendedTransaction(context = Dispatchers.IO, db = exposed) { block() }
 
     /**
      * Synchronous transaction. Only for startup / test code that isn't inside a
