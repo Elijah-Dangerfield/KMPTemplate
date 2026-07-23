@@ -20,6 +20,7 @@ import kotlin.time.Duration.Companion.minutes
  * abuse, not concerted DoS (your edge/CDN owns that).
  */
 const val PROFILE_WRITE_LIMIT = "profile-write"
+const val PLAYER_REPORT_LIMIT = "player-report"
 
 fun Application.installRateLimits() {
     install(RateLimit) {
@@ -34,6 +35,16 @@ fun Application.installRateLimits() {
             // a tighter cap so name-squatting bots are expensive; a real user
             // still has plenty of retries.
             rateLimiter(limit = 30, refillPeriod = 1.hours)
+            requestKey { call -> call.clientIp() }
+        }
+
+        register(RateLimitName(PLAYER_REPORT_LIMIT)) {
+            // POST /v1/reports targets another user, so it's a harassment /
+            // spam surface (a bad actor mass-reporting someone). A real user
+            // files a report rarely; 20/hour/IP leaves ample headroom for
+            // legitimate use while making scripted report-floods impractical.
+            // Per-IP keying mirrors the rest of the policy (see file header).
+            rateLimiter(limit = 20, refillPeriod = 1.hours)
             requestKey { call -> call.clientIp() }
         }
     }

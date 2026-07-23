@@ -19,6 +19,7 @@ import com.kmptemplate.server.plugins.installStatusPages
 import com.kmptemplate.server.routes.exampleRoutes
 import com.kmptemplate.server.routes.healthRoutes
 import com.kmptemplate.server.routes.meRoutes
+import com.kmptemplate.server.routes.playerReportRoutes
 import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
 import org.slf4j.LoggerFactory
@@ -99,6 +100,7 @@ fun Application.installApp(
         exampleRoutes(component?.exampleSource ?: InMemoryExampleSource())
         if (component != null && verification != null) {
             meRoutes(component.profileRepository)
+            playerReportRoutes(component.playerReportRepository)
         }
     }
 }

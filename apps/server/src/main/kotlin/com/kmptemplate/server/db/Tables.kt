@@ -21,3 +21,19 @@ object ProfilesTable : Table("profiles") {
     val updatedAt = timestamp("updated_at")
     override val primaryKey = PrimaryKey(userId)
 }
+
+/**
+ * Append-only player reports (trust and safety). One row per report; reads
+ * are deferred to a future moderation-review surface. See
+ * `V3__player_reports.sql`.
+ */
+object PlayerReportsTable : Table("player_reports") {
+    val id = long("id").autoIncrement()
+    val reporterUserId = uuid("reporter_user_id")
+    val reportedUserId = uuid("reported_user_id")
+    val context = text("context").nullable()
+    val reason = text("reason").nullable()
+    val reasonCategories = text("reason_categories").nullable()
+    val createdAt = timestamp("created_at")
+    override val primaryKey = PrimaryKey(id)
+}
