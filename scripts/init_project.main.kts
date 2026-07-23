@@ -1,6 +1,8 @@
 #!/usr/bin/env kotlin
 
-@file:DependsOn("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+// No @file:DependsOn here on purpose: the script uses only the stdlib, and a
+// dependency declaration makes every cold run resolve Maven coordinates over
+// the network (observed hanging the script runner entirely on flaky daemons).
 
 import java.io.File
 import kotlin.system.exitProcess
@@ -941,5 +943,8 @@ fun getReplacedName(name: String, projectName: ProjectName): String {
     return result
 }
 
-// Run the script
+// Run the script. Explicit exit: the script JVM has been observed lingering
+// after main() completes (a stray non-daemon thread keeps it alive), which
+// hangs automation that waits on the process.
 main(parseCliConfig(args.toList()))
+exitProcess(0)

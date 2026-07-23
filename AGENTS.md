@@ -93,6 +93,18 @@ The `Set<AutoInit>` is resolved at app start (`Application.onCreate` on Android,
 
 **Opt in** when there's first-touch latency the user notices, an `init {}` that registers a listener, or a cache that needs its observer running before the user can navigate. **Skip** for debug-only / QA-menu singletons and anything whose `init {}` is empty. Forgetting the marker is a perf regression, not a correctness one — the class still works lazily — so the bigger risk is overuse making boot slow.
 
+## Auth model (`:libraries:identity`)
+
+Anonymous-first Supabase auth. Sessions are never minted implicitly: onboarding drives guest creation (`GuestAccountCreator`), the sign-in flows mint claimed ones, and `GuestSessionHealer` recovers a stranded onboarded device.
+
+- **`AuthState` is sealed with no in-flight sentinel** — `Authenticated(userId, isAnonymous, email)` or `Unauthenticated(cause, reason, wasAnonymous)`. `current()` suspends until the answer is real; `observe()` emits only resolved values. UI renders a spinner while awaiting its first emission, never off a `Loading` enum.
+- **Per-operation sealed outcomes** (`SignInOutcome`, `SignUpOutcome`, …) instead of thrown exceptions — screens render specific messages for invalid-credentials vs offline vs already-registered.
+- **`Unauthenticated.reason` drives app routing**: `SessionExpired` pushes the blocking recovery screen (sign-in-again for claimed, start-fresh for guests); `SignedOut` marks a deliberate exit this run so self-heal never resurrects a signed-out user; `None` is the ordinary no-session state.
+- **User-change choke point**: every transition flows through the auth orchestrator, which runs the `UserScopedDataReset` dump (Room tables via `ClearableDao` multibinding, profile caches, account-scoped `AppData` fields) *before* the new `AuthState` is emitted — a reactive loader can't race the wipe. `AppEvent.UserChanged(previous, current)` is the after-the-fact announcement for side effects that hold no user-scoped storage.
+- **Tokens**: the network layer only sees `AuthTokenProvider` (`awaitReady()` then `accessToken()`); a server-confirmed 401-after-refresh routes through `SessionRejectionBus` (no 401 loops), a 403 ban envelope through `AccessDeniedBus`.
+- **Session persistence is OS-encrypted** (Keychain on iOS via the Swift `IOSSecureSessionStorage`, `EncryptedSharedPreferences` on Android) with a file mirror for anonymous sessions so a TestFlight Keychain wipe can't strand a guest.
+- The browser-OAuth redirect is `kmptemplate://login-callback` (the scheme renames with the project); `App.kt` hands it to `completeOAuthRedirect`, never the nav graph.
+
 ## Server (`:apps:server`)
 
 A Ktor + Postgres backend with Supabase JWT auth. It reuses the client's conventions—kotlin-inject + anvil DI (`ServerScope` / `ServerComponent`), the `domain/` interface + `data/` impl split, one `fun Route.xRoutes(deps)` per resource—and degrades gracefully (boots with no DB / no Supabase). It's a plain JVM module, so it applies plugins directly rather than via a convention plugin.

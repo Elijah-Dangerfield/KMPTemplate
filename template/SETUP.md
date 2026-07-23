@@ -147,19 +147,55 @@ and network errors; the rest of the codebase already uses this pattern.
 **JSON config.** `NetworkJson` is strict in debug (unknown keys/missing
 fields throw) and lenient in release (so a backend tweak can't crash users).
 
+## Supabase auth (hour 1)
+
+The app ships with anonymous-first Supabase auth wired end to end (guest
+creation in onboarding, email/password + Apple + browser-OAuth sign-in,
+encrypted session storage, `/v1/me` profile). To light it up:
+
+1. Create a Supabase project (free tier is fine). Note the project URL and
+   the **publishable (anon) key** (Settings → API Keys).
+2. Client config — add to `local.properties` (or export as env vars in CI):
+   ```
+   supabase.projectId=<ref>
+   supabase.url=https://<ref>.supabase.co
+   supabase.anonKey=<publishable key>
+   ```
+3. Enable providers in the Supabase dashboard (Authentication → Providers):
+   **Anonymous sign-ins** (required for the guest flow), **Email**
+   (confirm-email on), and optionally **Apple** / **Google**.
+4. Redirect URLs (Authentication → URL Configuration): add your custom
+   scheme callbacks so browser OAuth and the verify-email link return to
+   the app:
+   ```
+   <yourscheme>://login-callback
+   <yourscheme>://auth/confirmed
+   ```
+   The scheme is your project's lowercase name (see the intent filter in
+   `AndroidManifest.xml` / `CFBundleURLTypes` in `Info.plist` — both already
+   enabled).
+5. Server env (see `apps/server/.env.example`): `SUPABASE_URL` for JWT
+   verification, and `SUPABASE_SERVICE_ROLE_KEY` if you want in-app account
+   deletion (`DELETE /v1/me`) and display-name mirroring. Treat the service
+   role key as a root password — server secrets only, never the client.
+6. Verify: launch the app → complete onboarding as a guest → a user appears
+   in Supabase → Authentication → Users with `is_anonymous = true`, and
+   `GET /v1/me` (through the app) creates the profile row.
+
 ## Deep links
 
 Compose NavHost handles the routing once URLs reach it. Per-route deep
-links go on `screen<Route>(deepLinks = ...)`. Two things to set up per
-platform:
+links go on `screen<Route>(deepLinks = ...)` — use `routeDeepLink<T>()`,
+never bare `navDeepLink` (iOS crashes on the missing base-route NavTypes).
 
-- **Android**: uncomment the intent filter in `apps/compose/src/androidMain/AndroidManifest.xml`
-  and customize the scheme/host. Compose NavHost reads `Activity.intent.data`
-  automatically once a filter matches.
-- **iOS**: uncomment `CFBundleURLTypes` in `apps/ios/iosApp/Info.plist` for
-  custom-scheme links, or add an `Associated Domains` entitlement + AASA
-  file for Universal Links. `iOSApp.swift` already forwards every
-  `.onOpenURL` event to the Kotlin `DeepLinkBridge`.
+The custom-scheme wiring is already enabled on both platforms (the auth
+flows depend on it): the intent filter in
+`apps/compose/src/androidMain/AndroidManifest.xml` and `CFBundleURLTypes`
+in `apps/ios/iosApp/Info.plist`. For https App/Universal Links, add the
+`assetlinks.json` / `Associated Domains` + AASA setup alongside.
+`iOSApp.swift` forwards every `.onOpenURL` event to the Kotlin
+`DeepLinkBridge`; `App.kt` routes OAuth callbacks to the auth layer and
+everything else into the nav graph.
 
 ## In-app review
 
