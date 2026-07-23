@@ -54,7 +54,8 @@ Set under **Settings → Secrets and variables → Actions**. All are required f
 
 | Secret | Notes |
 | --- | --- |
-| `SENTRY_AUTH_TOKEN` | Sentry → User Auth Tokens → scope: `project:releases`, `org:read`. |
+| `SENTRY_AUTH_TOKEN` | Sentry → User Auth Tokens → scope: `project:releases`, `org:read`. Used by `beta.yml`/`release.yml` to create releases + upload mappings/dSYMs. |
+| `SENTRY_DSN` | Sentry → Project Settings → Client Keys (DSN). Baked into store builds so crash reporting is live; blank leaves crash reporting dormant. |
 
 And under **Settings → Secrets and variables → Actions → Variables** (not secrets):
 
@@ -62,6 +63,36 @@ And under **Settings → Secrets and variables → Actions → Variables** (not 
 | --- | --- |
 | `SENTRY_ORG` | Your Sentry org slug |
 | `SENTRY_PROJECT` | Your Sentry project slug |
+
+### Grafana Cloud telemetry (optional)
+
+Used by `beta.yml` and `release.yml` to bake client app-event credentials into
+store builds. Leave unset and the telemetry pipe stays dormant — the app builds
+and runs fine.
+
+| Secret | Notes |
+| --- | --- |
+| `GRAFANA_OTLP_BASE_URL` | Grafana Cloud → OpenTelemetry → OTLP endpoint base URL |
+| `GRAFANA_OTLP_INSTANCE_ID` | Same page — instance id (the numeric user) |
+| `GRAFANA_LOGS_WRITE_TOKEN` | A Grafana Cloud access-policy token with logs:write. Grafana auto-revokes `glc_` tokens it finds in public repos — never commit one. |
+
+### Server deploy (Fly.io)
+
+`server-deploy.yml` auto-deploys the dev server on pushes to `main` that touch
+server paths; `server-deploy-prod.yml` queues a prod deploy behind a manual
+approval. Requires the two Fly apps from `apps/server/DEPLOY.md`.
+
+| Secret | Notes |
+| --- | --- |
+| `FLY_API_TOKEN_DEV` | `fly tokens create deploy -a <project>-server-dev --expiry 8760h` |
+| `FLY_API_TOKEN_PROD` | `fly tokens create deploy -a <project>-server-prod --expiry 8760h` |
+| `ADMIN_API_TOKEN_DEV` *(optional)* | The dev server's `ADMIN_API_TOKEN` — lets the deploy upload the per-version config manifest (see `apps/admin/README.md`). Skipped with a warning if unset. |
+| `ADMIN_API_TOKEN_PROD` *(optional)* | Same, for prod. |
+
+Also create the **`production` GitHub Environment** (Settings → Environments →
+New environment → `production` → Required reviewers → add yourself).
+`server-deploy-prod.yml` pauses on it until a human approves the run — without
+the environment the prod deploy runs unguarded.
 
 ---
 

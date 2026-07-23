@@ -63,7 +63,14 @@ When you add a module or a new kind of file, walk this list:
   needs its path added, or generated projects get non-executable copies.
 - **`TEXT_FILE_EXTENSIONS` / `shouldProcessFile`** (init script) — a new text
   file type that can carry the project name (new config format, extensionless
-  file) must be added or it ships un-renamed.
+  file) must be added or it ships un-renamed. Example: detekt's ServiceLoader
+  file (`detekt-rules/src/main/resources/META-INF/services/dev.detekt.api.RuleSetProvider`)
+  is on the extensionless allowlist because its dotted name defeats extension
+  matching but its content is the provider's `com.kmptemplate` FQN.
+- **`config/detekt/baseline.xml`** — regenerate with `./gradlew detektBaseline`
+  when template code adds inline-string findings you intend to keep (prefer
+  fixing them via `:libraries:resources`); the baseline ships into generated
+  projects as their accepted debt.
 - **`cleanupTemplateArtifacts`** (init script) — template-only files must be
   added to the deletion list or they ship into generated projects.
 - **`SKIP_DIRECTORIES`** (init script) — new machine-local or build-output

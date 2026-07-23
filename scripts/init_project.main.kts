@@ -827,6 +827,14 @@ fun shouldProcessFile(file: File): Boolean {
         // .env files resolve to extension "example"/"env" — the server's
         // .env.example carries the project name in OTEL_SERVICE_NAME.
         ".env", ".env.example",
+        // detekt's ServiceLoader registration: the file's dotted name defeats
+        // extension matching, but its one line is the rule-set provider's FQN
+        // under com.kmptemplate — without a rename the generated project's
+        // detekt jar points at a class that no longer exists.
+        "dev.detekt.api.RuleSetProvider",
+        // Git hooks are extensionless; pre-push names the custom detekt
+        // ruleset (`kmptemplate`) in its comments.
+        "commit-msg", "post-commit", "pre-push",
     )
 }
 
