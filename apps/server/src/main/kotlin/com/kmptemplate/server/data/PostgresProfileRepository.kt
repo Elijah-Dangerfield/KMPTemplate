@@ -5,6 +5,7 @@ import com.kmptemplate.server.db.ProfilesTable
 import com.kmptemplate.server.db.toJavaInstant
 import com.kmptemplate.server.db.toKotlinInstant
 import com.kmptemplate.server.di.ServerScope
+import com.kmptemplate.server.domain.FindOrCreateProfileResult
 import com.kmptemplate.server.domain.Profile
 import com.kmptemplate.server.domain.ProfileRepository
 import com.kmptemplate.server.domain.UpdateProfileOutcome
@@ -12,6 +13,8 @@ import com.kmptemplate.server.domain.UserId
 import me.tatarka.inject.annotations.Inject
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
@@ -41,16 +44,37 @@ class PostgresProfileRepository(
     private val clock: Clock,
 ) : ProfileRepository {
 
-    override suspend fun findOrCreate(userId: UserId): Profile = database.transaction {
-        existing(userId) ?: run {
-            val now = clock.now().toJavaInstant()
-            ProfilesTable.insert {
-                it[ProfilesTable.userId] = userId.value
-                it[displayName] = defaultDisplayName(userId)
-                it[createdAt] = now
-                it[updatedAt] = now
+    override suspend fun findOrCreate(userId: UserId): Profile =
+        findOrCreateResult(userId).profile
+
+    override suspend fun findOrCreateResult(userId: UserId): FindOrCreateProfileResult =
+        database.transaction {
+            val found = existing(userId)
+            if (found != null) {
+                return@transaction FindOrCreateProfileResult(found, created = false)
             }
-            existing(userId) ?: error("Profile insert for $userId did not persist")
+            val now = clock.now().toJavaInstant()
+            val wonInsert = try {
+                ProfilesTable.insert {
+                    it[ProfilesTable.userId] = userId.value
+                    it[displayName] = defaultDisplayName(userId)
+                    it[createdAt] = now
+                    it[updatedAt] = now
+                }
+                true
+            } catch (e: ExposedSQLException) {
+                // A concurrent first-contact request beat us to the insert; the
+                // winner reports created = true, we re-read and report false.
+                if (!e.isUniqueViolation()) throw e
+                false
+            }
+            val profile = existing(userId) ?: error("Profile insert for $userId did not persist")
+            FindOrCreateProfileResult(profile, created = wonInsert)
+        }
+
+    override suspend fun delete(userId: UserId) {
+        database.transaction {
+            ProfilesTable.deleteWhere { ProfilesTable.userId eq userId.value }
         }
     }
 

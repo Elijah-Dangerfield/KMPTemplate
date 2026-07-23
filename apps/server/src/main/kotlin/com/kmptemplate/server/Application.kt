@@ -99,7 +99,7 @@ fun Application.installApp(
         healthRoutes()
         exampleRoutes(component?.exampleSource ?: InMemoryExampleSource())
         if (component != null && verification != null) {
-            meRoutes(component.profileRepository)
+            meRoutes(component.profileRepository, component.supabaseAdminClient)
             playerReportRoutes(component.playerReportRepository)
         }
     }

@@ -6,6 +6,7 @@ import com.kmptemplate.server.domain.ExampleSource
 import com.kmptemplate.server.domain.ModerationRepository
 import com.kmptemplate.server.domain.PlayerReportRepository
 import com.kmptemplate.server.domain.ProfileRepository
+import com.kmptemplate.server.domain.SupabaseAdminClient
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.MergeComponent
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
@@ -46,6 +47,7 @@ abstract class ServerComponent(
     abstract val profileRepository: ProfileRepository
     abstract val moderationRepository: ModerationRepository
     abstract val playerReportRepository: PlayerReportRepository
+    abstract val supabaseAdminClient: SupabaseAdminClient
 
     /**
      * Wall-clock source. Singleton so every component sees the same "now".

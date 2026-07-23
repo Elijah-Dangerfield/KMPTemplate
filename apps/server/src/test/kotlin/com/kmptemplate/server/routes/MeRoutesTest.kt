@@ -3,8 +3,11 @@ package com.kmptemplate.server.routes
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.kmptemplate.server.domain.DeleteUserResult
 import com.kmptemplate.server.domain.Profile
 import com.kmptemplate.server.domain.ProfileRepository
+import com.kmptemplate.server.domain.SupabaseAdminClient
+import com.kmptemplate.server.domain.UpdateDisplayNameResult
 import com.kmptemplate.server.domain.UpdateProfileOutcome
 import com.kmptemplate.server.domain.UserId
 import com.kmptemplate.server.plugins.JwtVerification
@@ -15,6 +18,7 @@ import com.kmptemplate.server.plugins.installStatusPages
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
@@ -135,14 +139,57 @@ class MeRoutesTest {
         }
     }
 
-    private suspend fun withMeApp(repo: ProfileRepository, block: suspend (HttpClient) -> Unit) {
+    @Test
+    fun deleteMe_deletesAdminThenLocal() = runTest {
+        val repo = FakeProfileRepository(fakeProfile())
+        val admin = FakeAdminClient(deleteResult = DeleteUserResult.Success)
+        withMeApp(repo, admin) { client ->
+            val resp = client.delete("/v1/me") {
+                header(HttpHeaders.Authorization, "Bearer ${validJwt()}")
+            }
+            assertEquals(HttpStatusCode.NoContent, resp.status)
+            assertEquals(listOf(userId), admin.deletedUsers)
+            assertEquals(listOf(userId), repo.deletedUsers)
+        }
+    }
+
+    @Test
+    fun deleteMe_returns503_whenAdminNotConfigured() = runTest {
+        val repo = FakeProfileRepository(fakeProfile())
+        withMeApp(repo, FakeAdminClient(deleteResult = DeleteUserResult.NotConfigured)) { client ->
+            val resp = client.delete("/v1/me") {
+                header(HttpHeaders.Authorization, "Bearer ${validJwt()}")
+            }
+            assertEquals(HttpStatusCode.ServiceUnavailable, resp.status)
+            // Local data survives — nothing was revoked upstream.
+            assertEquals(emptyList<UserId>(), repo.deletedUsers)
+        }
+    }
+
+    @Test
+    fun patchMe_returns400_whenNameBreaksRules() = runTest {
+        withMeApp(FakeProfileRepository(fakeProfile())) { client ->
+            val resp = client.patch("/v1/me") {
+                header(HttpHeaders.Authorization, "Bearer ${validJwt()}")
+                contentType(ContentType.Application.Json)
+                setBody(UpdateMeRequest(displayName = "ab"))
+            }
+            assertEquals(HttpStatusCode.BadRequest, resp.status)
+        }
+    }
+
+    private suspend fun withMeApp(
+        repo: ProfileRepository,
+        admin: SupabaseAdminClient = FakeAdminClient(),
+        block: suspend (HttpClient) -> Unit,
+    ) {
         testApplication {
             application {
                 installSerialization()
                 installRateLimits()
                 installStatusPages()
                 installAuthentication(JwtVerification.Static(testVerifier))
-                routing { meRoutes(repo) }
+                routing { meRoutes(repo, admin) }
             }
             val client = createClient {
                 install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
@@ -169,6 +216,7 @@ class MeRoutesTest {
 
     private class FakeProfileRepository(private var existing: Profile?) : ProfileRepository {
         var findOrCreateCalls = 0
+        val deletedUsers = mutableListOf<UserId>()
 
         override suspend fun findOrCreate(userId: UserId): Profile {
             findOrCreateCalls++
@@ -189,5 +237,30 @@ class MeRoutesTest {
             existing = updated
             return UpdateProfileOutcome.Success(updated)
         }
+
+        override suspend fun delete(userId: UserId) {
+            deletedUsers += userId
+            existing = null
+        }
+    }
+
+    private class FakeAdminClient(
+        private val deleteResult: DeleteUserResult = DeleteUserResult.NotConfigured,
+    ) : SupabaseAdminClient {
+        val deletedUsers = mutableListOf<UserId>()
+
+        override suspend fun deleteUser(userId: UserId): DeleteUserResult {
+            if (deleteResult is DeleteUserResult.Success || deleteResult is DeleteUserResult.AlreadyGone) {
+                deletedUsers += userId
+            }
+            return deleteResult
+        }
+
+        override suspend fun listAnonymousUsersOlderThan(olderThan: Instant): List<UserId> = emptyList()
+
+        override suspend fun updateUserDisplayName(
+            userId: UserId,
+            displayName: String,
+        ): UpdateDisplayNameResult = UpdateDisplayNameResult.Success
     }
 }

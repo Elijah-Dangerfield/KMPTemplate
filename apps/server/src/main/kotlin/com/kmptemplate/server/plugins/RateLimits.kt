@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 const val PROFILE_WRITE_LIMIT = "profile-write"
 const val PLAYER_REPORT_LIMIT = "player-report"
+const val DELETE_ACCOUNT_LIMIT = "delete-account"
 
 fun Application.installRateLimits() {
     install(RateLimit) {
@@ -35,6 +36,14 @@ fun Application.installRateLimits() {
             // a tighter cap so name-squatting bots are expensive; a real user
             // still has plenty of retries.
             rateLimiter(limit = 30, refillPeriod = 1.hours)
+            requestKey { call -> call.clientIp() }
+        }
+
+        register(RateLimitName(DELETE_ACCOUNT_LIMIT)) {
+            // App Store review explicitly cites brute-force / harassment as
+            // a deletion-endpoint risk. 5/hour per IP gives a legitimate
+            // user multiple retries while making scripted abuse impractical.
+            rateLimiter(limit = 5, refillPeriod = 1.hours)
             requestKey { call -> call.clientIp() }
         }
 
