@@ -123,7 +123,25 @@ Routes are `@Serializable` data classes extending `Route`. Register in `FeatureE
 screen<MyRoute> { backStackEntry -> MyScreen(...) }
 bottomSheet<SheetRoute> { backStackEntry, sheetState -> ... }
 dialog<DialogRoute> { backStackEntry, dialogState -> ... }
+navigation<MyGraph>(startDestination = MyRoute()) { screen<...>; bottomSheet<...> }
 ```
+
+### iOS/Native landmines (production crashes, both)
+
+1. **Routes must be `class` (or `data class`), never `data object`.** A
+   `data object` route SIGSEGVs at navigate time on iOS — Native's
+   serialization of object routes crashes inside androidx.navigation. An
+   arg-less route is still a `data class MyRoute(...)` extending `Route`
+   with default args.
+2. **Every enum (or other non-primitive) route arg must be `@Serializable`
+   AND registered in a typeMap.** Base-class args (`enter`/`exit`/`popExit`)
+   come from `baseRouteTypeMap`, which every `screen<>`/`dialog<>`/
+   `bottomSheet<>`/`routeDeepLink<>` builder merges in automatically. Args
+   you add to your own route need `typeMap = mapOf(typeOf<MyEnum>() to
+   serializableType<MyEnum>())` at the registration site. Miss one and
+   graph-build throws `could not find any NavType for argument …` — often
+   naming a *different* arg than the one you forgot. Use `routeDeepLink<T>`
+   for deep links, never bare `navDeepLink`.
 
 **Use `bottomSheet<>` for transient picker / overlay UIs** (a settings list, a "select an item" sheet) rather than pushing a full screen. The backstack stays one entry deep, the underlying screen is visible under a scrim, and `sheetState.dismiss()` is a clean exit. Reach for full `screen<>` only when the destination is its own context (settings page, detail view).
 
