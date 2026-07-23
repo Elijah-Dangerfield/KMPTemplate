@@ -2,6 +2,7 @@ package com.kmptemplate
 
 import com.kmptemplate.libraries.core.AppState
 import com.kmptemplate.libraries.core.AutoInit
+import com.kmptemplate.libraries.identity.auth.AuthRepository
 import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
 import com.kmptemplate.libraries.kmptemplate.Telemetry
@@ -28,6 +29,9 @@ interface AppComponent {
      * request reachability.
      */
     val appState: AppState
+
+    /** Auth surface for App.kt's deep-link OAuth completion + routing collectors. */
+    val authRepository: AuthRepository
     
     /**
      * Singletons that need to construct at app boot rather than lazily

@@ -21,6 +21,7 @@ kotlin {
             implementation(projects.libraries.core)
             implementation(libs.kermit)
             implementation(projects.libraries.flowroutines)
+            implementation(projects.libraries.networking)
             implementation(projects.libraries.kmptemplate.storage)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
@@ -28,6 +29,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(projects.libraries.kmptemplate)
+            implementation(projects.libraries.networking)
             // :libraries:core for AutoInit (AppEventDispatcher's supertype —
             // the test compiler has to load it to type-check the class).
             implementation(projects.libraries.core)

@@ -1,30 +1,31 @@
 package com.kmptemplate.features.home.impl
 
 import com.kmptemplate.libraries.flowroutines.SEAViewModel
-import com.kmptemplate.libraries.kmptemplate.UserRepository
+import com.kmptemplate.libraries.identity.profile.ProfileRepository
+import com.kmptemplate.libraries.identity.profile.displayNameOrNull
 import me.tatarka.inject.annotations.Inject
 
 @Inject
 class HomeViewModel(
-    private val userRepository: UserRepository,
+    private val profileRepository: ProfileRepository,
 ) : SEAViewModel<HomeState, HomeEvent, HomeAction>(
     initialStateArg = HomeState()
 ) {
-    
+
     init {
         takeAction(HomeAction.Load)
     }
-    
+
     override suspend fun handleAction(action: HomeAction) {
         when (action) {
-            is HomeAction.Load -> action.loadUser()
-            is HomeAction.Refresh -> action.loadUser()
+            is HomeAction.Load -> action.loadProfile()
+            is HomeAction.Refresh -> action.loadProfile()
         }
     }
-    
-    private suspend fun HomeAction.loadUser() {
-        val user = userRepository.getUser()
-        updateState { it.copy(userName = user?.name) }
+
+    private suspend fun HomeAction.loadProfile() {
+        val profile = profileRepository.current()
+        updateState { it.copy(userName = profile.displayNameOrNull) }
     }
 }
 

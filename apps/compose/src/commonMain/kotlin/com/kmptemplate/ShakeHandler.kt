@@ -4,7 +4,8 @@ import com.kmptemplate.libraries.core.ShakeDetector
 import com.kmptemplate.libraries.core.ShakeEvent
 import com.kmptemplate.libraries.core.ShakeMessageContext
 import com.kmptemplate.libraries.core.ShakeMessageProvider
-import com.kmptemplate.libraries.kmptemplate.UserRepository
+import com.kmptemplate.libraries.identity.profile.ProfileRepository
+import com.kmptemplate.libraries.identity.profile.displayNameOrNull
 import com.kmptemplate.libraries.navigation.Router
 import com.kmptemplate.libraries.navigation.ShakeDialogRoute
 import kotlinx.coroutines.CoroutineScope
@@ -20,11 +21,13 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 class ShakeHandler(
     private val shakeDetector: ShakeDetector,
     private val shakeMessageProvider: ShakeMessageProvider,
-    private val userRepository: UserRepository,
+    private val profileRepository: ProfileRepository,
     private val router: Router,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isShowingDialog = false
+    // Process-local flavor counter for the shake easter-egg copy.
+    private var shakeCount = 0
     
     fun start() {
         shakeDetector.start()
@@ -46,14 +49,14 @@ class ShakeHandler(
     private suspend fun handleShake(event: ShakeEvent) {
         if (isShowingDialog) return
         
-        val user = userRepository.getUser() ?: return
-        
+        val profile = profileRepository.current()
+
         val context = ShakeMessageContext(
-            shakeCount = user.shakeCount,
+            shakeCount = shakeCount,
             intensity = event.intensity,
             isLateNight = false,
-            isFirstSession = user.sessionsCount <= 1,
-            userName = user.name,
+            isFirstSession = false,
+            userName = profile.displayNameOrNull,
         )
         
         val message = shakeMessageProvider.getMessage(context)
@@ -65,7 +68,7 @@ class ShakeHandler(
                 subtext = message.subtext,
             )
         )
-        
-        userRepository.onShakeDetected()
+
+        shakeCount++
     }
 }

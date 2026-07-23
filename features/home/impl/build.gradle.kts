@@ -16,6 +16,7 @@ kotlin {
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.ui)
             implementation(projects.libraries.kmptemplate)
+            implementation(projects.libraries.identity)
 
             // Compose dependencies (navigation and lifecycle provided by kmptemplate.feature plugin)
             implementation(compose.runtime)
@@ -28,7 +29,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(projects.libraries.flowroutines.testing)
-            implementation(projects.libraries.kmptemplate)
+            implementation(projects.libraries.identity)
         }
     }
 }

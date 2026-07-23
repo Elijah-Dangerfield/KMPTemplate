@@ -1,13 +1,16 @@
 package com.kmptemplate.features.home.impl
 
 import com.kmptemplate.libraries.flowroutines.testing.CoroutineTest
-import com.kmptemplate.libraries.kmptemplate.User
-import com.kmptemplate.libraries.kmptemplate.UserRepository
+import com.kmptemplate.libraries.identity.profile.Profile
+import com.kmptemplate.libraries.identity.profile.ProfileRepository
+import com.kmptemplate.libraries.identity.profile.UpdateProfileOutcome
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Reference example for testing a SEAViewModel with the
@@ -20,57 +23,54 @@ import kotlin.test.assertNull
  *  - hand-roll a fake for each repository dependency (no mocking framework)
  *  - drive actions, assert on `vm.state`
  */
+@OptIn(ExperimentalTime::class)
 class HomeViewModelTest : CoroutineTest() {
 
     @Test
-    fun loadsUserNameOnInit() = runUnitTest {
-        val vm = HomeViewModel(FakeUserRepository(userWithName("Ada")))
+    fun loadsDisplayNameOnInit() = runUnitTest {
+        val vm = HomeViewModel(FakeProfileRepository(authenticated("Ada")))
 
         assertEquals("Ada", vm.state.userName)
     }
 
     @Test
     fun refreshPicksUpChangedName() = runUnitTest {
-        val repository = FakeUserRepository(userWithName("Ada"))
+        val repository = FakeProfileRepository(authenticated("Ada"))
         val vm = HomeViewModel(repository)
 
-        repository.user.value = userWithName("Grace")
+        repository.profile.value = authenticated("Grace")
         vm.takeAction(HomeAction.Refresh)
 
         assertEquals("Grace", vm.state.userName)
     }
 
     @Test
-    fun missingUserLeavesNameNull() = runUnitTest {
-        val vm = HomeViewModel(FakeUserRepository(user = null))
+    fun fallbackProfileWithoutNameLeavesNameNull() = runUnitTest {
+        val vm = HomeViewModel(FakeProfileRepository(Profile.Fallback(id = "local-id")))
 
         assertNull(vm.state.userName)
     }
 
-    private fun userWithName(name: String) = User(
-        name = name,
-        createdAt = 0L,
-        lastSessionAt = null,
-        hasCompletedOnboarding = true,
-        sessionsCount = 2,
-        appOpenCount = 2,
+    private fun authenticated(name: String) = Profile.Authenticated(
+        id = "user-1",
+        displayName = name,
+        email = null,
+        isAnonymous = true,
+        createdAt = Instant.fromEpochSeconds(0),
     )
 }
 
-private class FakeUserRepository(user: User?) : UserRepository {
-    val user = MutableStateFlow(user)
+private class FakeProfileRepository(initial: Profile) : ProfileRepository {
+    val profile = MutableStateFlow(initial)
 
-    override suspend fun ensureUserExists() = Unit
-    override fun observeUser(): Flow<User?> = user
-    override suspend fun getUser(): User? = user.value
-    override suspend fun setName(name: String?) {
-        user.value = user.value?.copy(name = name)
-    }
-    override suspend fun onSessionStarted() = Unit
-    override suspend fun onAppOpened() = Unit
-    override suspend fun setOnboardingComplete() = Unit
-    override suspend fun onShakeDetected() = Unit
-    override suspend fun deleteAll() {
-        user.value = null
+    override suspend fun current(): Profile = profile.value
+    override fun observe(): Flow<Profile> = profile
+    override suspend fun update(displayName: String?): UpdateProfileOutcome {
+        val current = profile.value
+        if (current is Profile.Authenticated && displayName != null) {
+            profile.value = current.copy(displayName = displayName)
+            return UpdateProfileOutcome.Success(current.copy(displayName = displayName))
+        }
+        return UpdateProfileOutcome.NotSignedIn
     }
 }

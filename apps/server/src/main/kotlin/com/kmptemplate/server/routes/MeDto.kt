@@ -17,6 +17,8 @@ data class MeResponse(
     val displayName: String,
     val isAnonymous: Boolean,
     val isNewAccount: Boolean = false,
+    /** Server wall-clock when the profile row was created — the client's "member since". */
+    val createdAtEpochMs: Long = 0,
 )
 
 @Serializable
@@ -29,4 +31,5 @@ fun Profile.toMeResponse(isAnonymous: Boolean, isNewAccount: Boolean = false): M
     displayName = displayName,
     isAnonymous = isAnonymous,
     isNewAccount = isNewAccount,
+    createdAtEpochMs = createdAt.toEpochMilliseconds(),
 )

@@ -5,24 +5,20 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
-import com.kmptemplate.libraries.kmptemplate.storage.db.SessionDao
-import com.kmptemplate.libraries.kmptemplate.storage.db.SessionEntity
-import com.kmptemplate.libraries.kmptemplate.storage.db.UserDao
-import com.kmptemplate.libraries.kmptemplate.storage.db.UserEntity
+import com.kmptemplate.libraries.kmptemplate.storage.db.ExampleUserDataDao
+import com.kmptemplate.libraries.kmptemplate.storage.db.ExampleUserDataEntity
 
 @Database(
     entities = [
-        UserEntity::class,
-        SessionEntity::class,
+        ExampleUserDataEntity::class,
     ],
-    version = 4, // Bumped version for schema change
+    version = 5, // Bumped: demo User/Session tables replaced by the example table
     exportSchema = true
 )
 @TypeConverters(CoreTypeConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
-    abstract fun sessionDao(): SessionDao
+    abstract fun exampleUserDataDao(): ExampleUserDataDao
 }
 
 @Suppress("KotlinNoActualForExpect")

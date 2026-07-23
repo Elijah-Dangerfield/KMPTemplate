@@ -1,20 +1,21 @@
 package com.kmptemplate.libraries.storage.impl.db
 
-import com.kmptemplate.libraries.kmptemplate.storage.db.SessionDao
-import com.kmptemplate.libraries.kmptemplate.storage.db.UserDao
+import com.kmptemplate.libraries.kmptemplate.storage.db.ClearableDao
+import com.kmptemplate.libraries.kmptemplate.storage.db.ExampleUserDataDao
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 
+/**
+ * The pattern for exposing a DAO to the DI graph: delegate to the database
+ * provider AND contribute the DAO into the [ClearableDao] multibinding set so
+ * `UserScopedDaoCleaner` wipes it on user change. Copy this pair of
+ * annotations for every user-scoped DAO you add.
+ */
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = UserDao::class)
-class ProvideUserDao @Inject constructor(
+@ContributesBinding(AppScope::class, boundType = ExampleUserDataDao::class)
+@ContributesBinding(AppScope::class, boundType = ClearableDao::class, multibinding = true)
+class ProvideExampleUserDataDao @Inject constructor(
     provider: AppDatabaseProvider
-) : UserDao by provider.database.userDao()
-
-@SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = SessionDao::class)
-class ProvideSessionDao @Inject constructor(
-    provider: AppDatabaseProvider
-) : SessionDao by provider.database.sessionDao()
+) : ExampleUserDataDao by provider.database.exampleUserDataDao()

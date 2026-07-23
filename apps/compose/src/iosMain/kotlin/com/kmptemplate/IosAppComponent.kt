@@ -1,5 +1,7 @@
 package com.kmptemplate
 
+import com.kmptemplate.libraries.identity.auth.AppleSignInCoordinator
+import com.kmptemplate.libraries.identity.auth.SecureSessionStorage
 import com.kmptemplate.libraries.kmptemplate.PermissionManager
 import com.kmptemplate.libraries.kmptemplate.ReviewPrompter
 import com.kmptemplate.libraries.ui.nativeviews.NativeViewFactory
@@ -13,6 +15,13 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 abstract class IosAppComponent(
     private val permissionManager: PermissionManager,
     private val reviewPrompter: ReviewPrompter,
+    // The Swift `IOSAppleSignInCoordinator` (ASAuthorizationController flow),
+    // passed in from `iOSApp.swift`. Android binds its own no-op via anvil.
+    private val appleSignInCoordinator: AppleSignInCoordinator,
+    // The Swift `IOSSecureSessionStorage` (Keychain-backed Supabase session
+    // store), passed in from `iOSApp.swift`. Android binds
+    // EncryptedSessionStorage via anvil.
+    private val secureSessionStorage: SecureSessionStorage,
     val nativeViewFactory: NativeViewFactory
 ) : AppComponent {
 
@@ -21,6 +30,12 @@ abstract class IosAppComponent(
 
     @Provides
     fun provideReviewPrompter(): ReviewPrompter = reviewPrompter
+
+    @Provides
+    fun provideAppleSignInCoordinator(): AppleSignInCoordinator = appleSignInCoordinator
+
+    @Provides
+    fun provideSecureSessionStorage(): SecureSessionStorage = secureSessionStorage
 }
 
 
@@ -28,5 +43,7 @@ abstract class IosAppComponent(
 expect fun create(
     permissionManager: PermissionManager,
     reviewPrompter: ReviewPrompter,
+    appleSignInCoordinator: AppleSignInCoordinator,
+    secureSessionStorage: SecureSessionStorage,
     nativeViewFactory: NativeViewFactory
 ): IosAppComponent

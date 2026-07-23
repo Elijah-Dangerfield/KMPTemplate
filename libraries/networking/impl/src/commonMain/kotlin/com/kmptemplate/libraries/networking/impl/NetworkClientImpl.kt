@@ -1,14 +1,24 @@
 package com.kmptemplate.libraries.networking.impl
 
+import com.kmptemplate.libraries.core.AuthGate
+import com.kmptemplate.libraries.core.AuthRequirement
+import com.kmptemplate.libraries.core.AuthVerdict
 import com.kmptemplate.libraries.core.BuildInfo
-import com.kmptemplate.libraries.core.logging.KLog
+import com.kmptemplate.libraries.core.Catching
+import com.kmptemplate.libraries.networking.AccessDeniedBus
+import com.kmptemplate.libraries.networking.SessionRejectionBus
 import com.kmptemplate.libraries.networking.AuthTokenProvider
+import com.kmptemplate.libraries.networking.ClientHeaders
+import com.kmptemplate.libraries.networking.InternalNetworkingApi
+import com.kmptemplate.libraries.networking.ClientHeadersProvider
 import com.kmptemplate.libraries.networking.NetworkClient
 import com.kmptemplate.libraries.networking.NetworkConfig
 import com.kmptemplate.libraries.networking.NetworkJson
 import com.kmptemplate.libraries.networking.NetworkReachability
+import com.kmptemplate.libraries.networking.platformHttpEngineFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
+import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -20,8 +30,12 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
+import com.kmptemplate.libraries.core.logging.KLog
+import kotlinx.serialization.Serializable
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
@@ -30,41 +44,73 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 @Inject
+@OptIn(InternalNetworkingApi::class)
 class NetworkClientImpl(
     private val config: NetworkConfig,
-    private val authTokenProvider: AuthTokenProvider,
+    private val tokenProvider: AuthTokenProvider,
+    private val headersProvider: ClientHeadersProvider,
     private val reachability: NetworkReachability,
+    private val accessDeniedBus: AccessDeniedBus,
+    private val sessionRejectionBus: SessionRejectionBus,
+    // Lazy: AuthGate's impl (identity) reaches NetworkClient through its own
+    // deps, so a direct injection would cycle at construction time.
+    private val authGate: () -> AuthGate,
 ) : NetworkClient {
 
     override val client: HttpClient by lazy {
-        HttpClient {
-            applyCommonConfig(config, reachability)
+        HttpClient(platformHttpEngineFactory) {
+            applyCommonConfig(config, headersProvider, reachability, accessDeniedBus)
         }
     }
 
     override val authenticatedClient: HttpClient by lazy {
-        HttpClient {
-            applyCommonConfig(config, reachability)
+        HttpClient(platformHttpEngineFactory) {
+            applyCommonConfig(config, headersProvider, reachability, accessDeniedBus)
             install(Auth) {
                 bearer {
+                    // By the time loadTokens runs, authedCall has already
+                    // called [awaitAuthReady], so the gateway peek is
+                    // synchronous and instant. Null means there's no
+                    // session (anon disabled, offline before first auth) —
+                    // request goes unauthed and the server 401s cleanly.
                     loadTokens {
-                        val token = authTokenProvider.getAccessToken() ?: return@loadTokens null
+                        val token = tokenProvider.accessToken()
+                            ?: return@loadTokens null
                         BearerTokens(accessToken = token, refreshToken = "")
                     }
                     refreshTokens {
-                        val token = authTokenProvider.refreshAccessToken() ?: return@refreshTokens null
+                        val token = tokenProvider.refreshAccessToken()
+                            ?: return@refreshTokens null
                         BearerTokens(accessToken = token, refreshToken = "")
                     }
                     sendWithoutRequest { true }
                 }
             }
+            // WebSocket plugin so callers can open sockets via the same
+            // authenticated client (the Auth bearer is attached on the WS
+            // handshake). The plugin is additive — existing HTTP calls don't
+            // notice it. Keepalive is per-engine; see
+            // installWebSocketKeepalive for the OkHttp trap.
+            installWebSocketKeepalive()
         }
     }
+
+    override suspend fun awaitAuthReady() {
+        tokenProvider.awaitReady()
+    }
+
+    override suspend fun authVerdict(requirement: AuthRequirement): AuthVerdict =
+        authGate().awaitVerdict(requirement)
+
+    override val sessionRejectionEpoch: Long
+        get() = sessionRejectionBus.rejectionEpoch
 }
 
 private fun HttpClientConfig<*>.applyCommonConfig(
     config: NetworkConfig,
+    headersProvider: ClientHeadersProvider,
     reachability: NetworkReachability,
+    accessDeniedBus: AccessDeniedBus,
 ) {
     install(ContentNegotiation) {
         json(NetworkJson)
@@ -80,6 +126,10 @@ private fun HttpClientConfig<*>.applyCommonConfig(
             // network is fine. Anything else never reached the server.
             if (cause !is ResponseException) {
                 reachability.reportUnreachable()
+                return@handleResponseExceptionWithRequest
+            }
+            if (cause.response.status == HttpStatusCode.Forbidden) {
+                signalAccessDeniedIfEnveloped(cause.response, accessDeniedBus)
             }
         }
     }
@@ -92,6 +142,17 @@ private fun HttpClientConfig<*>.applyCommonConfig(
         if (config.baseUrl.isNotBlank()) url(config.baseUrl)
         headers.append(HttpHeaders.Accept, "application/json")
         headers.append(HttpHeaders.ContentType, "application/json")
+        // Per-request: re-read from the provider on every call so locale
+        // changes flow through immediately. The provider caches its
+        // build-info bits, so this is cheap.
+        val h = headersProvider.current()
+        headers.append(HttpHeaders.AcceptLanguage, h.acceptLanguage)
+        headers.append(ClientHeaders.HEADER_PLATFORM, h.platform)
+        headers.append(ClientHeaders.HEADER_APP_VERSION, h.appVersion)
+        headers.append(ClientHeaders.HEADER_BUILD_NUMBER, h.buildNumber)
+        h.countryCode?.let { headers.append(ClientHeaders.HEADER_COUNTRY_CODE, it) }
+        h.installId?.let { headers.append(ClientHeaders.HEADER_INSTALL_ID, it) }
+        headers.append(ClientHeaders.HEADER_SESSION_ID, h.sessionId)
     }
     if (BuildInfo.isDebug) {
         install(Logging) {
@@ -105,4 +166,49 @@ private fun HttpClientConfig<*>.applyCommonConfig(
         }
     }
     expectSuccess = true
+}
+
+/**
+ * Server's `403 AccessDeniedResponse` wire shape — duplicated here (not shared)
+ * because the server class lives in `:apps:server` which the client must not
+ * depend on. Locked machine-readable data only, no copy: the client localizes
+ * off [reason]. `internal` so the impl module's test can construct an
+ * envelope-shaped response without re-deriving the shape; the public surface
+ * outside the module is [AccessDeniedBus.Denial].
+ */
+@Serializable
+internal data class AccessDeniedWire(
+    val reason: String,
+    val until: String? = null,
+    val appealUrl: String? = null,
+)
+
+/**
+ * On a `403`, attempt to read the response body as the locked [AccessDeniedWire]
+ * envelope and signal the access-denied bus. We don't throw or swallow — the
+ * caller's existing failure flow gets the same `ClientRequestException` it
+ * always did. A 403 *without* our envelope (a route-level deny, an upstream
+ * proxy 403) doesn't decode and is skipped silently — the [Catching] wrap is
+ * the safety net there.
+ *
+ * Run from `handleResponseExceptionWithRequest` rather than `validateResponse`
+ * because the `ResponseException` Ktor throws after validation holds a *saved*
+ * copy of the response — reading the body here doesn't race the caller's own
+ * body decoding (callers like `RoomRepositoryImpl` map 403 → `NotHost` off the
+ * status alone and never re-read the body anyway).
+ */
+internal suspend fun signalAccessDeniedIfEnveloped(
+    response: HttpResponse,
+    accessDeniedBus: AccessDeniedBus,
+) {
+    Catching { response.body<AccessDeniedWire>() }
+        .onSuccess { wire ->
+            accessDeniedBus.signalDenied(
+                AccessDeniedBus.Denial(
+                    reason = wire.reason,
+                    until = wire.until,
+                    appealUrl = wire.appealUrl,
+                ),
+            )
+        }
 }
