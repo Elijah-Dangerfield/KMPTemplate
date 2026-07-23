@@ -6,17 +6,25 @@ A Kotlin Multiplatform template with a clean, modular architecture using Compose
 
 ### Initialize Your Project
 
-**Run this first!** The init script creates a fresh copy of the template with your project name — the original template is left untouched:
+**Run this first!** The init script creates a fresh copy of the template with your project name — the original template is left untouched. Run it from the repo root (it needs the `kotlin` CLI — `brew install kotlin`):
 
 ```shell
-cd scripts
-./init_project.main.kts
+./scripts/init_project.main.kts
 ```
 
 You'll be prompted for:
 - **App Name** (e.g., "My Awesome App") — display name
 - **Package Name** (e.g., "com.example.myapp") — package declarations
+- **Contact email** — used in the privacy/terms pages
 - **Destination directory** — where to create the new project (defaults to the parent folder)
+- **CI** — whether to install the release automation now (you can opt in later with `./scripts/enable_ci.sh`)
+
+For automation there is a non-interactive mode where all flags are required together:
+
+```shell
+./scripts/init_project.main.kts --name "My App" --package com.example.myapp \
+  --email you@example.com --dir ../MyApp --ci=yes --yes
+```
 
 The script will:
 - Copy the template to `<destination>/<ProjectName>/`

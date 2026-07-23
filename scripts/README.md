@@ -1,101 +1,56 @@
-# KMP Template Scripts
+# Scripts
 
-This directory contains utility scripts for the KMP Template project.
+Utility scripts for this project.
 
-## init_project.main.kts
+> Template maintainers: init/verification tooling (`init_project.main.kts`,
+> `verify_template.sh`) is documented in `docs/template-maintenance.md`.
+> Those scripts are removed from generated projects.
 
-**Run this first!** This script initializes your project from the template by renaming all placeholder names to your chosen project name.
+## install_hooks.sh
 
-### Usage
+Installs the repo's git hooks (`.githooks/`) into your local clone. Run once
+after cloning, before your first commit:
 
 ```bash
-cd scripts
-./init_project.main.kts
+./scripts/install_hooks.sh
 ```
 
-The script will prompt you for:
-- **App Name** (e.g., "My Awesome App") - used for display names
-- **Package Name** (e.g., "com.example.myapp") - used for package declarations
+## enable_ci.sh
 
-It handles all naming conventions automatically:
-- `PascalCase` → MyAwesomeApp
-- `camelCase` → myAwesomeApp
-- `kebab-case` → my-awesome-app
-- `snake_case` → my_awesome_app
-- `lowercase` → myawesomeapp
+Present only if CI was declined at project init. Installs the staged CI /
+release automation (`.github/workflows/`, fastlane files, `pages/`,
+release-please config) and then removes itself:
 
----
+```bash
+./scripts/enable_ci.sh
+```
+
+See SETUP.md for the GitHub secrets the pipeline needs.
 
 ## create_module.main.kts
 
-An intelligent Kotlin script for creating new KMP modules with proper structure and configuration.
+Creates new KMP modules with proper structure and configuration.
 
-### Features
-
-✅ **Kotlin Multiplatform Structure**: Creates proper KMP module structure with `commonMain`, `androidMain`, `iosMain`, and `jvmMain` source sets
-
-✅ **Smart Plugin Selection**: Automatically applies correct build plugins:
-- `kmptemplate.feature` for UI feature modules
-- `kmptemplate.kotlin.multiplatform` for pure Kotlin libraries
-
-✅ **Package Structure**: Creates proper package hierarchy following `com.kmptemplate.{type}.{module}`
-
-✅ **Auto-Generated Files**: Creates starter files appropriate for module type:
-- Feature modules get Screen classes with Compose UI and ViewModel
-- Library modules get basic Kotlin classes
-
-✅ **Dependency Management**: Automatically updates:
-- `settings.gradle.kts` with module includes
-- `apps/compose/build.gradle.kts` with project dependencies
-
-✅ **Implementation Module Pattern**: Supports public/impl module pattern for libraries
-
-### Usage
-
-#### Interactive Mode
+- KMP source sets (`commonMain`, `androidMain`, `iosMain`) and the right
+  convention plugin per module type
+- Feature modules get a Screen + ViewModel starter; libraries get a basic
+  class; the public/impl split is supported for libraries
+- Updates `settings.gradle.kts` and `apps/compose/build.gradle.kts`
 
 ```bash
-cd scripts
-./create_module.main.kts
+./scripts/create_module.main.kts                      # interactive
+./scripts/create_module.main.kts feature messaging    # feature module
+./scripts/create_module.main.kts library analytics    # library module
+./scripts/create_module.main.kts library user:preferences  # sub-module
 ```
-
-#### Command Line Arguments
-
-```bash
-./create_module.main.kts [module-type] [module-name]
-```
-
-### Examples
-
-#### Create a Feature Module
-
-```bash
-./create_module.main.kts feature messaging
-```
-
-#### Create a Library Module
-
-```bash
-./create_module.main.kts library analytics
-```
-
-#### Create a Sub-Module
-
-```bash
-./create_module.main.kts library user:preferences
-```
-
----
 
 ## rotate_apple_sign_in_token.main.kts
 
-Utility script for rotating Apple Sign In tokens. Used for authentication setup.
-
----
+Rotates the Apple Sign In client secret (it expires at most every 6 months).
 
 ## cleanup.sh
 
-Script for cleaning build artifacts and caches.
+Cleans build artifacts and caches:
 
 ```bash
 ./scripts/cleanup.sh

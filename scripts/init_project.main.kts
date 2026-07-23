@@ -3,19 +3,31 @@
 @file:DependsOn("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
 import java.io.File
+import kotlin.system.exitProcess
 
 /**
  * KMP Template Project Initialization Script
- * 
+ *
  * This script helps you set up a new project from the KMP Template.
  * It will rename all template placeholders to your chosen project name.
- * 
- * Usage: ./init_project.main.kts
- * 
+ *
+ * Interactive usage: ./init_project.main.kts
+ *
  * The script will prompt you for:
  * - App name (e.g., "My Awesome App") - used for display
- * - Project identifier (e.g., "myawesomeapp") - used for module/package naming
  * - Package name (e.g., "com.example.myawesomeapp") - used for package declarations
+ * - Contact email and destination directory
+ *
+ * Non-interactive usage (all flags required together — used by
+ * scripts/verify_template.sh and template CI):
+ *
+ *   ./init_project.main.kts \
+ *     --name "My App" --package com.example.myapp \
+ *     --email you@example.com --dir /path/to/new/project \
+ *     --ci=yes --yes
+ *
+ * Any flag present requires ALL of them; exit code is non-zero on any
+ * validation or copy failure so automation can gate on it.
  */
 
 // Color codes for terminal output
@@ -113,13 +125,17 @@ val TEXT_FILE_EXTENSIONS = setOf(
     // Server: fly.toml app name + version catalog. (Dockerfile/.env are
     // extensionless and server config is project-agnostic, so they don't
     // carry the project name.)
-    "toml", "sql"
+    "toml", "sql",
+    // Staged GitHub Pages content ({{APP_NAME}} etc. live in the HTML).
+    "html", "css"
 )
 
 // Directories to skip during processing AND during copy
 val SKIP_DIRECTORIES = setOf(
     ".git", ".gradle", ".idea", "build", "node_modules", ".kotlin",
-    "caches", "generated", "intermediates"
+    "caches", "generated", "intermediates",
+    // Machine-local agent settings — never ship into generated projects.
+    ".claude"
 )
 
 // The template/ folder at the repo root is the init-time staging area
@@ -140,21 +156,110 @@ data class ReplacementStats(
     var replacementsMade: Int = 0
 )
 
-fun main() {
-    printBlue("""
-        ╔══════════════════════════════════════════════════════════════╗
-        ║         🚀 KMP Template Project Initialization 🚀            ║
-        ╠══════════════════════════════════════════════════════════════╣
-        ║  Creates a fresh copy of the template with your project     ║
-        ║  name — the original template is left untouched.            ║
-        ╚══════════════════════════════════════════════════════════════╝
-    """.trimIndent())
-    println()
+/**
+ * Values collected from CLI flags for the non-interactive mode. Null means
+ * "no flags given — run interactively".
+ */
+data class CliConfig(
+    val name: String,
+    val packageName: String,
+    val email: String,
+    val dir: String,
+    val ciEnabled: Boolean
+)
 
-    val projectName = getProjectName() ?: return
-    val packageName = getPackageName(projectName) ?: return
-    val contactEmail = getContactEmail() ?: return
-    val projectDir = getProjectDir(projectName) ?: return
+fun cliFail(message: String): Nothing {
+    printRed("❌ $message")
+    exitProcess(1)
+}
+
+/**
+ * All-or-nothing flag parsing: any flag present requires --name, --package,
+ * --email, --dir, --ci=yes|no AND --yes. Deliberately flags (not env vars or
+ * piped stdin) so automation breaks loudly when the interface changes instead
+ * of silently answering the wrong prompt.
+ */
+fun parseCliConfig(rawArgs: List<String>): CliConfig? {
+    if (rawArgs.isEmpty()) return null
+    val values = mutableMapOf<String, String>()
+    var confirmed = false
+    var i = 0
+    while (i < rawArgs.size) {
+        val arg = rawArgs[i]
+        when {
+            arg == "--yes" -> { confirmed = true; i++ }
+            arg.startsWith("--") && arg.contains('=') -> {
+                values[arg.substringBefore('=').removePrefix("--")] = arg.substringAfter('=')
+                i++
+            }
+            arg.startsWith("--") -> {
+                if (i + 1 >= rawArgs.size) cliFail("Missing value for $arg")
+                values[arg.removePrefix("--")] = rawArgs[i + 1]
+                i += 2
+            }
+            else -> cliFail("Unexpected argument: $arg")
+        }
+    }
+
+    val required = listOf("name", "package", "email", "dir", "ci")
+    val missing = required.filterNot(values::containsKey)
+    if (missing.isNotEmpty() || !confirmed) {
+        val flags = missing.map { "--$it" } + if (confirmed) emptyList() else listOf("--yes")
+        cliFail(
+            "Non-interactive mode is all-or-nothing; missing: ${flags.joinToString(" ")}\n" +
+                "   Usage: ./init_project.main.kts --name \"My App\" --package com.example.myapp " +
+                "--email you@example.com --dir /path --ci=yes|no --yes"
+        )
+    }
+
+    val ci = when (values.getValue("ci")) {
+        "yes" -> true
+        "no" -> false
+        else -> cliFail("--ci must be yes or no")
+    }
+    return CliConfig(
+        name = values.getValue("name"),
+        packageName = values.getValue("package"),
+        email = values.getValue("email"),
+        dir = values.getValue("dir"),
+        ciEnabled = ci
+    )
+}
+
+fun main(cli: CliConfig?) {
+    if (cli == null) {
+        printBlue("""
+            ╔══════════════════════════════════════════════════════════════╗
+            ║         🚀 KMP Template Project Initialization 🚀            ║
+            ╠══════════════════════════════════════════════════════════════╣
+            ║  Creates a fresh copy of the template with your project     ║
+            ║  name — the original template is left untouched.            ║
+            ╚══════════════════════════════════════════════════════════════╝
+        """.trimIndent())
+        println()
+    }
+
+    val projectName: ProjectName
+    val packageName: String
+    val contactEmail: String
+    val projectDir: File
+
+    if (cli != null) {
+        projectName = validateProjectName(cli.name.trim()) ?: cliFail("Invalid --name: ${cli.name}")
+        packageName = validatePackageName(cli.packageName.trim()) ?: cliFail("Invalid --package: ${cli.packageName}")
+        contactEmail = cli.email.trim().ifEmpty { cliFail("--email must not be empty") }
+        val dir = File(cli.dir).canonicalFile
+        if (dir.exists() && dir.listFiles()?.isNotEmpty() == true) {
+            cliFail("--dir already exists and is not empty: ${dir.absolutePath}")
+        }
+        if (!dir.exists() && !dir.mkdirs()) cliFail("Could not create --dir: ${dir.absolutePath}")
+        projectDir = dir
+    } else {
+        projectName = getProjectName() ?: return
+        packageName = getPackageName(projectName) ?: return
+        contactEmail = getContactEmail() ?: return
+        projectDir = getProjectDir(projectName) ?: return
+    }
 
     println()
     printCyan("📋 Configuration Summary:")
@@ -167,11 +272,13 @@ fun main() {
     println("   Destination:   ${projectDir.absolutePath}")
     println()
 
-    print("Proceed with these settings? (Y/n): ")
-    val confirm = readln().trim().lowercase()
-    if (confirm.isNotEmpty() && confirm != "y" && confirm != "yes") {
-        printYellow("👋 Initialization cancelled. Run again when ready!")
-        return
+    if (cli == null) {
+        print("Proceed with these settings? (Y/n): ")
+        val confirm = readln().trim().lowercase()
+        if (confirm.isNotEmpty() && confirm != "y" && confirm != "yes") {
+            printYellow("👋 Initialization cancelled. Run again when ready!")
+            return
+        }
     }
 
     println()
@@ -185,9 +292,9 @@ fun main() {
         copyTemplate(templateDir, projectDir)
         printGreen("   ✓ Template copied")
 
-        printBlue("📦 Step 2/8: Placing SETUP.md + asking about CI...")
+        printBlue("📦 Step 2/8: Placing SETUP.md + configuring CI...")
         placeSetupDoc(templateDir, projectDir)
-        val ciEnabled = maybeEnableCi(templateDir, projectDir)
+        val ciEnabled = maybeEnableCi(templateDir, projectDir, cli?.ciEnabled)
 
         printBlue("📝 Step 3/8: Replacing file contents...")
         replaceFileContents(projectDir, projectName, packageName, stats)
@@ -202,7 +309,7 @@ fun main() {
         substitutePlaceholders(projectDir, projectName, contactEmail)
 
         printBlue("🧹 Step 7/8: Cleaning up template artifacts...")
-        cleanupTemplateArtifacts(projectDir, projectName)
+        cleanupTemplateArtifacts(projectDir, projectName, ciEnabled)
         ensureExecutableBits(projectDir)
 
         printBlue("🔄 Step 8/8: Initializing git repository...")
@@ -235,7 +342,25 @@ fun main() {
         e.printStackTrace()
         printYellow("⚠️  Partially created project may exist at: ${projectDir.absolutePath}")
         printYellow("     The original template was not modified.")
+        exitProcess(1)
     }
+}
+
+/**
+ * Shared validation for both the interactive prompts and the CLI flags.
+ * Returns null when the input is unusable.
+ */
+fun validateProjectName(input: String): ProjectName? {
+    if (input.isEmpty()) return null
+    val projectName = ProjectName.fromDisplayName(input)
+    if (projectName.pascalCase.isEmpty() || !projectName.pascalCase[0].isLetter()) return null
+    if (!projectName.pascalCase.all { it.isLetterOrDigit() }) return null
+    return projectName
+}
+
+fun validatePackageName(input: String): String? {
+    val packageRegex = Regex("^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$")
+    return if (packageRegex.matches(input)) input else null
 }
 
 fun copyTemplate(source: File, dest: File) {
@@ -247,6 +372,13 @@ fun copyTemplate(source: File, dest: File) {
         // itself into the new project.
         if (file.parentFile?.canonicalPath == source.canonicalPath &&
             file.isDirectory && file.name == TEMPLATE_STAGING_DIR) return@forEach
+        // The root .github/ is the TEMPLATE repo's own CI (template-ci.yml).
+        // Generated projects get their workflows from template/ci/ instead.
+        if (file.parentFile?.canonicalPath == source.canonicalPath &&
+            file.isDirectory && file.name == ".github") return@forEach
+        // Machine-specific (Android SDK path etc.) — the IDE regenerates it.
+        if (file.parentFile?.canonicalPath == source.canonicalPath &&
+            file.name == "local.properties") return@forEach
         val target = File(dest, file.name)
         if (file.isDirectory) {
             copyTemplate(file, target)
@@ -279,22 +411,19 @@ fun copyRecursive(source: File, dest: File) {
 }
 
 /**
- * Returns the template staging directory inside the project dir, if it exists
- * (it gets copied there because its parent is the template root).
- *
- * Actually no — copyTemplate skips the template/ folder. So the staging source
- * is the original template's `template/` folder. We read it from the template
- * dir directly.
- */
-/**
  * File.copyTo doesn't preserve the executable bit, so any shell scripts and
  * git hooks shipped in the template need +x applied explicitly after copy.
  */
 fun ensureExecutableBits(projectDir: File) {
     val execPaths = listOf(
         "scripts/install_hooks.sh",
+        "scripts/enable_ci.sh",
+        "scripts/cleanup.sh",
+        "scripts/create_module.main.kts",
+        "scripts/rotate_apple_sign_in_token.main.kts",
         ".githooks/commit-msg",
         ".githooks/post-commit",
+        ".githooks/pre-push",
         "gradlew"
     )
     execPaths.forEach { rel ->
@@ -312,39 +441,48 @@ fun placeSetupDoc(templateDir: File, projectDir: File) {
 }
 
 /**
- * Asks whether to enable CI and, if yes, copies every file under
- * template/ci/ into the project, preserving relative paths.
+ * Asks whether to enable CI (or uses the --ci flag in non-interactive mode)
+ * and, if yes, copies every file under template/ci/ into the project,
+ * preserving relative paths.
+ *
+ * When CI is declined, the staging folder is still shipped (as template/ci/)
+ * together with scripts/enable_ci.sh so the project can opt in later — the
+ * staged files go through the same rename/substitution passes as everything
+ * else, so enabling later is a pure file move.
  */
-fun maybeEnableCi(templateDir: File, projectDir: File): Boolean {
+fun maybeEnableCi(templateDir: File, projectDir: File, cliCiEnabled: Boolean?): Boolean {
     val ciSrc = File(templateDir, "$TEMPLATE_STAGING_DIR/ci")
     if (!ciSrc.exists() || !ciSrc.isDirectory) return false
 
-    println()
-    printCyan("""
-        🚢 Enable CI / release automation?
+    val enable = cliCiEnabled ?: run {
+        println()
+        printCyan("""
+            🚢 Enable CI / release automation?
 
-        This copies release-please, fastlane, GitHub Pages, and the Sentry
-        triage prompt into your project:
+            This copies release-please, fastlane, GitHub Pages, and the Sentry
+            triage prompt into your project:
 
-          • .github/workflows/*.yml  (ci, release-please, release, etc.)
-          • apps/ios/Gemfile + apps/ios/fastlane/*
-          • pages/*.html, style.css, icons
-          • release-please-config.json, .release-please-manifest.json
-          • scripts/prompts/sentry-triage.md
+              • .github/workflows/*.yml  (ci, release-please, release, etc.)
+              • apps/ios/Gemfile + apps/ios/fastlane/*
+              • pages/*.html, style.css, icons
+              • release-please-config.json, .release-please-manifest.json
 
-        You'll still need to set GitHub secrets and create store listings
-        before the pipeline will actually ship — see SETUP.md.
+            You'll still need to set GitHub secrets and create store listings
+            before the pipeline will actually ship — see SETUP.md.
 
-        Say no if you want to wire this up later (or never). You can always
-        run the init script's CI-only opt-in manually later.
-    """.trimIndent())
-    println()
-    print("Enable CI? (y/N): ")
-    val answer = readln().trim().lowercase()
-    val enable = answer == "y" || answer == "yes"
+            Say no if you want to wire this up later (or never) — you can
+            enable it any time by running ./scripts/enable_ci.sh.
+        """.trimIndent())
+        println()
+        print("Enable CI? (y/N): ")
+        val answer = readln().trim().lowercase()
+        answer == "y" || answer == "yes"
+    }
 
     if (!enable) {
-        printYellow("   → CI skipped. Re-run setup from template/ci/ later if you change your mind.")
+        // Ship the staging folder so scripts/enable_ci.sh can install it later.
+        copyRecursive(ciSrc, File(projectDir, "$TEMPLATE_STAGING_DIR/ci"))
+        printYellow("   → CI skipped. Run ./scripts/enable_ci.sh later to install it.")
         return false
     }
 
@@ -392,11 +530,21 @@ fun substitutePlaceholders(projectDir: File, projectName: ProjectName, contactEm
     walk(projectDir)
 }
 
-fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName) {
-    val toDelete = listOf(
+fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName, ciEnabled: Boolean) {
+    val toDelete = mutableListOf(
         "scripts/init_project.main.kts",
-        "scripts/rename_to_template.sh"
+        "scripts/rename_to_template.sh",
+        // Template-maintenance tooling and planning docs — meaningful only in
+        // the template repo itself, never in a generated project.
+        "scripts/verify_template.sh",
+        "docs/template-maintenance.md",
+        "docs/cards-backport-plan.md",
+        "docs/template-upgrade-execution-plan.md"
     )
+    if (ciEnabled) {
+        // CI is already installed, so the late-opt-in path has nothing to do.
+        toDelete += "scripts/enable_ci.sh"
+    }
     toDelete.forEach { relative ->
         val file = File(projectDir, relative)
         if (file.exists()) {
@@ -549,19 +697,11 @@ fun getProjectName(): ProjectName? {
         return null
     }
     
-    val projectName = ProjectName.fromDisplayName(input)
-    
-    // Validate
-    if (projectName.pascalCase.isEmpty() || !projectName.pascalCase[0].isLetter()) {
-        printRed("❌ Invalid project name. Must start with a letter.")
+    val projectName = validateProjectName(input)
+    if (projectName == null) {
+        printRed("❌ Invalid project name. Must start with a letter and use only letters, numbers, and spaces.")
         return null
     }
-    
-    if (!projectName.pascalCase.all { it.isLetterOrDigit() }) {
-        printRed("❌ Invalid project name. Use only letters, numbers, and spaces.")
-        return null
-    }
-    
     return projectName
 }
 
@@ -608,16 +748,12 @@ fun getPackageName(projectName: ProjectName): String? {
         return null
     }
     
-    val packageName = input.ifEmpty { suggestedPackage }
-    
-    // Validate package name
-    val packageRegex = Regex("^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$")
-    if (!packageRegex.matches(packageName)) {
+    val packageName = validatePackageName(input.ifEmpty { suggestedPackage })
+    if (packageName == null) {
         printRed("❌ Invalid package name. Must be lowercase, dot-separated, and start with a letter.")
         printRed("   Example: com.mycompany.myapp")
         return null
     }
-    
     return packageName
 }
 
@@ -806,4 +942,4 @@ fun getReplacedName(name: String, projectName: ProjectName): String {
 }
 
 // Run the script
-main()
+main(parseCliConfig(args.toList()))
