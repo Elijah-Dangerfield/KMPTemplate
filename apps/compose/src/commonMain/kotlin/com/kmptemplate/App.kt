@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +24,12 @@ import com.kmptemplate.libraries.core.logOnFailure
 import com.kmptemplate.libraries.core.BuildInfo
 import com.kmptemplate.libraries.core.Platform
 import com.kmptemplate.libraries.core.logging.KLog
+import com.kmptemplate.libraries.navigation.AccessDeniedRoute
 import com.kmptemplate.libraries.navigation.AnimationType
 import com.kmptemplate.libraries.navigation.FeatureEntryPoint
+import com.kmptemplate.libraries.navigation.NavigationOptions
 import com.kmptemplate.libraries.navigation.Route
+import com.kmptemplate.libraries.navigation.SessionExpiredRoute
 import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowHost
 import com.kmptemplate.libraries.navigation.floatingwindow.FloatingWindowNavigator
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
@@ -133,15 +137,53 @@ fun App(appComponent: AppComponent) {
     ) {
         AppThemeProvider {
             Box(modifier = Modifier.fillMaxSize()) {
-                AppNavigation(
-                    navController = navController,
-                    floatingWindowNavigator = floatingWindowNavigator,
-                    featureEntryPoints = appComponent.featureEntryPoints,
-                    startDestination = appViewModel.startDestination,
-                    router = router,
-                )
+                // Null until the async AppData read resolves — the platform
+                // splash (keyed on appViewModel.isReady) covers the gap, so
+                // nothing renders behind it prematurely.
+                val startDestination by appViewModel.startDestination.collectAsState()
+                startDestination?.let { route ->
+                    AppNavigation(
+                        navController = navController,
+                        floatingWindowNavigator = floatingWindowNavigator,
+                        featureEntryPoints = appComponent.featureEntryPoints,
+                        startDestination = route,
+                        router = router,
+                    )
+                }
 
                 SplashGate()
+
+                // The auth server rejected our session mid-run: push a blocking
+                // SessionExpired screen (kept on top, stack intact) that owns
+                // "sign in again" (claimed) vs "start fresh" (guest). An ambient
+                // network event can't present this from a feature screen, so it
+                // routes here. The screen picks its copy off wasAnonymous.
+                LaunchedEffect(Unit) {
+                    appViewModel.sessionExpired.collect { event ->
+                        router.navigate(
+                            SessionExpiredRoute(wasAnonymous = event.wasAnonymous),
+                            NavigationOptions(launchSingleTop = true),
+                        )
+                    }
+                }
+
+                // Server returned the locked `403` access-denied envelope: push
+                // the blocking AccessDenied screen. Same launchSingleTop pattern
+                // as SessionExpired — a burst of denied calls collapses to one
+                // screen on top. The screen keys title/body off `reason` and
+                // surfaces the optional lift date + appeal link.
+                LaunchedEffect(Unit) {
+                    appViewModel.accessDenied.collect { denial ->
+                        router.navigate(
+                            AccessDeniedRoute(
+                                reason = denial.reason,
+                                until = denial.until,
+                                appealUrl = denial.appealUrl,
+                            ),
+                            NavigationOptions(launchSingleTop = true),
+                        )
+                    }
+                }
 
                 DialogHost(
                     modifier = Modifier.matchParentSize(),

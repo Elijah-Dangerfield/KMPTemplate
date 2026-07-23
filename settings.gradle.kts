@@ -52,6 +52,8 @@ if (!serverOnly) {
     // Features
     include(":features:home")
     include(":features:home:impl")
+    include(":features:onboarding")
+    include(":features:onboarding:impl")
 
     // Libraries
     include(":libraries:config")
