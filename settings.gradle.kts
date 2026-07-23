@@ -90,4 +90,9 @@ if (!serverOnly) {
     include(":libraries:kmptemplate:impl")
     include(":libraries:kmptemplate:storage")
     include(":libraries:ui")
+
+    // Custom detekt rules — a standalone JVM jar detekt loads via
+    // `detektPlugins`. Dev/CI tooling only, never shipped; gated out of the
+    // server-only Docker build like every other client module.
+    include(":detekt-rules")
 }
