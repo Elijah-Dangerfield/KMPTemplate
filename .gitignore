@@ -18,3 +18,9 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# Prebuilt admin console bundle staged for the server Docker image (CI-built)
+apps/server/admin-web/*
+!apps/server/admin-web/.gitkeep
+
+apps/admin/admin-tokens.local.properties

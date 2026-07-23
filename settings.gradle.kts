@@ -49,6 +49,12 @@ if (!serverOnly) {
     include(":apps:compose")
     // Note: iOS app is not a Gradle module - it's an Xcode project in apps/ios/
 
+    // Compose Multiplatform (web) admin console for remote config. The server
+    // serves the prebuilt bundle at /admin; CI builds it — the server build
+    // itself stays JS-toolchain-free, so it's gated out of the server-only
+    // graph like the rest of the client. The first (and only) JS target.
+    include(":apps:admin")
+
     // Features
     include(":features:home")
     include(":features:home:impl")
