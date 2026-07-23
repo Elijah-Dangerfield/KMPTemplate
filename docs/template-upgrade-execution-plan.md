@@ -167,4 +167,4 @@ and what is next.
 ## Status
 
 - [x] M0  - [x] M1  - [x] M2  - [x] M3  - [x] M4  - [x] M5
-- [ ] M6  - [ ] M7  - [ ] M8  - [ ] M9  - [ ] M10 - [ ] M11
+- [x] M6  - [ ] M7  - [ ] M8  - [ ] M9  - [ ] M10 - [ ] M11
