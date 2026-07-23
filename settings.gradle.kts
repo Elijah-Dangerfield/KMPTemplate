@@ -49,6 +49,12 @@ if (!serverOnly) {
     include(":apps:compose")
     // Note: iOS app is not a Gradle module - it's an Xcode project in apps/ios/
 
+    // End-to-end integration harness: the real client stack (real view models)
+    // driven against a real in-process Ktor server over a Testcontainers
+    // Postgres. Depends on client impl modules + :apps:server, so it's gated
+    // out of the server-only build.
+    include(":apps:integration")
+
     // Compose Multiplatform (web) admin console for remote config. The server
     // serves the prebuilt bundle at /admin; CI builds it — the server build
     // itself stays JS-toolchain-free, so it's gated out of the server-only
