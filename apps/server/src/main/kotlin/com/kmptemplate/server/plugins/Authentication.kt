@@ -13,6 +13,8 @@ import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
+import io.ktor.util.AttributeKey
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -40,8 +42,16 @@ sealed interface JwtVerification {
  * Installs JWT auth under [SUPABASE_JWT_AUTH] with the given [verification]
  * strategy. The single seam shared by production [com.kmptemplate.server.module]
  * and full-stack tests.
+ *
+ * [banGate], when present, folds the moderation check into the auth flow: a
+ * banned user's token validates to "no principal" and the challenge renders a
+ * `403` [AccessDeniedResponse] instead of the default `401`. Folding it here
+ * (rather than a separate post-auth plugin) is deliberate: the JWT provider's
+ * validate→challenge path is the one place in Ktor that reliably
+ * short-circuits the routing pipeline, so a banned caller never reaches a
+ * route handler.
  */
-fun Application.installAuthentication(verification: JwtVerification) {
+fun Application.installAuthentication(verification: JwtVerification, banGate: BanGate? = null) {
     install(Authentication) {
         jwt(SUPABASE_JWT_AUTH) {
             when (verification) {
@@ -57,24 +67,65 @@ fun Application.installAuthentication(verification: JwtVerification) {
 
                 is JwtVerification.Static -> verifier(verification.verifier)
             }
-            validateAndChallengeForUserId()
+            validateAndChallengeForUserId(banGate)
         }
     }
 }
 
-private fun JWTAuthenticationProvider.Config.validateAndChallengeForUserId() {
+/**
+ * Marks a call whose token was valid but belongs to a banned user. Set during
+ * `validate` (which then returns no principal); read in `challenge` so a ban
+ * renders the `403` [AccessDeniedResponse] while a genuinely missing/invalid
+ * token still renders the `401`.
+ */
+private val BannedResponseKey = AttributeKey<AccessDeniedResponse>("kmptemplate.banned-response")
+
+private fun JWTAuthenticationProvider.Config.validateAndChallengeForUserId(banGate: BanGate?) {
     validate { credential ->
         // `sub` must be a UUID. Anything else is a malformed token → 401.
         val sub = credential.payload.subject
-        if (sub.isNullOrBlank() || UserId.parse(sub) == null) null
-        else JWTPrincipal(credential.payload)
+        val userId = if (sub.isNullOrBlank()) null else UserId.parse(sub)
+        if (userId == null) return@validate null
+
+        if (banGate != null && rejectIfBanned(banGate, userId)) return@validate null
+
+        JWTPrincipal(credential.payload)
     }
     challenge { _, _ ->
-        call.respond(
-            HttpStatusCode.Unauthorized,
-            mapOf("error" to mapOf("code" to "unauthorized", "message" to "Missing or invalid access token")),
-        )
+        val banned = call.attributes.getOrNull(BannedResponseKey)
+        if (banned != null) {
+            call.respond(HttpStatusCode.Forbidden, banned)
+        } else {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                mapOf("error" to mapOf("code" to "unauthorized", "message" to "Missing or invalid access token")),
+            )
+        }
     }
+}
+
+/**
+ * True if [userId] is banned — and, as a side effect, stashes the locked `403`
+ * envelope on the call so `challenge` can render it. A lookup failure logs and
+ * returns false (fail **open**): a transient `auth` read must not lock every
+ * user out, and the token still expires on its own.
+ */
+private suspend fun ApplicationCall.rejectIfBanned(banGate: BanGate, userId: UserId): Boolean {
+    val status = runCatching { banGate.moderation.banStatusFor(userId) }
+        .getOrElse { error ->
+            LoggerFactory.getLogger("BanGate").warn("Ban lookup failed for {} — allowing through", userId, error)
+            null
+        } ?: return false
+
+    attributes.put(
+        BannedResponseKey,
+        AccessDeniedResponse(
+            reason = status.reason.wire,
+            until = status.until?.toString(),
+            appealUrl = banGate.appealUrl,
+        ),
+    )
+    return true
 }
 
 /**

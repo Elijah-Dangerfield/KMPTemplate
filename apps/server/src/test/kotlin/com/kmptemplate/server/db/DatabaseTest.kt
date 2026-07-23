@@ -61,6 +61,26 @@ abstract class DatabaseTest {
         return UserId(id)
     }
 
+    /**
+     * Set (or clear, with null) `auth.users.banned_until` for a seeded user —
+     * what the Supabase dashboard's ban action does to the real table.
+     *
+     * Raw SQL rather than an Exposed column mapping so the test doesn't have
+     * to pin a TIMESTAMPTZ column type — the JDBC driver coerces the bound
+     * timestamp into the real `auth.users.banned_until` column directly.
+     */
+    protected fun setBannedUntil(userId: UserId, until: java.time.Instant?) {
+        database.blockingTransaction {
+            org.jetbrains.exposed.sql.transactions.TransactionManager.current().exec(
+                stmt = "UPDATE auth.users SET banned_until = ? WHERE id = ?",
+                args = listOf(
+                    org.jetbrains.exposed.sql.javatime.JavaInstantColumnType() to until,
+                    org.jetbrains.exposed.sql.UUIDColumnType() to userId.value,
+                ),
+            )
+        }
+    }
+
     /** Exposed mapping for the minimal `auth.users` stub (see init-auth.sql). */
     private object AuthUsersTable : Table("auth.users") {
         val id = uuid("id")

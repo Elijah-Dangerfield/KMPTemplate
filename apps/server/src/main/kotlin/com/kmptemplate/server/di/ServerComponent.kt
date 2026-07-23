@@ -2,6 +2,7 @@ package com.kmptemplate.server.di
 
 import com.kmptemplate.server.db.Database
 import com.kmptemplate.server.domain.ExampleSource
+import com.kmptemplate.server.domain.ModerationRepository
 import com.kmptemplate.server.domain.ProfileRepository
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.MergeComponent
@@ -36,6 +37,7 @@ abstract class ServerComponent(
 ) {
     abstract val exampleSource: ExampleSource
     abstract val profileRepository: ProfileRepository
+    abstract val moderationRepository: ModerationRepository
 
     /**
      * Wall-clock source. Singleton so every component sees the same "now".

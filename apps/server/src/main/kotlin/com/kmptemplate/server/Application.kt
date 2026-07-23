@@ -5,6 +5,7 @@ import com.kmptemplate.server.data.InMemoryExampleSource
 import com.kmptemplate.server.db.Database
 import com.kmptemplate.server.di.ServerComponent
 import com.kmptemplate.server.di.create
+import com.kmptemplate.server.plugins.BanGate
 import com.kmptemplate.server.plugins.JwtVerification
 import com.kmptemplate.server.plugins.installAuthentication
 import com.kmptemplate.server.plugins.installCors
@@ -67,7 +68,11 @@ fun Application.module(config: ServerConfig) {
     }
 
     val component = database?.let { ServerComponent::class.create(it) }
-    installApp(component, verification)
+    // Ban gate needs the DB (moderation reads live in auth.users), so limited
+    // mode simply runs without it — same null-safe degradation as everything
+    // else here.
+    val banGate = component?.let { BanGate(it.moderationRepository, config.accessControl.appealUrl) }
+    installApp(component, verification, banGate)
 }
 
 /**
@@ -78,12 +83,16 @@ fun Application.module(config: ServerConfig) {
  * null only when Supabase isn't configured. Health + the example resource are
  * always served.
  */
-fun Application.installApp(component: ServerComponent?, verification: JwtVerification?) {
+fun Application.installApp(
+    component: ServerComponent?,
+    verification: JwtVerification?,
+    banGate: BanGate? = null,
+) {
     installSerialization()
     installCors()
     installRateLimits()
     installStatusPages()
-    if (verification != null) installAuthentication(verification)
+    if (verification != null) installAuthentication(verification, banGate)
 
     routing {
         healthRoutes()
