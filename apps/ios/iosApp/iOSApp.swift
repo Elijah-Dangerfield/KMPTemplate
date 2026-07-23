@@ -6,7 +6,7 @@ import ComposeApp
 struct iOSApp: App {
     
     let permissionManager = IOSPermissionManager()
-    let reviewPrompter = IOSReviewPrompter()
+    let reviewLauncher = IOSReviewLauncher()
     let appleSignInCoordinator = IOSAppleSignInCoordinator()
     let secureSessionStorage = IOSSecureSessionStorage()
     private let nativeViewFactory = IOSNativeViewFactory.shared
@@ -15,7 +15,7 @@ struct iOSApp: App {
     init() {
         self.iOSAppComponent = create(
             permissionManager: permissionManager,
-            reviewPrompter: reviewPrompter,
+            reviewLauncher: reviewLauncher,
             appleSignInCoordinator: appleSignInCoordinator,
             secureSessionStorage: secureSessionStorage,
             nativeViewFactory: nativeViewFactory

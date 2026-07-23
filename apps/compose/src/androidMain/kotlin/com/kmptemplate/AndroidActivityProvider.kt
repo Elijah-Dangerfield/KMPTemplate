@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import com.kmptemplate.libraries.kmptemplate.impl.ActivityProvider
+import com.kmptemplate.libraries.kmptemplate.ActivityProvider
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference
 
 /**
  * Tracks the foreground [Activity] via [Application.ActivityLifecycleCallbacks]
- * so DI bindings (e.g. [com.kmptemplate.libraries.kmptemplate.impl.AndroidReviewPrompter])
+ * so DI bindings (e.g. `AndroidReviewLauncher` in `:libraries:review:impl`)
  * can launch flows that need a real Activity reference.
  *
  * Held weakly so a backgrounded Activity can be GC'd. `currentActivity()`

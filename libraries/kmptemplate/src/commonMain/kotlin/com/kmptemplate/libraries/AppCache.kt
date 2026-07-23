@@ -33,6 +33,12 @@ data class AppData(
     // User actions
     val feedbacksGiven: Int = 0,
     val bugsReported: Int = 0,
+
+    /** Epoch-ms — first observed by the review coordinator. 0 = uncaptured. */
+    val reviewInstallAt: Long = 0L,
+
+    /** Epoch-ms — last review prompt the coordinator forwarded to the platform. 0 = never. */
+    val lastReviewPromptAt: Long = 0L,
 ) {
     /**
      * Get the visit count for a screen by its tracking key.

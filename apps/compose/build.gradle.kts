@@ -28,6 +28,8 @@ kotlin {
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.navigation.impl)
             implementation(projects.libraries.resources)
+            implementation(projects.libraries.review)
+            implementation(projects.libraries.review.impl)
 
             implementation(projects.libraries.storage)
             implementation(projects.libraries.storage.impl)

@@ -140,11 +140,15 @@ fun App(appComponent: AppComponent) {
     ) {
         AppThemeProvider {
             Box(modifier = Modifier.fillMaxSize()) {
-                // Null until the async AppData read resolves — the platform
-                // splash (keyed on appViewModel.isReady) covers the gap, so
-                // nothing renders behind it prematurely.
+                // Stage 1: null until the async AppData read resolves — the
+                // platform splash (keyed on appViewModel.isReady) covers the
+                // gap. Stage 2: the Compose boot gate holds a loading screen
+                // until the remaining boot work (config + profile resolve)
+                // lands, so the first real frame renders authoritative data.
+                val bootComplete by appViewModel.isBootComplete.collectAsState()
                 val startDestination by appViewModel.startDestination.collectAsState()
-                startDestination?.let { route ->
+                val route = startDestination
+                if (bootComplete && route != null) {
                     AppNavigation(
                         navController = navController,
                         floatingWindowNavigator = floatingWindowNavigator,
@@ -153,6 +157,8 @@ fun App(appComponent: AppComponent) {
                         router = router,
                         telemetry = appComponent.telemetry,
                     )
+                } else {
+                    BootLoadingScreen()
                 }
 
                 SplashGate()

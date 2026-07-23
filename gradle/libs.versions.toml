@@ -26,6 +26,7 @@ kotlinx-serialization = "1.9.0"
 kotlinxCoroutinesCore = "1.10.2"
 kotlinxDatetime = "0.7.1"
 ktor = "3.3.3"
+wiretap = "1.0.0-RC15"
 logback = "1.5.6"
 exposed = "0.56.0"
 postgres = "42.7.4"
@@ -144,6 +145,15 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+
+# WiretapKMP — debug-only network inspector (HTTP/WS/SSE) with a built-in UI.
+# `wiretap-ktor` is the real plugin + launcher; `wiretap-ktor-noop` is the
+# zero-overhead release stand-in with the identical API surface (so common
+# code compiles against either). Swapped per-build: Android via
+# debug/releaseImplementation, iOS via the `kmptemplate.wiretap.ios` property.
+# See libraries/networking/impl/build.gradle.kts.
+wiretap-ktor = { module = "dev.skymansandy:wiretap-ktor", version.ref = "wiretap" }
+wiretap-ktor-noop = { module = "dev.skymansandy:wiretap-ktor-noop", version.ref = "wiretap" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }

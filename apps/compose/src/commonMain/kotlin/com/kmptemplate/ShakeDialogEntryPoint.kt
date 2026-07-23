@@ -2,11 +2,13 @@ package com.kmptemplate
 
 import androidx.navigation.NavGraphBuilder
 import com.kmptemplate.features.profile.BugReportRoute
+import com.kmptemplate.libraries.core.BuildInfo
 import com.kmptemplate.libraries.navigation.FeatureEntryPoint
 import com.kmptemplate.libraries.navigation.Router
 import com.kmptemplate.libraries.navigation.ShakeDialogRoute
 import com.kmptemplate.libraries.navigation.dialog
 import com.kmptemplate.libraries.navigation.toRouteOrNull
+import com.kmptemplate.libraries.networking.NetworkInspector
 import com.kmptemplate.libraries.ui.components.dialog.ShakeDialog
 import me.tatarka.inject.annotations.Inject
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
@@ -16,12 +18,14 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, multibinding = true)
 @Inject
-class ShakeDialogEntryPoint : FeatureEntryPoint {
+class ShakeDialogEntryPoint(
+    private val networkInspector: NetworkInspector,
+) : FeatureEntryPoint {
 
     override fun NavGraphBuilder.buildNavGraph(router: Router) {
         dialog<ShakeDialogRoute> { backStackEntry, dialogState ->
             val route = backStackEntry.toRouteOrNull<ShakeDialogRoute>()
-            
+
             ShakeDialog(
                 state = dialogState,
                 headline = route?.headline ?: "I felt that.",
@@ -32,6 +36,17 @@ class ShakeDialogEntryPoint : FeatureEntryPoint {
                     router.navigate(
                         BugReportRoute(contextMessage = "Triggered via shake")
                     )
+                },
+                // Debug-only: reuse the shake gesture to also open the
+                // WiretapKMP network inspector. Hidden in release (and the
+                // inspector itself is the noop there).
+                onOpenNetworkInspector = if (BuildInfo.isDebug) {
+                    {
+                        router.goBack()
+                        networkInspector.open()
+                    }
+                } else {
+                    null
                 },
             )
         }

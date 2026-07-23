@@ -1,7 +1,7 @@
 package com.kmptemplate
 
 import android.content.Context
-import com.kmptemplate.libraries.kmptemplate.impl.ActivityProvider
+import com.kmptemplate.libraries.kmptemplate.ActivityProvider
 import me.tatarka.inject.annotations.Provides
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.MergeComponent

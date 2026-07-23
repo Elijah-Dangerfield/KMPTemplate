@@ -80,6 +80,8 @@ if (!serverOnly) {
     include(":libraries:identity")
     include(":libraries:identity:impl")
     include(":libraries:resources")
+    include(":libraries:review")
+    include(":libraries:review:impl")
     include(":libraries:storage")
     include(":libraries:storage:impl")
     // No api sibling on purpose: the public surface is the `logEvent`
