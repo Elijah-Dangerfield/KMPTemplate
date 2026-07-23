@@ -6,10 +6,13 @@ import com.kmptemplate.libraries.networking.AuthTokenProvider
 import com.kmptemplate.libraries.networking.NetworkClient
 import com.kmptemplate.libraries.networking.NetworkConfig
 import com.kmptemplate.libraries.networking.NetworkJson
+import com.kmptemplate.libraries.networking.NetworkReachability
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -30,17 +33,18 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 class NetworkClientImpl(
     private val config: NetworkConfig,
     private val authTokenProvider: AuthTokenProvider,
+    private val reachability: NetworkReachability,
 ) : NetworkClient {
 
     override val client: HttpClient by lazy {
         HttpClient {
-            applyCommonConfig(config)
+            applyCommonConfig(config, reachability)
         }
     }
 
     override val authenticatedClient: HttpClient by lazy {
         HttpClient {
-            applyCommonConfig(config)
+            applyCommonConfig(config, reachability)
             install(Auth) {
                 bearer {
                     loadTokens {
@@ -58,9 +62,26 @@ class NetworkClientImpl(
     }
 }
 
-private fun HttpClientConfig<*>.applyCommonConfig(config: NetworkConfig) {
+private fun HttpClientConfig<*>.applyCommonConfig(
+    config: NetworkConfig,
+    reachability: NetworkReachability,
+) {
     install(ContentNegotiation) {
         json(NetworkJson)
+    }
+    // Witnessed reachability: a response (any status, even 4xx/5xx) means the
+    // round-trip worked; a failure *without* a response (timeout / IO / DNS /
+    // captive portal) means it didn't. This is what lets the offline banner
+    // reflect "actually online" rather than just the OS's "there's a path."
+    HttpResponseValidator {
+        validateResponse { reachability.reportReachable() }
+        handleResponseExceptionWithRequest { cause, _ ->
+            // A ResponseException means the server answered (a 4xx/5xx) — the
+            // network is fine. Anything else never reached the server.
+            if (cause !is ResponseException) {
+                reachability.reportUnreachable()
+            }
+        }
     }
     install(HttpTimeout) {
         requestTimeoutMillis = config.requestTimeoutMillis

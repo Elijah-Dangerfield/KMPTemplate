@@ -33,7 +33,6 @@ import com.kmptemplate.libraries.navigation.serializableType
 import com.kmptemplate.libraries.navigation.toEnterTransition
 import com.kmptemplate.libraries.navigation.toExitTransition
 import com.kmptemplate.libraries.navigation.toRouteOrNull
-import com.kmptemplate.libraries.ui.PreviewAppState
 import com.kmptemplate.libraries.ui.components.Screen
 import com.kmptemplate.libraries.ui.components.SnackbarDuration
 import com.kmptemplate.libraries.ui.components.dialog.DialogHost
@@ -112,8 +111,10 @@ fun App(appComponent: AppComponent) {
         }
     )
 
+    val appState = remember { appComponent.appState }
+
     CompositionLocalProvider(
-        LocalAppState provides PreviewAppState,
+        LocalAppState provides appState,
         LocalClock provides appComponent.provideClock(),
         LocalBuildInfo provides BuildInfo,
         LocalDialogHostState provides dialogHostState

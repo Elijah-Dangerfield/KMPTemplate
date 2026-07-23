@@ -1,5 +1,6 @@
 package com.kmptemplate
 
+import com.kmptemplate.libraries.core.AppState
 import com.kmptemplate.libraries.core.AutoInit
 import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
@@ -20,6 +21,13 @@ interface AppComponent {
     val telemetry: Telemetry
     val shakeHandler: ShakeHandler
     val deepLinkBridge: DeepLinkBridge
+
+    /**
+     * Production app-wide state (offline banner etc.). Backed by
+     * AppStateImpl — platform connectivity combined with witnessed
+     * request reachability.
+     */
+    val appState: AppState
     
     /**
      * Singletons that need to construct at app boot rather than lazily
