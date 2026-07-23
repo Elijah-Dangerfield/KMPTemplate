@@ -16,6 +16,7 @@ import com.kmptemplate.server.plugins.installRateLimits
 import com.kmptemplate.server.plugins.installSentry
 import com.kmptemplate.server.plugins.installSerialization
 import com.kmptemplate.server.plugins.installStatusPages
+import com.kmptemplate.server.plugins.installWebSockets
 import com.kmptemplate.server.routes.exampleRoutes
 import com.kmptemplate.server.routes.healthRoutes
 import com.kmptemplate.server.routes.meRoutes
@@ -93,6 +94,7 @@ fun Application.installApp(
     installCors()
     installRateLimits()
     installStatusPages()
+    installWebSockets()
     if (verification != null) installAuthentication(verification, banGate)
 
     routing {
