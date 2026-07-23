@@ -97,7 +97,7 @@ fun BasicDialog(
 
                     Button(
                         size = ButtonSize.Medium,
-                        type = ButtonType.Tertiary,
+                        type = ButtonType.Secondary,
                         onClick = onSecondaryButtonClicked,
                         modifier = Modifier.fillMaxWidth()
                     ) {

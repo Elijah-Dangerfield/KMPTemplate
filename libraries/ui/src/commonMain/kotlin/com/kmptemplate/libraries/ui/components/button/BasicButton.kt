@@ -1,21 +1,34 @@
 package com.kmptemplate.libraries.ui.components.button
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
@@ -41,41 +54,30 @@ internal fun BasicButton(
     borderColor: ColorResource?,
     contentColor: ColorResource,
     size: ButtonSize,
-    style: ButtonStyle,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    deepColor: ColorResource? = null,          // the 3D lip; null = flat button
     icon: IconResource? = null,
     contentPadding: PaddingValues = size.padding(hasIcon = icon != null),
     enabled: Boolean = true,
+    onDisabledTap: (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
-
     CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+        val effectiveOnClick = if (enabled) onClick else onDisabledTap
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = modifier.thenIf(enabled) {
-                bounceClick(
-                    mutableInteractionSource = interactionSource,
-                    onClick = onClick
-                )
-            }
-        ) {
+        val face: @Composable () -> Unit = {
             Surface(
-                modifier = modifier
-                    .semantics { role = Role.Button },
+                modifier = Modifier.semantics { role = Role.Button },
                 radius = Radii.Button,
-                elevation = if (backgroundColor != null) Elevation.Button else Elevation.None,
+                // When a deepColor is present the 3D lip replaces the drop
+                // shadow entirely, so no elevation there.
+                elevation = if (deepColor == null && backgroundColor != null) Elevation.Button else Elevation.None,
                 color = backgroundColor,
                 contentColor = contentColor,
-                border = borderColor?.let {
-                    Border(
-                        it,
-                        OutlinedButtonBorderWidth
-                    )
-                },
-                contentPadding = contentPadding
+                border = borderColor?.let { Border(it, OutlinedButtonBorderWidth) },
+                contentPadding = contentPadding,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -84,18 +86,71 @@ internal fun BasicButton(
                         Alignment.CenterHorizontally
                     )
                 ) {
-                    if (icon != null) {
-                        SmallIcon(
-                            icon = icon
-                        )
-                    }
-
+                    if (icon != null) SmallIcon(icon = icon)
                     ProvideTextConfig(size.textConfig(), content = content)
                 }
             }
+        }
 
+        if (deepColor == null) {
+            // Flat path (outlined / text / disabled / default): original behaviour + bounce.
+            Box(
+                contentAlignment = Alignment.Center,
+                // Propagate min constraints so a caller-supplied `Modifier.fillMaxWidth()`
+                // (which sets minWidth = maxWidth on the outer Box) flows down to the Surface
+                // and stretches the button. Default behavior — no width modifier — leaves
+                // minWidth at 0, so the button still wraps content inside weighted Rows.
+                propagateMinConstraints = true,
+                modifier = modifier.thenIf(effectiveOnClick != null) {
+                    bounceClick(
+                        mutableInteractionSource = interactionSource,
+                        onClick = effectiveOnClick!!
+                    )
+                },
+            ) { face() }
+        } else {
+            // Springy 3D lip: a hard "deep" band sits behind the face; the face DROPS onto it
+            // on press — no soft Material shadow, no scale bounce.
+            val depthAtRest = size.pressDepth()
+            val pressed by interactionSource.collectIsPressedAsState()
+            val drop by animateDpAsState(
+                targetValue = if (pressed) depthAtRest else 0.dp,
+                animationSpec = spring(stiffness = Spring.StiffnessHigh),
+                label = "ButtonLip",
+            )
+            Box(
+                contentAlignment = Alignment.Center,
+                propagateMinConstraints = true,
+                modifier = modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = effectiveOnClick != null,
+                    onClick = { effectiveOnClick?.invoke() },
+                ),
+            ) {
+                // deep band fills the whole box (face + the reserved lip strip)
+                Box(Modifier.matchParentSize().clip(Radii.Button.shape).background(deepColor.color))
+                // face sized normally + a constant bottom reserve (stable height); drops on press.
+                // propagateMinConstraints carries the outer Box's min width (set by a caller's
+                // fillMaxWidth) down to the face Surface, so a full-width button's face stretches to
+                // match the lip band instead of wrapping its content on the left.
+                Box(
+                    propagateMinConstraints = true,
+                    modifier = Modifier
+                        .padding(bottom = depthAtRest)
+                        .offset { IntOffset(x = 0, y = drop.roundToPx()) },
+                ) { face() }
+            }
         }
     }
+}
+
+/** Lip depth by size — the constant strip the face drops onto. */
+private fun ButtonSize.pressDepth(): Dp = when (this) {
+    ButtonSize.Large -> 5.dp
+    ButtonSize.Medium -> 4.dp
+    ButtonSize.Small -> 3.dp
+    ButtonSize.ExtraSmall -> 3.dp
 }
 
 
@@ -226,7 +281,6 @@ private fun LargeButton() {
             borderColor = null,
             contentColor = AppTheme.colors.onAccentPrimary,
             size = ButtonSize.Large,
-            style = ButtonStyle.Filled,
             onClick = {},
             content = { Text(text = "Filled Button") }
         )
@@ -242,7 +296,6 @@ private fun MediumButton() {
             borderColor = AppTheme.colors.border,
             contentColor = AppTheme.colors.text,
             size = ButtonSize.Medium,
-            style = ButtonStyle.Outlined,
             onClick = {},
             content = { Text(text = "Outlined Button") }
         )
@@ -258,7 +311,6 @@ private fun SmallButton() {
             borderColor = null,
             contentColor = AppTheme.colors.accentPrimary,
             size = ButtonSize.Small,
-            style = ButtonStyle.Text,
             onClick = {},
             content = { Text(text = "Text Button") }
         )

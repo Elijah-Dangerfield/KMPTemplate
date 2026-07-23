@@ -18,6 +18,10 @@ import com.kmptemplate.libraries.ui.components.button.ButtonType
 import com.kmptemplate.libraries.ui.components.text.Text
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+// Debug-only CTA label — dev-facing, so a constant rather than a string
+// resource (the button never renders in release builds).
+private const val NetworkInspectorCta = "Network inspector"
+
 @Composable
 fun ShakeDialog(
     headline: String,
@@ -26,6 +30,9 @@ fun ShakeDialog(
     onReportBug: () -> Unit,
     modifier: Modifier = Modifier,
     state: DialogState = rememberDialogState(),
+    // Debug-only: when non-null, an extra action opens the on-device network
+    // inspector. Release callers leave this null so the button never shows.
+    onOpenNetworkInspector: (() -> Unit)? = null,
 ) {
     BasicDialog(
         state = state,
@@ -68,9 +75,24 @@ fun ShakeDialog(
                 ) {
                     Text("Report a bug")
                 }
-                
+
+                if (onOpenNetworkInspector != null) {
+                    Spacer(modifier = Modifier.height(Dimension.D500))
+                    Button(
+                        onClick = {
+                            state.dismiss()
+                            onOpenNetworkInspector()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        size = ButtonSize.Medium,
+                        type = ButtonType.Secondary,
+                    ) {
+                        Text(NetworkInspectorCta)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(Dimension.D500))
-                
+
                 Button(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
@@ -106,6 +128,20 @@ private fun ShakeDialogPreview_NoSubtext() {
             subtext = null,
             onDismiss = {},
             onReportBug = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ShakeDialogPreview_WithInspector() {
+    PreviewContent {
+        ShakeDialog(
+            headline = "I felt that.",
+            subtext = "Testing the waters?",
+            onDismiss = {},
+            onReportBug = {},
+            onOpenNetworkInspector = {},
         )
     }
 }
