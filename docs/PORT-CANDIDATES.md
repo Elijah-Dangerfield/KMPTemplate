@@ -66,14 +66,6 @@ A small `:libraries:ui` primitive that returns a fixed value under `LocalInspect
 
 **Copy:** `libraries/ui/src/commonMain/.../components/LoopingAnimation.kt`.
 
-### 8. Sentry ProGuard mapping upload
-
-Only matters once candidate 1 lands, and it matters immediately then: obfuscated crash reports are unreadable. Uses the Sentry Gradle plugin with `autoInstallation` **off**, because the default adds `sentry-android` on top of the KMP Sentry SDK the template already uses.
-
-**Copy:** the Sentry plugin block in `apps/compose/build.gradle.kts`.
-
-**Warning worth carrying:** Cards had a hand-rolled `upload-proguard` CI step that looked healthy for months and could never have worked — it named a manifest path AGP no longer writes, and there was no ProGuard UUID to match, so it associated with nothing and reported success. Verify by confirming `assets/sentry-debug-meta.properties` is in the built APK, not by trusting a green step.
-
 ---
 
 ## Lessons for code this template already has

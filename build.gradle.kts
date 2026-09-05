@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.ktor) apply false
     alias(libs.plugins.sentryKmp) apply false
+    alias(libs.plugins.sentryAndroid) apply false
     alias(libs.plugins.kotlinCocoapods) apply false
     // Declared here (version only) so the conditional block below can apply it.
     alias(libs.plugins.detekt) apply false

@@ -1,11 +1,48 @@
 plugins {
     id("kmptemplate.application")
     id("co.touchlab.skie") version "0.10.12"
-
+    alias(libs.plugins.sentryAndroid)
 }
 
 android {
     namespace = "com.kmptemplate"
+}
+
+/**
+ * Sentry's Android Gradle plugin, for exactly one job: making obfuscated crash
+ * reports readable.
+ *
+ * R8 renames methods, so from the first minified release every Sentry frame
+ * arrives as `a.b.c`. Deobfuscating needs two things — the mapping file
+ * uploaded, and a ProGuard UUID stamped into the build tying that mapping to
+ * this APK. A hand-rolled `sentry-cli upload-proguard` step supplies only the
+ * first: with no UUID to match against, the upload associates with nothing and
+ * still reports success. Confirm this is working by unzipping the APK and
+ * checking `assets/sentry-debug-meta.properties` for `io.sentry.ProguardUuids`,
+ * not by trusting a green upload step.
+ */
+sentry {
+    org.set(providers.environmentVariable("SENTRY_ORG"))
+    projectName.set(providers.environmentVariable("SENTRY_PROJECT"))
+    authToken.set(providers.environmentVariable("SENTRY_AUTH_TOKEN"))
+
+    // This project already uses the Kotlin Multiplatform Sentry SDK.
+    // Auto-installation would add `sentry-android` on top of it, and two SDKs
+    // initialising in one process is not a thing to discover in production.
+    autoInstallation { enabled.set(false) }
+
+    // Always stamp the UUID: it is what makes a mapping associable at all, and
+    // it costs nothing in a build without a token.
+    includeProguardMapping.set(true)
+
+    // Only upload when a token exists, so a contributor can still build a
+    // release locally without one.
+    autoUploadProguardMapping.set(
+        providers.environmentVariable("SENTRY_AUTH_TOKEN").isPresent,
+    )
+
+    // No build-time telemetry to Sentry about our Gradle builds.
+    telemetry.set(false)
 }
 
 kotlin {
