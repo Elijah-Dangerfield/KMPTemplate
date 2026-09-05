@@ -14,12 +14,9 @@ class RealAppDatabaseProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : AppDatabaseProvider {
 
-    private val converters = CoreTypeConverters()
-
     override val database: AppDatabase by lazy {
         builderFactory
             .create()
-            .addTypeConverter(converters)
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(dispatcherProvider.io)
             .fallbackToDestructiveMigration(dropAllTables = true)

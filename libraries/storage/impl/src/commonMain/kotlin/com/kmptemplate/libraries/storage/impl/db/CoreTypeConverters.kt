@@ -1,6 +1,5 @@
 package com.kmptemplate.libraries.storage.impl.db
 
-import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import kotlinx.datetime.Instant
 import kotlinx.serialization.builtins.ListSerializer
@@ -15,8 +14,21 @@ import kotlinx.serialization.json.Json
  * - Instant <-> Long (epoch milliseconds)
  * - List<String> <-> String (JSON)
  * - Map<String, String> <-> String (JSON)
+ *
+ * Room instantiates this itself, via the no-arg constructor, and only for the
+ * DAOs that actually need it. It is deliberately **not** `@ProvidedTypeConverter`:
+ * a provided converter has to be handed to the builder with `addTypeConverter`,
+ * and Room rejects one that no entity requires —
+ *
+ *   IllegalArgumentException: Unexpected type converter CoreTypeConverters@...
+ *
+ * — which throws while the database is being built, i.e. at app start, before
+ * the first frame. Since a template ships converters ahead of the entities that
+ * will use them, the provided form is a boot crash waiting for the first
+ * project that trims the example table. Only reach for `@ProvidedTypeConverter`
+ * when a converter genuinely needs injected state, and then add it to the
+ * builder in the same change as the entity that requires it.
  */
-@ProvidedTypeConverter
 class CoreTypeConverters {
 
     private val json = Json {
