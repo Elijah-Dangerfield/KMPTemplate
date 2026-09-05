@@ -541,7 +541,12 @@ fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName, ciEnabl
         "scripts/verify_template.sh",
         "docs/template-maintenance.md",
         "docs/cards-backport-plan.md",
-        "docs/template-upgrade-execution-plan.md"
+        "docs/template-upgrade-execution-plan.md",
+        // The port queue and its plans are the template's own backlog. They name
+        // the source apps systems were carried back from, which a generated
+        // project has no use for and the de-branding check would flag.
+        "docs/PORT-CANDIDATES.md",
+        "docs/plans"
     )
     if (ciEnabled) {
         // CI is already installed, so the late-opt-in path has nothing to do.
@@ -550,7 +555,9 @@ fun cleanupTemplateArtifacts(projectDir: File, projectName: ProjectName, ciEnabl
     toDelete.forEach { relative ->
         val file = File(projectDir, relative)
         if (file.exists()) {
-            file.delete()
+            // deleteRecursively, not delete: the list holds directories as well
+            // as files, and File.delete() is a silent no-op on a non-empty one.
+            file.deleteRecursively()
             printGreen("   ✓ Removed $relative")
         }
     }

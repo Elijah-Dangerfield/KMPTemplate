@@ -66,8 +66,10 @@ fi
 #    boundaries (Wildcards, Discards, CardSecondary all contain it);
 #    downcard/warm-felt are distinctive enough to match anywhere. The two
 #    history docs legitimately discuss the Cards app as the origin of
-#    backported systems.
-BRAND_ALLOWLIST='^\./docs/decisions\.md:|^\./docs/backend-and-supabase-auth-plan\.md:'
+#    backported systems. BSD grep strips the leading ./ that GNU grep emits,
+#    so the allowlist has to anchor on both or it silently matches nothing
+#    when this runs on a Mac.
+BRAND_ALLOWLIST='^(\./)?docs/(decisions|backend-and-supabase-auth-plan)\.md:'
 if grep -rIiE --exclude-dir=.git '(^|[^A-Za-z])cards([^A-Za-z]|$)|downcard|warm-felt' . 2>/dev/null \
     | grep -vE "$BRAND_ALLOWLIST" >/tmp/verify_brand.txt; then
   head -20 /tmp/verify_brand.txt >&2
@@ -97,7 +99,9 @@ for f in \
   scripts/enable_ci.sh \
   docs/template-maintenance.md \
   docs/cards-backport-plan.md \
-  docs/template-upgrade-execution-plan.md; do
+  docs/template-upgrade-execution-plan.md \
+  docs/PORT-CANDIDATES.md \
+  docs/plans; do
   [ ! -e "$f" ] || fail "template artifact shipped into generated project: $f"
 done
 [ ! -d template ] || fail "template/ staging dir shipped despite CI being enabled"

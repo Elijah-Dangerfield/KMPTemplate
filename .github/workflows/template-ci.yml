@@ -25,18 +25,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: De-branding grep
-        # Cards-specific branding must never land in template code. The
-        # backport planning/history docs legitimately reference Cards.
+        # Source-app branding must never land in template code. The port queue,
+        # the port plans and the history docs legitimately name the app a system
+        # was backported from — that attribution is the point of those files —
+        # and the two greppers plus this step contain the search term itself.
+        # Allowlist by path, not basename: a same-named file elsewhere in the
+        # tree should still be caught.
         run: |
+          # BSD grep strips the leading ./ that GNU grep emits, so anchor on both.
+          P='^(\./)?'
+          ALLOW="${P}docs/(decisions|backend-and-supabase-auth-plan|cards-backport-plan|template-upgrade-execution-plan|template-maintenance|PORT-CANDIDATES)\.md:|${P}docs/plans/|${P}scripts/(verify_template\.sh|init_project\.main\.kts):|${P}\.github/workflows/template-ci\.yml:"
           if grep -rIiE --exclude-dir=.git \
-               --exclude=cards-backport-plan.md \
-               --exclude=template-upgrade-execution-plan.md \
-               --exclude=decisions.md \
-               --exclude=backend-and-supabase-auth-plan.md \
-               --exclude=verify_template.sh \
-               --exclude=init_project.main.kts \
-               'downcard|warm-felt|\bcards\b' .; then
-            echo "::error::Cards branding found in template sources (see matches above)"
+               'downcard|warm-felt|\bcards\b' . | grep -vE "$ALLOW"; then
+            echo "::error::Source-app branding found in template sources (see matches above)"
             exit 1
           fi
 

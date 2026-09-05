@@ -204,7 +204,7 @@ Default it to a noop, never `error("not provided")`. This keeps `@Preview` and u
 
 Apps generated from here run into production before the template does. They hit the App Store review, the Play policy deadline, the R8 keep rule that only breaks at runtime, the Compose gotcha that only shows up at 60fps with real data. That knowledge is worth more than anything written speculatively in this repo, and it only arrives if someone carries it back.
 
-**If you are working in a generated app, port it back.** The rule lives in that app's AGENTS.md: whenever you finish something structural, ask whether a brand-new app would want it before it has any features. If yes, add a bullet to [`docs/PORT-CANDIDATES.md`](docs/PORT-CANDIDATES.md) here — what it is, why a generic app wants it, and the path to copy from. Don't port speculatively; something that hasn't survived production downstream is not yet worth this repo's maintenance.
+**If you are working in a generated app, port it back.** The rule lives in that app's AGENTS.md: whenever you finish something structural, ask whether a brand-new app would want it before it has any features. If yes, add a bullet to `docs/PORT-CANDIDATES.md` **in the template repo** — what it is, why a generic app wants it, and the path to copy from. That file lives in the template only; a generated project doesn't carry a copy. Don't port speculatively; something that hasn't survived production downstream is not yet worth this repo's maintenance.
 
 **If you are working in this template**, `docs/PORT-CANDIDATES.md` is the queue. Take from it in priority order. Delete entries as you land them rather than ticking them off, so the file stays a queue and not a changelog.
 
