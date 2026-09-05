@@ -1,6 +1,8 @@
 # Port candidates
 
-Things a downstream app built and proved in production that this template should probably have. See AGENTS.md → "This template is fed by the apps built from it" for how entries get here and what qualifies.
+Work for this repo, found by the apps built from it. Two kinds: something a downstream app built and proved in production that a brand-new app would want, and a bug or rough edge in code this template already ships. The second kind matters more, because every generated app already has it.
+
+See AGENTS.md → "This template is fed by the apps built from it" for how entries get here and what qualifies.
 
 **This is a queue, not a changelog.** Delete an entry when you land it. Nothing here is a commitment — an item that still looks wrong after a closer look should be deleted with a line saying why, in the section at the bottom.
 
@@ -36,6 +38,31 @@ A small `:libraries:ui` primitive that returns a fixed value under `LocalInspect
 
 ---
 
+## From Moving Eyes (`~/Workspace/MovingEyes`), captured 2026-09-05
+
+Generated before the September 2026 update, so it inherited a template several
+months old and hit its edges in order.
+
+### 11. An opt-in switch for the Compose compiler's own metrics
+
+`-Pmovingeyes.composeMetrics=true` writes the stability and skippability
+reports to `build/compose-reports`. Off by default, because it slows every
+compile and the output is only useful while someone is reading it.
+
+The reason it earns a place in the template rather than in each app: "is this
+composable skippable" has no answer from reading the source. A
+restartable-but-not-skippable composable recomposes whenever its parent does,
+however unchanged its arguments, and nothing about the code says so. Without
+the report the honest answer to "is our Compose performance good" is a shrug,
+and with it Moving Eyes could say **341 restartable composables, 0
+non-skippable** and move on.
+
+**Copy:** `build-logic/src/main/java/.../util/ComposeMetrics.kt` plus its call
+in `ComposeMultiplatformConventionPlugin` and the `compose-compiler-gradle-plugin`
+entry in the version catalog.
+
+---
+
 ## Lessons for code this template already has
 
 No new module — these are fixes or comments for what is already here.
@@ -57,6 +84,60 @@ Cards listed `versions.properties` and `Config.xcconfig` in `extra-files` but ne
 Use the block form, not a trailing comment: in a properties file `#` only starts a comment at the start of a line, so a trailing `# x-release-please-version` becomes part of the value.
 
 **Reference:** commit `7f91f507` in Cards.
+
+### 12. `moduleConfig.serialization()` adds a dependency commonMain cannot see
+
+`ConfigurationExtension.serialization()` does
+`project.dependencies { add("implementation", ...) }`. In a Kotlin Multiplatform
+module `implementation` is the Android/JVM configuration, so `commonMain` never
+sees it — a module that calls the helper and uses `@Serializable` in `commonMain`
+**compiles on Android and fails to link on iOS**. Since everyone builds Android
+far more often, that surfaces at a milestone rather than at the edit that caused
+it, and the helper's name sends you looking at the iOS target instead of at the
+source set.
+
+Two neighbours compound it: `compose()` and `networking()` in the same class are
+**empty**, so a module can call them, look configured, and have nothing happen.
+
+Moving Eyes deleted all three — the Compose compiler plugin already arrives via
+`KotlinMultiplatformConventionPlugin`, and the serialization dependency belongs
+in the module's own `commonMain` block where it is visible.
+
+Four template modules call `serialization()` today, so landing this means an iOS
+link of each to confirm. Worth doing; not worth doing blind.
+
+**Reference:** `libraries/scene/build.gradle.kts` in Moving Eyes for the shape
+after the change.
+
+### 13. `Modifier.composed` is still all over `:libraries:ui`
+
+`composed` is deprecated, allocates a fresh modifier on every composition, and
+opts its chain out of skipping. It survives here in `fadingEdges` (now fixed),
+`Pulsate`, `BounceClick`, `ScrollBar` and `Header` — all of them attached to
+things that recompose with the screen behind them.
+
+Most are mechanical to convert: a `@Composable fun Modifier.x()` where the body
+needs composition, or a plain factory where it turns out it never did. Both
+`fadingEdge` overloads needed `composed` only to read a theme colour that
+`BlendMode.DstIn` then ignored, so they became plain factories.
+
+### 14. Never conclude a custom detekt rule is clean from a clean run
+
+Cards found rules registered, configured active, compiled into the jar, and
+never dispatched on detekt `2.0.0-alpha.5`; `alpha.6` fixed it. That story is in
+circulation, so here is the correction: **Moving Eyes checked and its rules
+dispatched fine on `alpha.5`.** An unconditional-report probe returned an
+identical 8078 findings on both versions.
+
+So the version is not a universal cause, and there is at least one other worth
+checking first — also seen in Moving Eyes: **the Gradle daemon caches detekt's
+worker classloader**, so an edited rule keeps running its previous jar until
+`./gradlew --stop`.
+
+The method is the lesson, not the version. A silently-undispatched rule and a
+working rule that finds nothing are identical from the build output, so prove
+dispatch by making the rule report unconditionally, confirm the flood, then
+revert.
 
 ---
 

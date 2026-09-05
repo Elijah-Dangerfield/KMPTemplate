@@ -204,7 +204,12 @@ Default it to a noop, never `error("not provided")`. This keeps `@Preview` and u
 
 Apps generated from here run into production before the template does. They hit the App Store review, the Play policy deadline, the R8 keep rule that only breaks at runtime, the Compose gotcha that only shows up at 60fps with real data. That knowledge is worth more than anything written speculatively in this repo, and it only arrives if someone carries it back.
 
-**If you are working in a generated app, port it back.** The rule lives in that app's AGENTS.md: whenever you finish something structural, ask whether a brand-new app would want it before it has any features. If yes, add a bullet to `docs/PORT-CANDIDATES.md` **in the template repo** — what it is, why a generic app wants it, and the path to copy from. That file lives in the template only; a generated project doesn't carry a copy. Don't port speculatively; something that hasn't survived production downstream is not yet worth this repo's maintenance.
+**If you are working in a generated app, port it back.** Two things qualify, and both go to the same place — `docs/PORT-CANDIDATES.md` **in the template repo**, which is a queue of work for this repo, not a log of what has been done:
+
+- **Something you built that a brand-new app would want before it has any features.** Say what it is, why a generic app wants it, and the path to copy from. Don't port speculatively; something that hasn't survived production downstream is not yet worth this repo's maintenance.
+- **A bug in code you inherited from the template, or a fix that generalizes.** These matter more, because every generated app already has them. Say what broke, *how it looked from the outside*, and why it was hard to spot — the next person meets a symptom, not a cause. Worth writing even when the fix is one line: the diagnosis is the value, not the diff. If you can fix it in the template yourself, do that and skip the entry.
+
+Note that file lives in the template only; a generated project doesn't carry a copy, so you are writing across repos on purpose.
 
 **If you are working in this template**, `docs/PORT-CANDIDATES.md` is the queue. Take from it in priority order. Delete entries as you land them rather than ticking them off, so the file stays a queue and not a changelog.
 
