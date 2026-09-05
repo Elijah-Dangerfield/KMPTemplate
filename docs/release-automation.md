@@ -102,7 +102,11 @@ Sentry triage is not a workflow — it runs as a Claude Code routine on the main
 
 ## Versioning
 
-- **`versionName` / `MARKETING_VERSION`** — owned by release-please. Do not edit in feature PRs. Markers in [versions.properties](../versions.properties) and [Config.xcconfig](../apps/ios/Configuration/Config.xcconfig) tell the bot where to write.
+- **`versionName` / `MARKETING_VERSION`** — owned by release-please. Do not edit in feature PRs. `x-release-please-start-version` / `x-release-please-end` markers in [versions.properties](../versions.properties) and [Config.xcconfig](../apps/ios/Configuration/Config.xcconfig) tell the bot where to write.
+
+  **Don't delete those markers, and don't add a file to `extra-files` without them.** release-please skips an unmarked `extra-files` entry *silently* — no warning, no error, exit 0 — so the symptom is not a failed release. It is a green release that tags and changelogs a new version while the version files stay behind, and ships the new code labelled with the old version to both stores. Use the block form: in a properties file `#` only starts a comment at the start of a line, so a trailing `# x-release-please-version` ends up inside the value. An xcconfig comments with `//`, not `#` — release-please matches the marker text wherever it appears on a line, but the file still has to parse.
+
+  After changing anything about those files, verify by running a release-please dry run, or at minimum confirm the marker lines still bracket the value line and that `grep '^MARKETING_VERSION'` still returns it — `release.yml`, `beta.yml` and the Fastfile all read it that way.
 - **`versionCode` / iOS build number** — auto-overridden in CI with `GITHUB_RUN_NUMBER` via env vars `VERSION_CODE_OVERRIDE` and `BUILD_NUMBER_OVERRIDE`. They bump monotonically without commits. (See [Versioning.kt](../build-logic/src/main/java/com/kmptemplate/util/Versioning.kt).)
 - **Sentry release ID**: `kmptemplate@{version}+{build}` (e.g. `kmptemplate@0.2.0+42`). Created on both platforms in release.yml.
 

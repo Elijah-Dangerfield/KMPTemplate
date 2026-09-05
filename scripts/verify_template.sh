@@ -114,6 +114,33 @@ done
 COMMITS="$(git rev-list --count HEAD 2>/dev/null || echo 0)"
 [ "$COMMITS" = "1" ] || fail "expected exactly 1 git commit, found $COMMITS"
 
+# 8. Every release-please `extra-files` entry exists and carries a version
+#    marker. release-please skips an unmarked extra-file SILENTLY — no warning,
+#    no error, exit 0 — so nothing else in this pipeline can catch it. The
+#    symptom is not a failed release; it is a green one that tags and changelogs
+#    a new version while the version files stay behind, shipping the new code
+#    labelled with the old version to both stores. Asserted here because a
+#    deleted marker looks like a tidy-up in review.
+if [ -f release-please-config.json ]; then
+  python3 - <<'PYEOF' || fail "release-please extra-files are missing version markers (see above)"
+import json, os, sys
+cfg = json.load(open("release-please-config.json"))
+bad = []
+for pkg in cfg.get("packages", {}).values():
+    for entry in pkg.get("extra-files", []):
+        path = entry if isinstance(entry, str) else entry.get("path", "")
+        if not path:
+            continue
+        if not os.path.exists(path):
+            bad.append(f"{path}: listed in extra-files but does not exist")
+        elif "x-release-please-start-version" not in open(path, encoding="utf-8").read():
+            bad.append(f"{path}: no x-release-please-start-version marker")
+for line in bad:
+    print(f"  {line}", file=sys.stderr)
+sys.exit(1 if bad else 0)
+PYEOF
+fi
+
 if [ "$FAILURES" -gt 0 ]; then
   echo "==> $FAILURES static assertion(s) failed — aborting before build" >&2
   exit 1
