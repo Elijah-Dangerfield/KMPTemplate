@@ -6,6 +6,8 @@ Things a downstream app built and proved in production that this template should
 
 Paths are relative to the source repo named on the entry.
 
+**Candidates 1–6 and 9–10 now have a sequenced implementation plan:** [docs/plans/port-from-cards-2026-09.md](plans/port-from-cards-2026-09.md). Delete an entry here as its phase there lands.
+
 ---
 
 ## From Cards (`~/Workspace/Cards`), captured 2026-09-05
