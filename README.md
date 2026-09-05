@@ -114,6 +114,13 @@ Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/nav
 | [apps/server/DEPLOY.md](apps/server/DEPLOY.md) | Fly.io two-environment deployment |
 | [apps/admin/README.md](apps/admin/README.md) | The remote-config admin console |
 | [docs/swift-kotlin-communication-patterns.md](docs/swift-kotlin-communication-patterns.md) | Exposing Kotlin to Swift and vice versa |
+| [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md) | The queue of things downstream apps proved that belong here |
+
+## This template learns from the apps built with it
+
+Apps generated from here reach production before the template does. They hit the store review, the policy deadline, the R8 rule that only breaks at runtime, the Compose bug that only appears at 60fps with real data. That knowledge is worth more than anything written speculatively in this repo, and it only arrives if someone carries it back.
+
+So the flow runs both ways. A generated app takes the scaffolding; when it learns something a brand-new app would want on day one, that goes in [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md) — code, or just as often a one-line warning about a landmine that cost a day. Working in a generated app? Its AGENTS.md carries the rule. Working here? That file is the queue.
 
 ---
 

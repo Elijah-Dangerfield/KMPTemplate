@@ -200,6 +200,27 @@ Default it to a noop, never `error("not provided")`. This keeps `@Preview` and u
 - Custom UI components in libraries/ui—avoid Material directly
 - Check `ComposeApp.h` for Swift names of Kotlin types before using in Swift
 
+## This template is fed by the apps built from it
+
+Apps generated from here run into production before the template does. They hit the App Store review, the Play policy deadline, the R8 keep rule that only breaks at runtime, the Compose gotcha that only shows up at 60fps with real data. That knowledge is worth more than anything written speculatively in this repo, and it only arrives if someone carries it back.
+
+**If you are working in a generated app, port it back.** The rule lives in that app's AGENTS.md: whenever you finish something structural, ask whether a brand-new app would want it before it has any features. If yes, add a bullet to [`docs/PORT-CANDIDATES.md`](docs/PORT-CANDIDATES.md) here — what it is, why a generic app wants it, and the path to copy from. Don't port speculatively; something that hasn't survived production downstream is not yet worth this repo's maintenance.
+
+**If you are working in this template**, `docs/PORT-CANDIDATES.md` is the queue. Take from it in priority order. Delete entries as you land them rather than ticking them off, so the file stays a queue and not a changelog.
+
+**Generalize on the way in.** A port arrives shaped like the app it came from. Strip its domain, name it for what it does rather than what it did, and keep the *reason* — the comment explaining why a rule exists is usually the most valuable line in the diff, because it is what stops the next person deleting it.
+
+## Known landmines
+
+Each of these cost a downstream app real time. They are cheap to avoid and expensive to rediscover.
+
+- **Compose Multiplatform's iOS klib only ships the JetBrains `Preview` annotation.** Migrating previews to `androidx.compose.ui.tooling.preview.Preview` compiles on Android and fails the iOS link. One app migrated 171 files before finding out, and only because it compiled the iOS target for an unrelated reason. Use `org.jetbrains.compose.ui.tooling.preview.Preview`.
+- **Routes must be `class`, never `data object`.** A `data object FooRoute : Route()` SIGSEGVs the iOS navigator at navigate time. Also covered under Navigation.
+- **Enum route arguments must be `@Serializable`** or the graph crashes at build time on iOS/Native. JVM tests will not catch it.
+- **`UIApplication.canOpenURL` needs its scheme declared in `LSApplicationQueriesSchemes`.** Undeclared, it returns false for everything, and a launcher that checks it first silently opens nothing — every outbound link in the app dies with no error.
+- **Infinite animations hang preview and screenshot capture.** Anything looping forever must return a fixed value under `LocalInspectionMode`, or a screenshot test waits for an idle state that never arrives.
+- **Reading an animated value during composition recomposes the whole subtree every frame.** `val x by animateFloatAsState(...)` read in a composable body is the single most common Compose performance bug; feeding text with it thrashes Skia's glyph cache and can wedge the RenderThread into an ANR. Read it in `graphicsLayer`/`drawBehind` instead. A detekt rule for this is a listed port candidate.
+
 ## iOS Notes
 
 - iOS framework compiled from `apps/compose`, embedded as `ComposeApp.xcframework`
