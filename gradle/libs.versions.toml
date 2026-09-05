@@ -5,6 +5,8 @@ androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
 androidx-core-splashscreen = "1.0.1"
 androidx-metricsPerformance = "1.0.0"
+androidx-benchmark = "1.4.1"
+androidx-uiautomator = "2.4.0"
 androidx-security-crypto = "1.1.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.9.6"
@@ -79,6 +81,9 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 # has no equivalent API and reports no jank on purpose.
 androidx-metrics-performance = { module = "androidx.metrics:metrics-performance", version.ref = "androidx-metricsPerformance" }
 androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
+# Baseline Profile generation + the minified-release smoke test (:apps:baselineprofile).
+androidx-benchmark-macroJunit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidx-benchmark" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidx-uiautomator" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 compose-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "composeMultiplatform" }
@@ -218,6 +223,7 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 androidxRoom = { id = "androidx.room", version.ref = "room" }
 sentryKmp = { id = "io.sentry.kotlin.multiplatform.gradle", version.ref = "sentryKmp" }
 sentryAndroid = { id = "io.sentry.android.gradle", version.ref = "sentryAndroidGradlePlugin" }
+baselineProfile = { id = "androidx.baselineprofile", version.ref = "androidx-benchmark" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 

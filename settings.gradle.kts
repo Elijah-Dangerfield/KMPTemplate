@@ -55,6 +55,11 @@ if (!serverOnly) {
     // out of the server-only build.
     include(":apps:integration")
 
+    // Baseline Profile generation + the minified-release smoke test. A
+    // com.android.test module that ships nothing and exists only at build time,
+    // so it is client-side and gated out of the server-only graph.
+    include(":apps:baselineprofile")
+
     // Compose Multiplatform (web) admin console for remote config. The server
     // serves the prebuilt bundle at /admin; CI builds it — the server build
     // itself stays JS-toolchain-free, so it's gated out of the server-only

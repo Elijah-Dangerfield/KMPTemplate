@@ -8,19 +8,11 @@ See AGENTS.md → "This template is fed by the apps built from it" for how entri
 
 Paths are relative to the source repo named on the entry.
 
-**Candidates 1–6 and 9–10 now have a sequenced implementation plan:** [docs/plans/port-from-cards-2026-09.md](plans/port-from-cards-2026-09.md). Delete an entry here as its phase there lands.
+**Candidates 1–5, 8 and 10 had a sequenced implementation plan:** [docs/plans/port-from-cards-2026-09.md](plans/port-from-cards-2026-09.md). All of them except 10 have landed and been deleted from this file. Candidate 10 is that plan's Phase 7, still open — see the note on it below.
 
 ---
 
 ## From Cards (`~/Workspace/Cards`), captured 2026-09-05
-
-### 2. A Baseline Profile module and the workflow that keeps it fresh
-
-Cold start is the one cost every user pays on every launch, and a Baseline Profile is the single biggest lever on it. There is no reason for each new app to rebuild the module, the Gradle Managed Device config, and the generator split from scratch.
-
-Two things here are earned rather than obvious. **The startup profile and the journey profile must come from different generators** — sharing one deep journey produces byte-identical files, and an oversized startup profile spills into later DEX files and slows the launch it exists to speed up. And **the generator runs a *release* variant**, so a benchmark hook gated on `BuildConfig.DEBUG` is dead exactly where it is needed; gate on the backend environment instead, which is also what stops a generation run creating accounts in production.
-
-**Copy:** `apps/baselineprofile/` and `.github/workflows/baseline-profile.yml` (monthly, opens a PR rather than pushing, with sanity checks on rule count and per-package coverage).
 
 ### 6. Install facts as telemetry attributes
 
