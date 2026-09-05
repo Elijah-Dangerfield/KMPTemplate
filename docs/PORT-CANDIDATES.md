@@ -20,20 +20,6 @@ Two things here are earned rather than obvious. **The startup profile and the jo
 
 **Copy:** `apps/baselineprofile/` and `.github/workflows/baseline-profile.yml` (monthly, opens a PR rather than pushing, with sanity checks on rule count and per-package coverage).
 
-### 4. Cold-start timing (`app.startup`)
-
-Measures OS process creation → first usable frame, reported once per process.
-
-Measuring from process creation rather than from the first line of Kotlin is the whole point: process fork, DEX loading and Application init all happen before any app code can start a timer, and that is precisely the part a Baseline Profile improves. A timer started later reports "no change" after the change that mattered most. Pairs with candidate 2 — without this, a template ships profile generation and no way to tell whether it helped.
-
-Also calls `reportFullyDrawn()` at the same instant, which is what Play Console grades "fully drawn" startup on. Without it Play measures to the splash frame, a number no user experiences.
-
-**Copy:** `libraries/telemetry/impl/.../StartupReporter.kt`, `AndroidProcessStartTimeProvider.kt`, `IosProcessStartTimeProvider.kt`, and the `reportStartupWhenReady()` hook in `MainActivity`.
-
-**Carry the two exclusions**, both of which are load-bearing: drop "startups" over 30s (the system started the process in the background hours before anyone opened the app) and report only once per process (an Activity recreation draws a fresh first frame that is not a startup). Without them the percentiles are meaningless.
-
-**iOS reports nothing, deliberately.** There is no readable process-start clock without `sysctl(KERN_PROC)`, which Kotlin/Native does not expose for Apple targets and which is a required-reason API. The right iOS source is MetricKit's `MXAppLaunchMetric`, under its own event name. The `IosProcessStartTimeProvider` KDoc explains this so nobody re-attempts it.
-
 ### 6. Install facts as telemetry attributes
 
 `genuine_install`, `is_emulator`, `is_sideloaded`, `is_rooted`, `installer_package`, `device_class`, `os_version`, stamped on every record.

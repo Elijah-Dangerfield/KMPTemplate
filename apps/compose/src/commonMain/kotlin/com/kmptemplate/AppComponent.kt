@@ -6,6 +6,7 @@ import com.kmptemplate.libraries.identity.auth.AuthRepository
 import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
 import com.kmptemplate.libraries.telemetry.impl.JankMonitor
+import com.kmptemplate.libraries.telemetry.impl.StartupReporter
 import com.kmptemplate.libraries.kmptemplate.Telemetry
 import com.kmptemplate.libraries.navigation.FeatureEntryPoint
 import me.tatarka.inject.annotations.Provides
@@ -27,6 +28,13 @@ interface AppComponent {
      * binds a no-op (see [JankMonitor]).
      */
     val jankMonitor: JankMonitor
+
+    /**
+     * Cold-start duration, reported once per process when the first usable
+     * frame is on screen. Android measures from OS process creation; iOS
+     * reports nothing on purpose (see [ProcessStartTimeProvider]).
+     */
+    val startupReporter: StartupReporter
     val shakeHandler: ShakeHandler
     val deepLinkBridge: DeepLinkBridge
 
