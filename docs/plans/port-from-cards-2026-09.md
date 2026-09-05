@@ -2,7 +2,7 @@
 
 **Source repo:** `~/Workspace/Cards` (github.com/Elijah-Dangerfield/Cards) — generated from this template, live on Play and the App Store. Every item below was built and proven there first.
 
-**Status:** written 2026-09-05, executed 2026-09-05. Phases 0–6 landed, one commit each. Phase 7 remains open, and its stated reason for deferral turned out to be wrong — see the note on it below.
+**Status:** written 2026-09-05, executed 2026-09-05. **All phases landed**, one commit each. Phase 7 was deferred on a false premise (this repo does have a release pipeline, staged in `template/ci/`), and its marker half turned out to be a live bug; that is now fixed. The dynamic release-PR probe is deliberately not built — see Phase 7.
 
 Three things did not match the plan's assumptions, recorded here because the plan was the thing that was wrong:
 
@@ -162,7 +162,9 @@ Worse, the second lesson below is **already a live bug there**. `template/ci/rel
 
 The first lesson is also directly applicable: that config's `pull-request-header` is a fixed string asserting four things about every release, which is the "asserts rather than asks" shape the note below describes.
 
-**Left undone deliberately, not overlooked** — the instruction for this run was not to build a release pipeline for it. Pick it up knowing the premise has changed.
+**Landed 2026-09-05.** Both files now carry `x-release-please-start-version` / `x-release-please-end` markers, and `verify_template.sh` asserts every `extra-files` entry exists and is marked — proven to fail on a stripped marker, since a silent skip is invisible to every other check in the pipeline. `pull-request-header` no longer asserts store state it cannot see; it says so and asks the reader to check the cases where merging is wrong.
+
+**Still not built, on purpose:** the dynamic probe. Cards' `release_pr_context.py` queries Play and App Store Connect on every PR update — is there a production release at all, is a staged rollout still running, is a version already `WAITING_FOR_REVIEW`. That needs credentials and a script this repo does not have, and the checklist covers the same cases at the cost of a human reading it. Build it when someone has actually merged over a build in review.
 
 When this template does grow a release pipeline, two Cards lessons should come with it:
 
@@ -183,7 +185,7 @@ When this template does grow a release pipeline, two Cards lessons should come w
 | 4 · Animated-state detekt rule | 0 | Small |
 | 5 · JankStats | — | Medium |
 | 6 · Cold-start timing | — (pairs with 3) | Medium |
-| 7 · Release PR context | — (one already exists in `template/ci/`) | Open; includes a live bug |
+| 7 · Release PR context | — (one already exists in `template/ci/`) | Markers fixed; probe not built |
 
 Phases 0, 1, 4, 5 and 6 are independent of each other and can be done in any order once 0 is out of the way. Only 2 and 3 genuinely need 1 first.
 

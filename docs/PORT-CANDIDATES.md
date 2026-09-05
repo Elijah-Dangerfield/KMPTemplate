@@ -8,7 +8,7 @@ See AGENTS.md → "This template is fed by the apps built from it" for how entri
 
 Paths are relative to the source repo named on the entry.
 
-**Candidates 1–5, 8 and 10 had a sequenced implementation plan:** [docs/plans/port-from-cards-2026-09.md](plans/port-from-cards-2026-09.md). All of them except 10 have landed and been deleted from this file. Candidate 10 is that plan's Phase 7, still open — see the note on it below.
+**Candidates 1–5, 8 and 10 had a sequenced implementation plan:** [docs/plans/port-from-cards-2026-09.md](plans/port-from-cards-2026-09.md). All of them have landed and been deleted from this file.
 
 ---
 
@@ -68,14 +68,6 @@ This template already has `withSpan` and a Ktor telemetry plugin, so it is very 
 The fix is to root a new trace at the originator of each unit of work and let everything below nest. Be exhaustive about what counts as an originator: rooting only the obvious handlers left the trace unbounded, just smaller.
 
 **Reference:** commit `ac58b1ba` in Cards.
-
-### 10. If you add release-please, the version markers are not optional
-
-Cards listed `versions.properties` and `Config.xcconfig` in `extra-files` but neither carried `x-release-please` markers, so release-please updated neither **and said nothing about it**. A release cut a tag and a changelog while both files stayed a version behind, and the binaries that reached App Store Connect and the Play production track were the new code labelled with the old version.
-
-Use the block form, not a trailing comment: in a properties file `#` only starts a comment at the start of a line, so a trailing `# x-release-please-version` becomes part of the value.
-
-**Reference:** commit `7f91f507` in Cards.
 
 ### 12. `moduleConfig.serialization()` adds a dependency commonMain cannot see
 
