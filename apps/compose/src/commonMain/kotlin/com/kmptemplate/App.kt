@@ -40,6 +40,7 @@ import com.kmptemplate.libraries.navigation.toEnterTransition
 import com.kmptemplate.libraries.navigation.toExitTransition
 import com.kmptemplate.libraries.navigation.toRouteOrNull
 import com.kmptemplate.libraries.kmptemplate.Telemetry
+import com.kmptemplate.libraries.telemetry.impl.JankMonitor
 import com.kmptemplate.libraries.ui.components.Screen
 import com.kmptemplate.libraries.ui.components.SnackbarDuration
 import com.kmptemplate.libraries.ui.components.dialog.DialogHost
@@ -156,6 +157,7 @@ fun App(appComponent: AppComponent) {
                         startDestination = route,
                         router = router,
                         telemetry = appComponent.telemetry,
+                        jankMonitor = appComponent.jankMonitor,
                     )
                 } else {
                     BootLoadingScreen()
@@ -228,6 +230,7 @@ private fun AppNavigation(
     startDestination: Route,
     router: DelegatingRouter,
     telemetry: Telemetry,
+    jankMonitor: JankMonitor,
 ) {
     // Tag every crash/error with the route the user is currently on. Sheets
     // and dialogs are real destinations on this same back stack (see
@@ -238,7 +241,13 @@ private fun AppNavigation(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRouteName = currentBackStackEntry?.destination?.routeClassNameOrNull()
     LaunchedEffect(currentRouteName) {
-        currentRouteName?.let { telemetry.setCurrentRoute(it) }
+        currentRouteName?.let {
+            telemetry.setCurrentRoute(it)
+            // Same hook, so jank attribution and crash attribution always name
+            // the same screen. This closes out the previous screen's frame tally
+            // and emits it as one app.jank event — never one per frame.
+            jankMonitor.onRouteChanged(it)
+        }
     }
 
     // Remember the graph-builder lambda so recompositions of AppNavigation

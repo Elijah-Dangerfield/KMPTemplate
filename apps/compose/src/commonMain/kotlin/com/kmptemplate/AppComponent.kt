@@ -5,6 +5,7 @@ import com.kmptemplate.libraries.core.AutoInit
 import com.kmptemplate.libraries.identity.auth.AuthRepository
 import com.kmptemplate.libraries.navigation.DeepLinkBridge
 import com.kmptemplate.libraries.navigation.impl.DelegatingRouter
+import com.kmptemplate.libraries.telemetry.impl.JankMonitor
 import com.kmptemplate.libraries.kmptemplate.Telemetry
 import com.kmptemplate.libraries.navigation.FeatureEntryPoint
 import me.tatarka.inject.annotations.Provides
@@ -20,6 +21,12 @@ interface AppComponent {
     val appViewModel: AppViewModel  // Singleton, shared between MainActivity and App
     val delegatingRouter: DelegatingRouter
     val telemetry: Telemetry
+
+    /**
+     * Real-user frame timing, reported per screen. Android binds JankStats; iOS
+     * binds a no-op (see [JankMonitor]).
+     */
+    val jankMonitor: JankMonitor
     val shakeHandler: ShakeHandler
     val deepLinkBridge: DeepLinkBridge
 

@@ -34,14 +34,6 @@ Also calls `reportFullyDrawn()` at the same instant, which is what Play Console 
 
 **iOS reports nothing, deliberately.** There is no readable process-start clock without `sysctl(KERN_PROC)`, which Kotlin/Native does not expose for Apple targets and which is a required-reason API. The right iOS source is MetricKit's `MXAppLaunchMetric`, under its own event name. The `IosProcessStartTimeProvider` KDoc explains this so nobody re-attempts it.
 
-### 5. Real-user frame timing (`app.jank`)
-
-One event per screen visit from AndroidX JankStats: frames rendered, how many missed their deadline, worst single frame. Answers "is the app smooth, and which screen isn't" continuously and for everyone, rather than from the one user who bothered to report it.
-
-Aggregated per screen visit, never per frame — a frame callback fires 60 times a second per user, and logging that would cost more than it tells you and swamp the pipe.
-
-**Copy:** `libraries/telemetry/impl/.../JankMonitor.kt`, `JankTally.kt`, `androidMain/AndroidJankMonitor.kt`, `iosMain/IosJankMonitor.kt` (a deliberate no-op — iOS has no equivalent API, and a lookalike number that meant something different per platform would be worse than an absence).
-
 ### 6. Install facts as telemetry attributes
 
 `genuine_install`, `is_emulator`, `is_sideloaded`, `is_rooted`, `installer_package`, `device_class`, `os_version`, stamped on every record.
