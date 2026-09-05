@@ -129,7 +129,12 @@ val TEXT_FILE_EXTENSIONS = setOf(
     // carry the project name.)
     "toml", "sql",
     // Staged GitHub Pages content ({{APP_NAME}} etc. live in the HTML).
-    "html", "css"
+    "html", "css",
+    // R8 keep rules are written against the package prefix. Left un-renamed,
+    // every `-keep class com.kmptemplate.**` matches nothing in the generated
+    // project — R8 then strips serializers, routes and the DI entry point, and
+    // the build still succeeds. The failure is at runtime, in release only.
+    "pro"
 )
 
 // Directories to skip during processing AND during copy

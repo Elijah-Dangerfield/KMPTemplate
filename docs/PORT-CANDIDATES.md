@@ -12,18 +12,6 @@ Paths are relative to the source repo named on the entry.
 
 ## From Cards (`~/Workspace/Cards`), captured 2026-09-05
 
-### 1. R8 is off in this template, and the keep rules are non-obvious
-
-`ApplicationConventionPlugin` sets `isMinifyEnabled = false`, so every app generated from here ships unminified until someone notices. Play flags apps under 25% obfuscation with a **February 2027 deadline**, so this is a dated obligation for every downstream app, not a nice-to-have. Shrinking and startup gains come with it.
-
-The reason this belongs in a template rather than in each app: R8 breaks what is resolved **by name at runtime**, and in a KMP app of this shape that is always the same three things — `kotlinx.serialization` models (the generated `Companion.serializer()` looks dead to R8), type-safe navigation routes (renaming them breaks nav with an argument error rather than a missing-class error), and the DI entry point. Every app built from here will need the identical rules and will lose the same day rediscovering them.
-
-**Copy:** `apps/compose/proguard-rules.pro`, and the `release { }` block in `build-logic/.../ApplicationConventionPlugin.kt`.
-
-**Bring the comments.** The rules are unremarkable; the explanations of what breaks and how it presents are the valuable part. Note also `-keepnames class * extends java.lang.Throwable`, without which every crash report arrives titled `a.b.c`.
-
-**Caveat:** rules for third-party libraries only apply if the template has those libraries. Take the serialization / nav / DI / Throwable core; drop anything app-specific.
-
 ### 2. A Baseline Profile module and the workflow that keeps it fresh
 
 Cold start is the one cost every user pays on every launch, and a Baseline Profile is the single biggest lever on it. There is no reason for each new app to rebuild the module, the Gradle Managed Device config, and the generator split from scratch.

@@ -95,7 +95,19 @@ class ApplicationConventionPlugin : Plugin<Project> {
                         applicationIdSuffix = ".debug"
                     }
                     release {
-                        isMinifyEnabled = false
+                        // R8 on. Play flags an app under 25% obfuscation as
+                        // below its threshold with a Feb 2027 deadline, and the
+                        // size and startup wins come with it. The keep rules in
+                        // apps/compose/proguard-rules.pro are what make this
+                        // survive: R8 breaks whatever is resolved by name at
+                        // runtime, and every failure mode is at runtime, so a
+                        // release build that merely compiles proves nothing.
+                        isMinifyEnabled = true
+                        isShrinkResources = true
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro",
+                        )
                         signingConfig = releaseSigning ?: signingConfigs.getByName("debug")
                     }
                 }
