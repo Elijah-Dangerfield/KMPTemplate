@@ -2,7 +2,13 @@
 
 **Source repo:** `~/Workspace/Cards` (github.com/Elijah-Dangerfield/Cards) — generated from this template, live on Play and the App Store. Every item below was built and proven there first.
 
-**Status:** not started. Written 2026-09-05.
+**Status:** written 2026-09-05, executed 2026-09-05. Phases 0–6 landed, one commit each. Phase 7 remains open, and its stated reason for deferral turned out to be wrong — see the note on it below.
+
+Three things did not match the plan's assumptions, recorded here because the plan was the thing that was wrong:
+
+- **Phase 0's premise was false.** `VerifyStrings` was never inert — a deliberate violation fails the build on `alpha.5` as well as `alpha.6`, checked both ways. There was no backlog. The bump still landed, as a prerequisite for Phase 4's rule, which genuinely does not dispatch on `alpha.5`.
+- **Phase 1 uncovered a pre-existing boot crash.** The app did not launch at all, on any build type, because Room rejected an unrequired `@ProvidedTypeConverter`. R8 changed the symptom (it merged the converter into an unrelated class) but not the cause. Fixed separately, ahead of the R8 commit.
+- **Phase 1's acceptance is only partly met.** Navigation and serializer round-trips were exercised on a minified build; a completed network round trip was not, because this template has no live backend to reach — the configured Supabase host is NXDOMAIN and `NetworkConfig.baseUrl` defaults to empty. Re-check the first time a backend is wired up.
 
 Read [AGENTS.md](../../AGENTS.md) → "This template is fed by the apps built from it" for why this exists, and [PORT-CANDIDATES.md](../PORT-CANDIDATES.md) for the wider queue this plan is drawn from. Delete an entry from that queue as its phase here lands.
 
@@ -148,9 +154,15 @@ Measures OS process creation → first usable frame, once per process. **Measuri
 
 ---
 
-## Phase 7 — Release PR context (deferred: no release pipeline here yet)
+## Phase 7 — Release PR context (still open; the reason for deferring it was wrong)
 
-**Scoped out for now, recorded so it is not lost.** This template has only `template-ci.yml` — no release-please, no release workflow, no `.github/scripts/`. Cards' release-PR work has nowhere to land until that exists.
+**Deferred on the grounds that there was nowhere for it to land. That is not true.** The template repo's *own* CI is only `template-ci.yml`, which is what the paragraph below was written from — but generated projects get a full release pipeline staged in `template/ci/`: `release.yml`, `beta.yml`, `release-please.yml`, `retag-release.yml` and `release-please-config.json`. Everything in this phase has somewhere to land, one directory over.
+
+Worse, the second lesson below is **already a live bug there**. `template/ci/release-please-config.json` lists `versions.properties` and `apps/ios/Configuration/Config.xcconfig` in `extra-files`, and neither file carries an `x-release-please` marker. That is the exact configuration that cut a tag and a changelog downstream while both version files stayed a release behind, shipping the new code labelled with the old version to the Play production track and App Store Connect. Every project generated from this template inherits it today.
+
+The first lesson is also directly applicable: that config's `pull-request-header` is a fixed string asserting four things about every release, which is the "asserts rather than asks" shape the note below describes.
+
+**Left undone deliberately, not overlooked** — the instruction for this run was not to build a release pipeline for it. Pick it up knowing the premise has changed.
 
 When this template does grow a release pipeline, two Cards lessons should come with it:
 
@@ -171,6 +183,8 @@ When this template does grow a release pipeline, two Cards lessons should come w
 | 4 · Animated-state detekt rule | 0 | Small |
 | 5 · JankStats | — | Medium |
 | 6 · Cold-start timing | — (pairs with 3) | Medium |
-| 7 · Release PR context | a release pipeline existing | Deferred |
+| 7 · Release PR context | — (one already exists in `template/ci/`) | Open; includes a live bug |
 
 Phases 0, 1, 4, 5 and 6 are independent of each other and can be done in any order once 0 is out of the way. Only 2 and 3 genuinely need 1 first.
+
+Executed in the order 0, 1, 2, 4, 5, 6, 3 — the dependencies were respected and the two largest phases were left until last.
