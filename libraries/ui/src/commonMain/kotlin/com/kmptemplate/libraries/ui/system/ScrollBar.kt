@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -37,7 +36,12 @@ fun Modifier.scrollbar(
     ),
     padding: PaddingValues = PaddingValues(all = 0.dp)
 ): Modifier = composed {
-    val scrollbarAlpha by animateFloatAsState(
+    // Kept as State and read inside drawWithContent below, not unwrapped with
+    // `by` here: `by` would subscribe this composable to a value that changes
+    // every animation frame, recomposing the whole scrolling subtree for the
+    // life of the fade. Read in the draw lambda, only the draw phase
+    // invalidates.
+    val scrollbarAlpha = animateFloatAsState(
         targetValue = alpha,
         animationSpec = alphaAnimationSpec
     )
@@ -47,7 +51,7 @@ fun Modifier.scrollbar(
     drawWithContent {
         drawContent()
 
-        val showScrollBar = state.isScrollInProgress || scrollbarAlpha > 0.0f
+        val showScrollBar = state.isScrollInProgress || scrollbarAlpha.value > 0.0f
 
         // Draw scrollbar only if currently scrolling or if scroll animation is ongoing.
         if (showScrollBar) {
@@ -96,7 +100,7 @@ fun Modifier.scrollbar(
                 indicatorThicknessPx = indicatorThicknessPx,
                 scrollbarPositionWithoutInsets = scrollbarPositionWithoutInsets,
                 scrollbarSizeWithoutInsets = scrollbarSizeWithoutInsets,
-                scrollbarAlpha = scrollbarAlpha
+                scrollbarAlpha = scrollbarAlpha.value
             )
         }
     }
@@ -113,7 +117,12 @@ fun Modifier.scrollbar(
     ),
     padding: PaddingValues = PaddingValues(all = 0.dp)
 ): Modifier = composed {
-    val scrollbarAlpha by animateFloatAsState(
+    // Kept as State and read inside drawWithContent below, not unwrapped with
+    // `by` here: `by` would subscribe this composable to a value that changes
+    // every animation frame, recomposing the whole scrolling subtree for the
+    // life of the fade. Read in the draw lambda, only the draw phase
+    // invalidates.
+    val scrollbarAlpha = animateFloatAsState(
         targetValue = alpha,
         animationSpec = alphaAnimationSpec
     )
@@ -123,7 +132,7 @@ fun Modifier.scrollbar(
     drawWithContent {
         drawContent()
 
-        val showScrollBar = state.isScrollInProgress || scrollbarAlpha > 0.0f
+        val showScrollBar = state.isScrollInProgress || scrollbarAlpha.value > 0.0f
         if (showScrollBar) {
             val layoutInfo = state.layoutInfo
             val totalItemCount = layoutInfo.totalItemsCount
@@ -170,7 +179,7 @@ fun Modifier.scrollbar(
                 indicatorThicknessPx = indicatorThicknessPx,
                 scrollbarPositionWithoutInsets = scrollbarPositionWithoutInsets,
                 scrollbarSizeWithoutInsets = scrollbarSizeWithoutInsets,
-                scrollbarAlpha = scrollbarAlpha
+                scrollbarAlpha = scrollbarAlpha.value
             )
         }
     }

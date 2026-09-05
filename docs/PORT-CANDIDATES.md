@@ -20,16 +20,6 @@ Two things here are earned rather than obvious. **The startup profile and the jo
 
 **Copy:** `apps/baselineprofile/` and `.github/workflows/baseline-profile.yml` (monthly, opens a PR rather than pushing, with sanity checks on rule count and per-package coverage).
 
-### 3. The `AnimatedStateReadInComposition` detekt rule
-
-This template already has a `detekt-rules` module with one rule in it, so this is a drop-in.
-
-Reading an animated value during composition (`val x by animateFloatAsState(...)` in a composable body) recomposes the whole subtree every frame. It is the most common Compose performance bug there is, it is invisible in review, and when the subtree contains text it thrashes Skia's glyph cache and can wedge the RenderThread into an ANR. **The rule found 19 instances on its first run in Cards, seven of them in files that had just been swept by hand for exactly this pattern.** A human reviewer does not reliably catch it; a linter does, on every PR, for free.
-
-**Copy:** `detekt-rules/src/main/kotlin/.../AnimatedStateReadInComposition.kt` plus its registration in the rule-set provider.
-
-**Gotcha worth carrying:** the rule silently did not dispatch on detekt `2.0.0-alpha.5` and started working on `alpha.6`, with no change to the rule itself. If a new rule appears to do nothing, suspect the detekt version before the rule.
-
 ### 4. Cold-start timing (`app.startup`)
 
 Measures OS process creation → first usable frame, reported once per process.

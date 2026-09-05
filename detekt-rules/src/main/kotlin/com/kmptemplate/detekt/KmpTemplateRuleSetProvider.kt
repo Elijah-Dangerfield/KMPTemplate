@@ -16,6 +16,7 @@ class KmpTemplateRuleSetProvider : RuleSetProvider {
         ruleSetId,
         listOf(
             ::VerifyStrings,
+            ::AnimatedStateReadInComposition,
         ),
     )
 }

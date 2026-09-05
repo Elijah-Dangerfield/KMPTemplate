@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
@@ -148,7 +148,10 @@ private fun MagnifyingBottomBarItem(
     isSelected: Boolean,
     modifier: Modifier
 ) {
-    val scale by animateFloatAsState(
+    // Kept as State and read in the graphicsLayer lambda below. Unwrapped with
+    // `by` and fed to Modifier.scale, the spring would recompose this whole item
+    // — badge, icon and all — on every frame of the bounce.
+    val scale = animateFloatAsState(
         targetValue = if (isSelected) 1.2f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -157,6 +160,13 @@ private fun MagnifyingBottomBarItem(
         label = "scale"
     )
 
+    // Suppressed rather than fixed: this is a parameter to a composable (Icon's
+    // tint), so composition genuinely needs the value and there is no draw-phase
+    // lambda to move it into. The read sits inside the innermost content lambda,
+    // the tightest recomposition scope available — only the Icon recomposes, for
+    // the 220ms of the tween, on a tab change the user just made. `scale` above
+    // was the one that mattered and it is fixed.
+    @Suppress("AnimatedStateReadInComposition")
     val iconColor by animateColorResourceAsState(
         targetValue = if (isSelected) {
             AppTheme.colors.text
@@ -172,7 +182,10 @@ private fun MagnifyingBottomBarItem(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier.scale(scale),
+            modifier = Modifier.graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            },
             contentAlignment = Alignment.Center
         ) {
             BadgedBox(

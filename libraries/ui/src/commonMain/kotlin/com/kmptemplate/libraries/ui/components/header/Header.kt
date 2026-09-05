@@ -80,6 +80,12 @@ fun TopBar(
     }
 }
 
+// Suppressed rather than fixed: Modifier.shadow has no lambda form, so a shadow
+// driven by an animated value has no phase-deferred equivalent to move the read
+// into. The cost is bounded — this recomposes only the header, only while the
+// lift animation runs, which is a couple of hundred milliseconds at the top of a
+// scroll. If shadow ever grows a lambda overload, drop the `by` and use it.
+@Suppress("AnimatedStateReadInComposition")
 private fun Modifier.elevateOnScroll(
     scrollState: ScrollState?,
 ): Modifier {
