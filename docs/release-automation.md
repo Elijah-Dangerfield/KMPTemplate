@@ -114,6 +114,21 @@ Sentry triage is not a workflow — it runs as a Claude Code routine on the main
 
 Set under **Settings → Secrets and variables → Actions**. Secrets are encrypted, variables (`vars.*`) are plaintext.
 
+### Only one of these is per-app
+
+Worth knowing before you do this the second time: of the thirteen secrets below, twelve are properties of your Apple team, your Play developer account, and your Sentry org. They are identical for every app you will ever generate from this template.
+
+| Scope | Secrets |
+|---|---|
+| Account-wide, write once, reuse forever | `APPLE_TEAM_ID`, `APPLE_DIST_CERT_P12_BASE64`, `APPLE_DIST_CERT_PASSWORD`, `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_KEY_P8_BASE64`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`, `SENTRY_AUTH_TOKEN` |
+| Per app | `SENTRY_DSN`, because it points at a Sentry project |
+
+One Apple distribution certificate signs every app on the team. One App Store Connect API key covers the team. One Play service account covers the developer account, once you grant it access to each app. One upload keystore can sign all of them: with Play App Signing the upload key only proves *you* sent the build, and Google holds the key users actually verify.
+
+So do not treat a new app as thirteen console visits. Keep the shared material in one private folder outside any repo, alongside a script that runs `gh secret set` for a named repo, and a new app costs one four-line file. GitHub does not offer account-level secrets for personal repos; a free organization does, with per-repository visibility, if you would rather have the platform hold them. Moving repos into an org rewrites their GitHub Pages URL, so do that before you file a privacy policy URL with either store, not after.
+
+The one that is genuinely dangerous to lose is the Android upload keystore. Everything else on the list can be reissued from a console in five minutes, including the Apple `.p8` that only downloads once. The keystore cannot: once an app has shipped a build signed with it, losing it means asking Google to reset the upload key before you can publish an update.
+
 ### Already set
 
 - `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64`
