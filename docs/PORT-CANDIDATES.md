@@ -53,6 +53,32 @@ non-skippable** and move on.
 in `ComposeMultiplatformConventionPlugin` and the `compose-compiler-gradle-plugin`
 entry in the version catalog.
 
+### 15. A check for Android string escapes in `composeResources` XML
+
+Moving Eyes shipped `IT\'S ALIVE` to TestFlight, backslash and all. The habit
+comes from Android: in `res/values/strings.xml` an apostrophe must be escaped
+or aapt fails the build, so anyone who has written Android strings types `\'`
+without thinking. Compose Multiplatform's file looks identical and behaves
+differently. `XmlValuesConverterTask` reads the DOM's `textContent` and writes
+it into the `.cvr` verbatim, with no unescape step anywhere in the resources
+package, so the backslash is just another character in the string.
+
+Nothing catches it. Not the compiler, not detekt, not a screenshot test, not a
+reviewer skimming a diff, because `\'` is what a correct Android string looks
+like. It was found by reading a photograph of a phone.
+
+The check has to be a Gradle verification task over
+`*/src/*/composeResources/values/*.xml`, not a detekt rule. `VerifyStrings`
+runs on Kotlin PSI (`visitCallExpression`, `KtStringTemplateExpression`) and
+cannot see XML; detekt has no XML frontend to give it one. Wire the new task
+into the same `check` chain so it fails CI rather than printing a warning
+nobody reads.
+
+Flag every backslash in a `<string>` body, not just `\'`. The converter passes
+all of them through, so `\"`, `\n` and `\t` are equally literal, and a real
+newline or a Unicode escape is what the author actually wanted. Cheap to write,
+and the failure it prevents is one that reaches customers.
+
 ---
 
 ## Lessons for code this template already has
