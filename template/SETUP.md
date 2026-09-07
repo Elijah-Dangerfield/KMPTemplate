@@ -36,6 +36,10 @@ To bypass in scripted contexts (not CI — `CI` env var is honored): `-Dkmptempl
 
 Set under **Settings → Secrets and variables → Actions**. All are required for `release.yml` to ship.
 
+**Do this once, not once per app.** Every value below except `SENTRY_DSN` and `SENTRY_PROJECT` belongs to your Apple team, your Play developer account, or your Sentry org, and is identical for every project this template generates. Keep the certificate, the `.p8`, the upload keystore and the service-account JSON in one private folder outside any repo, with a script that runs `gh secret set` against a named repo. A new app then costs two values, not fifteen. See [release-automation.md → Secrets and variables](../docs/release-automation.md#secrets-and-variables).
+
+The one item that cannot be reissued is the Android upload keystore: once an app has shipped a build signed with it, losing it means asking Google to reset the upload key. Everything else on this page can be regenerated from a console in minutes.
+
 ### Android signing
 
 | Secret | How to get it |
@@ -62,7 +66,7 @@ Set under **Settings → Secrets and variables → Actions**. All are required f
 
 | Secret | Notes |
 | --- | --- |
-| `SENTRY_AUTH_TOKEN` | Sentry → User Auth Tokens → scope: `project:releases`, `org:read`. Used by `beta.yml`/`release.yml` to create releases + upload mappings/dSYMs. |
+| `SENTRY_AUTH_TOKEN` | Sentry → **Settings → Organization Tokens** → Create New Organization Token (`sntrys_…`). Used by `beta.yml`/`release.yml` to create releases + upload mappings/dSYMs. Organization tokens carry exactly one scope, `org:ci`, and it is not selectable: release creation, source map upload, code mappings. That is all CI needs. Do **not** go looking for `org:read` or `project:releases` to tick; those belong to personal tokens and are not offered here. A healthy org token also answers 403 to Sentry's read endpoints, so do not treat that as a broken token. |
 | `SENTRY_DSN` | Sentry → Project Settings → Client Keys (DSN). Baked into store builds so crash reporting is live; blank leaves crash reporting dormant. |
 
 And under **Settings → Secrets and variables → Actions → Variables** (not secrets):
