@@ -70,6 +70,13 @@ abstract class ServerComponent(
      * fire-and-forget config-change webhook). SupervisorJob so one failure
      * doesn't cascade. Singleton — the process owns exactly one and never
      * cancels it (it dies with the process).
+     *
+     * **If you trace work launched here, root a new trace for it.** A coroutine
+     * that finishes with an OTel context installed can leave it on the pool
+     * thread, and the next unrelated job scheduled there inherits it as parent.
+     * `withSpan` parents to whatever is current, so the result is unrelated
+     * background work stitched into someone else's trace, unbounded. See the
+     * KDoc on `withSpan` in `plugins/Tracing.kt` for the full failure mode.
      */
     @Provides
     @SingleIn(ServerScope::class)

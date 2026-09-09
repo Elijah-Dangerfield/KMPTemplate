@@ -72,3 +72,25 @@ the arbiter rather than pre-checking for races.
 
 **Why:** one procedure for schema change (add the next `V##__name.sql`, never edit
 an applied one), and idempotency that's correct under concurrency.
+
+## 2026-09-09 — Ports considered and rejected
+
+**Decision:** three things a downstream app offered back are deliberately not in
+this template. Recorded so they don't get re-proposed each time someone reads
+that app's setup and notices the gap.
+
+- **Macrobenchmark `FrameTimingMetric` in CI.** The right tool for catching jank
+  regressions, and it needs a real device. Emulator frame timing on a shared CI
+  runner varies more run-to-run than the regressions worth catching, so any
+  threshold produces flaky red and gets disabled within a month. Only worth it
+  for a project with a device farm. Real-user frame timing (`app.jank`) covers
+  the same question continuously and is in the template instead.
+- **The Grafana dashboards themselves.** The queries encode one app's event
+  names. The *conventions* are portable and already carried; the boards are not.
+- **The observability routine and its skills.** Genuinely useful, and shaped
+  entirely around one project's dashboards, alert ids and inbox. Revisit only if
+  a second app wants the same thing — that is the point at which the generic
+  shape becomes visible.
+
+**Why here rather than the port queue:** the queue is work waiting to happen, and
+these are closed questions. Keeping them there made an empty queue impossible.

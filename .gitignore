@@ -43,3 +43,9 @@ apps/admin/admin-tokens.local.properties
 *.jks
 *.keystore
 *.p12
+
+# Agent scratch: machine-local settings and temporary git worktrees.
+# Worktrees here are whole second checkouts of this repo — left untracked they
+# show up in every recursive grep and status, which is how a stray nested
+# project has confused this repo's own smoke test before.
+.claude/

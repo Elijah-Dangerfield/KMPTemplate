@@ -104,6 +104,36 @@ internal val serverTracer: Tracer
  *
  * Use for manual spans around notable work; HTTP requests are traced
  * automatically by [installHttpServerTracing].
+ *
+ * ## Parenting to the *current* context is a trap on long-lived work
+ *
+ * "Parented to the current OTel context" is right for a request handler, where
+ * the current context is that request's span and ends with it. It is wrong
+ * anywhere the current context outlives the unit of work, and there are two
+ * such places in this server the moment anyone uses them:
+ *
+ * 1. **A WebSocket handler.** [installWebSockets] is installed, and
+ *    [KtorServerTelemetry] opens a span for the upgrade request. That span
+ *    stays current for the entire life of the socket, so every `withSpan` in
+ *    the handler — for hours, across every message and every connected user —
+ *    nests under one root. Downstream this produced a single trace id covering
+ *    six rooms, several users and hours of wall time, permanently stuck at
+ *    "root span not yet received". Effectively one trace, so trace-level
+ *    debugging stopped working entirely.
+ * 2. **The shared `Dispatchers.Default` scope** (`provideServerCoroutineScope`).
+ *    A coroutine that finishes while a context is installed can leave it on the
+ *    pool thread, and the next unrelated unit of work scheduled there picks it
+ *    up as its parent.
+ *
+ * The fix in both cases is to **root a new trace at the originator of each unit
+ * of work** — per message, per job — and let everything below nest under that.
+ * Be exhaustive about what counts as an originator: rooting only the obvious
+ * handlers leaves the trace unbounded, just smaller.
+ *
+ * There are no `webSocket(...)` routes and no `withSpan` callers here yet, so
+ * this is a trap rather than a live bug. It is written down because the
+ * mechanism is fully assembled and the symptom — one enormous trace that never
+ * completes — does not look like a tracing-setup problem when you meet it.
  */
 internal suspend inline fun <T> withSpan(
     name: String,
