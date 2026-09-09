@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.thenIf
@@ -80,12 +78,15 @@ fun TopBar(
     }
 }
 
-// Suppressed rather than fixed: Modifier.shadow has no lambda form, so a shadow
-// driven by an animated value has no phase-deferred equivalent to move the read
-// into. The cost is bounded — this recomposes only the header, only while the
-// lift animation runs, which is a couple of hundred milliseconds at the top of a
-// scroll. If shadow ever grows a lambda overload, drop the `by` and use it.
-@Suppress("AnimatedStateReadInComposition")
+// `@Composable` rather than `composed`, and `graphicsLayer` rather than
+// `Modifier.shadow`. The two go together: dropping `composed` moves this body
+// into TopBar's own composition, so the animated elevation had to stop being
+// read there, or every lift would recompose the whole header at 60fps.
+// `shadow()` takes its elevation as a plain argument and has no lambda form;
+// `graphicsLayer` does, and `shadow()` is itself only a graphicsLayer setting
+// shadowElevation, shape and clip. Reading `.value` in the lambda keeps the lift
+// a draw-phase invalidation, so the suppression this used to carry is gone.
+@Composable
 private fun Modifier.elevateOnScroll(
     scrollState: ScrollState?,
 ): Modifier {
@@ -94,16 +95,15 @@ private fun Modifier.elevateOnScroll(
         "ScrollState should not be null when liftOnScroll is true"
     }
 
-    return this.composed {
-        val elevation by animateDpAsState(
-            if (scrollState.canScrollBackward) {
-                Elevation.Header.dp
-            } else {
-                0.dp
-            }, label = ""
-        )
-        Modifier.shadow(elevation)
-    }
+    val elevation = animateDpAsState(
+        if (scrollState.canScrollBackward) {
+            Elevation.Header.dp
+        } else {
+            0.dp
+        }, label = ""
+    )
+
+    return this.graphicsLayer { shadowElevation = elevation.value.toPx() }
 }
 
 @Preview

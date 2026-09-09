@@ -150,6 +150,7 @@ class AnimatedStateReadInComposition(config: Config) : Rule(
             // look like an androidx animation call at the site that uses it —
             // add yours here as you write them.
             "animateColorResourceAsState",
+            "rememberLoopingFloat",
         )
     }
 }
