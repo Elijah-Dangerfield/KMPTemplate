@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +25,18 @@ import com.kmptemplate.system.AppTheme
 import com.kmptemplate.libraries.ui.system.color.ColorResource
 import kotlin.math.max
 
+/**
+ * An overlay scrollbar that fades in while [state] is scrolling and fades out
+ * again after it settles.
+ *
+ * `@Composable` rather than the deprecated `composed`: the fade needs
+ * `animateFloatAsState` and the indicator colour comes from [AppTheme], both of
+ * which have to run in composition. What `composed` added on top of that was a
+ * fresh modifier instance per composition and a chain that can never skip —
+ * paid by every scrolling screen in the app, on every recomposition, animating
+ * or not.
+ */
+@Composable
 fun Modifier.scrollbar(
     state: ScrollState,
     direction: Orientation,
@@ -35,7 +47,7 @@ fun Modifier.scrollbar(
         durationMillis = if (state.isScrollInProgress) 150 else 500
     ),
     padding: PaddingValues = PaddingValues(all = 0.dp)
-): Modifier = composed {
+): Modifier {
     // Kept as State and read inside drawWithContent below, not unwrapped with
     // `by` here: `by` would subscribe this composable to a value that changes
     // every animation frame, recomposing the whole scrolling subtree for the
@@ -48,7 +60,7 @@ fun Modifier.scrollbar(
 
     val indicatorColor = AppTheme.colors.surfaceDisabled
 
-    drawWithContent {
+    return drawWithContent {
         drawContent()
 
         val showScrollBar = state.isScrollInProgress || scrollbarAlpha.value > 0.0f
@@ -106,6 +118,8 @@ fun Modifier.scrollbar(
     }
 }
 
+/** As above, for a lazy list. See the note on the [ScrollState] overload. */
+@Composable
 fun Modifier.scrollbar(
     state: LazyListState,
     direction: Orientation,
@@ -116,7 +130,7 @@ fun Modifier.scrollbar(
         durationMillis = if (state.isScrollInProgress) 150 else 500
     ),
     padding: PaddingValues = PaddingValues(all = 0.dp)
-): Modifier = composed {
+): Modifier {
     // Kept as State and read inside drawWithContent below, not unwrapped with
     // `by` here: `by` would subscribe this composable to a value that changes
     // every animation frame, recomposing the whole scrolling subtree for the
@@ -129,7 +143,7 @@ fun Modifier.scrollbar(
 
     val indicatorColor = AppTheme.colors.surfaceDisabled
 
-    drawWithContent {
+    return drawWithContent {
         drawContent()
 
         val showScrollBar = state.isScrollInProgress || scrollbarAlpha.value > 0.0f
@@ -185,18 +199,22 @@ fun Modifier.scrollbar(
     }
 }
 
+@Composable
 fun Modifier.verticalScrollWithBar(
     scrollState: ScrollState
 ): Modifier = this.verticalScroll(scrollState).scrollbar(scrollState, Orientation.Vertical)
 
+@Composable
 fun Modifier.verticalScrollWithBar(
     lazyListState: LazyListState
 ): Modifier = this.scrollbar(lazyListState, Orientation.Vertical)
 
+@Composable
 fun Modifier.horizontalScrollWithBar(
     scrollState: ScrollState
 ): Modifier = this.horizontalScroll(scrollState).scrollbar(scrollState, Orientation.Horizontal)
 
+@Composable
 fun Modifier.horizontalScrollWithBar(
     lazyListState: LazyListState
 ): Modifier = this.scrollbar(lazyListState, Orientation.Horizontal)

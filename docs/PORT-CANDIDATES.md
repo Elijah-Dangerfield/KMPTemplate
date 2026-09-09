@@ -22,12 +22,6 @@ Every app hits the same problem the first time it looks at its own dashboards: d
 
 **Copy:** `libraries/telemetry/impl/.../InstallFacts.kt`, `AndroidInstallFactsProvider.kt`, `IosInstallFactsProvider.kt`.
 
-### 7. `rememberLoopingFloat` — infinite animations that don't hang capture
-
-A small `:libraries:ui` primitive that returns a fixed value under `LocalInspectionMode`. Any looping animation left running under a preview or screenshot test means the harness waits for an idle state that never arrives, so the test hangs rather than failing — the worst kind of failure to diagnose. Cheap to include now, annoying to retrofit once a screenshot suite exists.
-
-**Copy:** `libraries/ui/src/commonMain/.../components/LoopingAnimation.kt`.
-
 ---
 
 ## From Moving Eyes (`~/Workspace/MovingEyes`), captured 2026-09-05
@@ -118,18 +112,6 @@ link of each to confirm. Worth doing; not worth doing blind.
 
 **Reference:** `libraries/scene/build.gradle.kts` in Moving Eyes for the shape
 after the change.
-
-### 13. `Modifier.composed` is still all over `:libraries:ui`
-
-`composed` is deprecated, allocates a fresh modifier on every composition, and
-opts its chain out of skipping. It survives here in `fadingEdges` (now fixed),
-`Pulsate`, `BounceClick`, `ScrollBar` and `Header` — all of them attached to
-things that recompose with the screen behind them.
-
-Most are mechanical to convert: a `@Composable fun Modifier.x()` where the body
-needs composition, or a plain factory where it turns out it never did. Both
-`fadingEdge` overloads needed `composed` only to read a theme colour that
-`BlendMode.DstIn` then ignored, so they became plain factories.
 
 ### 14. Never conclude a custom detekt rule is clean from a clean run
 
