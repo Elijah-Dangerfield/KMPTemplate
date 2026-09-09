@@ -255,7 +255,13 @@ fun main(cli: CliConfig?) {
         projectName = validateProjectName(cli.name.trim()) ?: cliFail("Invalid --name: ${cli.name}")
         packageName = validatePackageName(cli.packageName.trim()) ?: cliFail("Invalid --package: ${cli.packageName}")
         contactEmail = cli.email.trim().ifEmpty { cliFail("--email must not be empty") }
-        val dir = File(cli.dir).canonicalFile
+        // A relative --dir resolves against the template's parent, not the
+        // working directory — see [resolveDestination]. Checked before mkdirs so
+        // a rejected path doesn't leave an empty directory behind.
+        val dir = resolveDestination(cli.dir)
+        destinationProblem(dir)?.let {
+            cliFail("--dir must be outside the template: $it. Got: ${dir.absolutePath}")
+        }
         if (dir.exists() && dir.listFiles()?.isNotEmpty() == true) {
             cliFail("--dir already exists and is not empty: ${dir.absolutePath}")
         }
@@ -666,8 +672,42 @@ fun resetGitHistory(rootDir: File, projectName: ProjectName) {
     }
 }
 
+/** The template checkout this script is running from. */
+fun templateRoot(): File = File(".").canonicalFile
+
+/**
+ * Resolves [input] to an absolute destination, treating a relative path as
+ * relative to the template's **parent** rather than to the process's working
+ * directory.
+ *
+ * The prompt suggests an absolute path beside the template, so answering it
+ * with a bare `MyApp` plainly means "there". The JVM disagrees: `File("MyApp")`
+ * resolves against `user.dir`, which is the template checkout itself, so the
+ * new project silently lands *inside* the template. That has happened. The
+ * nested project then shows up in the template's `git status` forever, and it
+ * breaks `verify_template.sh` — init copies the whole tree, so the nested
+ * project's own docs get copied into the smoke-test project and trip its
+ * de-branding grep, with a failure that names files nobody recognises.
+ */
+fun resolveDestination(input: String): File {
+    val base = templateRoot().parentFile ?: File(System.getProperty("user.home"))
+    val raw = File(input)
+    return if (raw.isAbsolute) raw.canonicalFile else File(base, input).canonicalFile
+}
+
+/** Why [dir] is not a legal destination, or null when it is fine. */
+fun destinationProblem(dir: File): String? {
+    val template = templateRoot()
+    val inside = dir.canonicalPath.startsWith(template.canonicalPath + File.separator)
+    return when {
+        dir.canonicalPath == template.canonicalPath -> "that is the template itself"
+        inside -> "it is inside the template checkout (${template.absolutePath})"
+        else -> null
+    }
+}
+
 fun getProjectDir(projectName: ProjectName): File? {
-    val templateDir = File(".").canonicalFile
+    val templateDir = templateRoot()
     val parentDir = templateDir.parentFile?.absolutePath ?: System.getProperty("user.home")
     val suggestedPath = File(parentDir, projectName.pascalCase).absolutePath
 
@@ -690,7 +730,18 @@ fun getProjectDir(projectName: ProjectName): File? {
         return null
     }
 
-    val projectDir = File(input.ifEmpty { suggestedPath }).canonicalFile
+    // Relative answers resolve against the template's parent, not the working
+    // directory — see [resolveDestination]. "MyApp" means ../MyApp, which is
+    // what the suggested path above implies.
+    val projectDir = resolveDestination(input.ifEmpty { suggestedPath })
+
+    destinationProblem(projectDir)?.let { problem ->
+        printRed("❌ Cannot create the project there: $problem.")
+        printYellow("   A generated project must live outside the template, or it")
+        printYellow("   ends up tracked by the template's git and breaks its smoke test.")
+        printYellow("   Suggested: $suggestedPath")
+        return null
+    }
 
     if (projectDir.exists() && projectDir.listFiles()?.isNotEmpty() == true) {
         printRed("❌ Directory already exists and is not empty: ${projectDir.absolutePath}")
