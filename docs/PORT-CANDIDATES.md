@@ -144,10 +144,78 @@ checking first — also seen in Moving Eyes: **the Gradle daemon caches detekt's
 worker classloader**, so an edited rule keeps running its previous jar until
 `./gradlew --stop`.
 
+This template checked too, and agrees: `VerifyStrings` dispatched on `alpha.5`
+and `alpha.6` alike, a deliberate violation failing the build on both. The
+repo was bumped to `alpha.6` anyway, because the rule that prompted the
+original story does still need it — but the `alpha.5` premise was false here.
+
 The method is the lesson, not the version. A silently-undispatched rule and a
 working rule that finds nothing are identical from the build output, so prove
 dispatch by making the rule report unconditionally, confirm the flood, then
 revert.
+
+### 16. `SEAViewModel` saves state on clear, and the save has never worked
+
+Every screen in the template extends `SEAViewModel`, whose `onCleared()` does:
+
+```kotlin
+Catching { savedStateHandle[STATE_KEY] = state }
+    .logOnFailure("Could not save state on clear for state: ...")
+```
+
+This **always throws**. `SavedStateHandle.set` only accepts what can go into a
+Bundle — primitives, `Parcelable`, `Serializable`, arrays of those — and the
+`State` types are plain Kotlin data classes. So no SEAViewModel screen has ever
+restored its state after process death, in any app generated from this template.
+
+**How it looks from the outside:** nothing. `Catching { }` turns it into a log
+line at error level with no stack context, on a screen the user just left. It
+appears once per screen exit, which is often enough to read as noise:
+
+```
+Can't put value with type class com.<pkg>.features.home.impl.feedback.FeatureState into saved state
+```
+
+Two things make it hard to spot. The feature is only observable after process
+death, which nobody tests by hand; and R8 renames the class in the message, so
+in a release build it reads `Can't put value with type class x6.j` and looks
+like an obfuscation problem rather than a design one. Found while verifying a
+minified build, and only identified as pre-existing by running the same journey
+on debug and getting the identical failure.
+
+**Fix is a judgement call, not a diff.** Either make it work — require `State`
+to be `@Serializable` (most already are) and store the encoded string — or
+delete the override, if process-death restoration isn't wanted. Do not leave a
+swallowed always-failing write in place.
+
+**Reference:** `libraries/flowroutines/src/commonMain/.../SEAViewModel.kt`.
+
+### 17. The Supabase project id falls back to a hardcoded dead project
+
+`loadSupabaseMetadata()` in `build-logic/.../Versioning.kt` resolves
+`supabase.projectId` from `local.properties`, then `SUPABASE_PROJECT_ID`, then
+falls back to a **literal project ref belonging to someone else** — one that no
+longer resolves at all. `anonKey` falls back to `""`.
+
+So a freshly generated project with no Supabase configured builds green and
+ships a client pointed at a hostname that does not exist. Every auth call fails
+with `Unable to resolve host … No address associated with hostname`, which reads
+as a network problem on the device rather than a missing config on the machine.
+
+**How it looks from the outside:** the app launches, onboarding completes, and
+guest account creation fails silently with `account_ready=false`. Nothing in the
+build output mentions Supabase, because the fallback made the config look
+present.
+
+A fallback that is obviously a placeholder, or an absent value that fails the
+build with "set supabase.projectId in local.properties", would both be better
+than a real-looking ref to a dead project. Also blocks end-to-end verification
+of release builds — there is no backend to round-trip against, which is why the
+R8 port could confirm navigation and serialization but not a completed network
+call.
+
+**Reference:** `build-logic/src/main/java/.../util/Versioning.kt:136`, and the
+same ref hardcoded in `scripts/rotate_apple_sign_in_token.main.kts`.
 
 ---
 
