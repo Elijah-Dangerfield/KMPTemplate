@@ -4,7 +4,6 @@ plugins {
 
 moduleConfig {
     di()
-    serialization()
     optIn("kotlin.time.ExperimentalTime")
 }
 

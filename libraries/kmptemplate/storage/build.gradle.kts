@@ -16,6 +16,7 @@ kotlin {
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.storage)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }
