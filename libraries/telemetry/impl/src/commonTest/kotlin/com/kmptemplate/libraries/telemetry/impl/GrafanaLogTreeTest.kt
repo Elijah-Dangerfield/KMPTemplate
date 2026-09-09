@@ -28,6 +28,7 @@ class GrafanaLogTreeTest {
                 currentSessionId = { sessionId },
                 currentInstallId = { installId },
                 isOffline = { offline },
+                installFacts = { RetailInstallFacts },
                 processorFactory = { processor },
             ),
         )

@@ -14,14 +14,6 @@ Paths are relative to the source repo named on the entry.
 
 ## From Cards (`~/Workspace/Cards`), captured 2026-09-05
 
-### 6. Install facts as telemetry attributes
-
-`genuine_install`, `is_emulator`, `is_sideloaded`, `is_rooted`, `installer_package`, `device_class`, `os_version`, stamped on every record.
-
-Every app hits the same problem the first time it looks at its own dashboards: developer emulators and sideloaded debug builds are counted as users, and crash-free rate is measured against a population that includes the developer. Cards found **98 client-side 429s that were 100% sideloaded dev builds and zero retail** — a number that reads as an incident without this attribution and as noise with it.
-
-**Copy:** `libraries/telemetry/impl/.../InstallFacts.kt`, `AndroidInstallFactsProvider.kt`, `IosInstallFactsProvider.kt`.
-
 ### 7. `rememberLoopingFloat` — infinite animations that don't hang capture
 
 A small `:libraries:ui` primitive that returns a fixed value under `LocalInspectionMode`. Any looping animation left running under a preview or screenshot test means the harness waits for an idle state that never arrives, so the test hangs rather than failing — the worst kind of failure to diagnose. Cheap to include now, annoying to retrofit once a screenshot suite exists.
