@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kmptemplate.libraries.core.logging.KLog
+import com.kmptemplate.libraries.core.BuildInfo
 import com.kmptemplate.libraries.core.Catching
 import com.kmptemplate.libraries.core.ConcurrentHashMap
 import com.kmptemplate.libraries.core.logOnFailure
@@ -224,10 +225,36 @@ abstract class SEAViewModel<S : Any, E : Any, A : Any>(
      */
     protected abstract suspend fun handleAction(action: A)
 
+    /**
+     * Best-effort save for process-death restoration. **Failing here is the
+     * normal case, not an error.**
+     *
+     * This is opportunistic on purpose, and pairs with the equally opportunistic
+     * read in [mutableStateFlow]. If [S] happens to be something
+     * `SavedStateHandle` can put in a Bundle, the screen gets process-death
+     * restoration for free and nobody had to ask for it. If it doesn't — and a
+     * plain Kotlin data class doesn't, which is most states — the write throws,
+     * the read falls back to `initialState()`, and the screen rebuilds exactly
+     * as it would have anyway.
+     *
+     * So the failure is logged in debug only. At error level in release it is
+     * one line per screen exit on nearly every screen in the app, which teaches
+     * people to ignore the log rather than telling them anything. In a minified
+     * build it is worse than useless: R8 renames the class, so it reads
+     * `Can't put value with type class x6.j` and looks like an obfuscation bug.
+     *
+     * Want restoration on a particular screen? Make that screen's `State`
+     * Bundle-able. Nothing here needs to change.
+     */
     override fun onCleared() {
-        Catching {
-            savedStateHandle[STATE_KEY] = state
-        }.logOnFailure("Could not save state on clear for state: ${state::class.simpleName}")
+        val saved = Catching { savedStateHandle[STATE_KEY] = state }
+        if (BuildInfo.isDebug) {
+            saved.logOnFailure(
+                "${state::class.simpleName} isn't Bundle-able, so this screen won't restore " +
+                    "after process death. Expected for a plain data class — make the State " +
+                    "Bundle-able if you want restoration.",
+            )
+        }
     }
 
     companion object {
