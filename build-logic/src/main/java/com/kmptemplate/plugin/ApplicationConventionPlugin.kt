@@ -4,6 +4,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.kmptemplate.ext.ConfigurationExtension
 import com.kmptemplate.util.SharedConstants
 import com.kmptemplate.util.configureAndroid
+import com.kmptemplate.util.configureComposeMetrics
 import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.configureKotlinMultiplatform
 import com.kmptemplate.util.configureReleaseSigning
@@ -58,6 +59,8 @@ class ApplicationConventionPlugin : Plugin<Project> {
                 apply(libs.plugins.kotlinSerialization.get().pluginId)
                 apply(libs.plugins.buildconfig.get().pluginId)
             }
+
+            configureComposeMetrics()
 
             project.optInKotlinMarkers("kotlin.time.ExperimentalTime")
             project.optInKotlinMarkers("kotlin.uuid.ExperimentalUuidApi")

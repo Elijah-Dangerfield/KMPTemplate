@@ -3,6 +3,7 @@ package com.kmptemplate.plugin
 import com.android.build.gradle.LibraryExtension
 import com.kmptemplate.ext.ConfigurationExtension
 import com.kmptemplate.util.configureAndroid
+import com.kmptemplate.util.configureComposeMetrics
 import com.kmptemplate.util.configureKotlinInject
 import com.kmptemplate.util.configureKotlinMultiplatform
 import com.kmptemplate.util.enforceModuleBoundaries
@@ -56,6 +57,7 @@ class ComposeMultiplatformConventionPlugin : Plugin<Project> {
             configureKotlinMultiplatform()
             configureKotlinInject()
             configureComposeTestDependencies()
+            configureComposeMetrics()
             
             extensions.configure<LibraryExtension> {
                 configureAndroid()
