@@ -103,7 +103,14 @@ private fun Modifier.elevateOnScroll(
         }, label = ""
     )
 
-    return this.graphicsLayer { shadowElevation = elevation.value.toPx() }
+    // `clip` mirrors what `shadow()` does — it defaults to `elevation > 0.dp`,
+    // not to false — so the lift clips to bounds exactly as it did before.
+    // Shape stays the graphicsLayer default, which is the RectangleShape
+    // `shadow()` also defaults to.
+    return this.graphicsLayer {
+        shadowElevation = elevation.value.toPx()
+        clip = shadowElevation > 0f
+    }
 }
 
 @Preview

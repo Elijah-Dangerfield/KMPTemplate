@@ -66,11 +66,22 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
  * val showingFace by remember { derivedStateOf { rotation.value <= 90f } }
  * ```
  *
- * If neither applies, `@Suppress("AnimatedStateReadInComposition")` with a
- * comment saying why. `Modifier.shadow` is the known-good case: it has no lambda
- * form, so a shadow driven by an animated value has no phase-deferred
- * equivalent. A per-frame recomposition that is genuinely required is fine; one
- * nobody noticed is what causes ANRs.
+ * If neither applies, `@Suppress("AnimatedStateReadInComposition")` on the
+ * property — not the function, so a later animation in the same composable is
+ * still caught — with a comment saying why.
+ *
+ * Before reaching for the suppression, check whether the modifier you are
+ * feeding has a `graphicsLayer` equivalent. `Modifier.shadow` looks like the
+ * classic unavoidable case, because it takes elevation as a plain argument and
+ * has no lambda form — but it is itself only a graphicsLayer setting
+ * `shadowElevation`, `shape` and `clip`, so writing that lambda directly defers
+ * the read to the draw phase and needs no suppression. `Modifier.scale`,
+ * `Modifier.alpha` and `Modifier.rotate` are the same. The genuinely
+ * unavoidable case is a value composition needs in order to decide *what to
+ * emit*, and `derivedStateOf` usually narrows that.
+ *
+ * A per-frame recomposition that is genuinely required is fine; one nobody
+ * noticed is what causes ANRs.
  */
 class AnimatedStateReadInComposition(config: Config) : Rule(
     config,
