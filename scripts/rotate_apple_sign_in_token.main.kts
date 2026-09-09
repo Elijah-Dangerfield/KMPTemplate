@@ -74,6 +74,15 @@ fun derSignatureToJose(der: ByteArray): ByteArray {
     return toFixed(r) + toFixed(s)
 }
 
+val supabaseProjectRef = File("local.properties")
+    .takeIf { it.exists() }
+    ?.readLines()
+    ?.firstOrNull { it.trimStart().startsWith("supabase.projectId=") }
+    ?.substringAfter("=")
+    ?.trim()
+    ?.takeIf { it.isNotEmpty() }
+    ?: prompt("Supabase project ref (not found in local.properties)")
+
 val teamId = prompt("Apple Team ID")
 val keyId = prompt("Apple Key ID")
 val clientId = prompt("Apple Services ID (client_id)")
@@ -108,7 +117,7 @@ println("Expires (UTC): $expirationDate")
 println("Validity days: $validityDays")
 println()
 println("Next steps:")
-println("1. Open Supabase provider settings: https://supabase.com/dashboard/project/mfozvowjsxdwrslyoyrf/auth/providers?provider=Apple")
+println("1. Open Supabase provider settings: https://supabase.com/dashboard/project/$supabaseProjectRef/auth/providers?provider=Apple")
 println("2. Paste this token into the 'Secret Key' field along with your Client ID ($clientId), Team ID ($teamId), and Key ID ($keyId).")
 println("3. Save the provider configuration.")
 println("4. Set a reminder before $expirationDate to rerun this script and rotate the token.")
