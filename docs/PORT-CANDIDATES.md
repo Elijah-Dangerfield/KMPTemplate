@@ -83,3 +83,52 @@ which AGENTS.md already names as a SIGSEGV at navigate time on iOS.
 The generalisable lesson is defect 3: a sensor scoped to the composition feeding
 a queue gated on the lifecycle. The symptom appears on resume and looks nothing
 like the cause.
+
+---
+
+## The custom detekt rules are enforced only by a hook, and their own tests never run
+
+**Found by:** Sodogku, 2026-09-09. Fixed there by adding one CI step.
+
+Two gaps, and the second is the one that rots quietly.
+
+**1. Nothing on the server runs detekt.** `.github/workflows/template-ci.yml` runs
+`testDebugUnitTest`, the server tests and the iOS compile. The only thing that
+runs `./gradlew detekt` is `.githooks/pre-push`, which is per-machine, requires
+`scripts/install_hooks.sh` to have been run, and is skippable with
+`SKIP_DETEKT=1`. So the `kmptemplate` ruleset is enforced by whoever remembered
+to install the hook.
+
+These are not style rules. `VerifyStrings` guards a crash on a missing key and
+`AnimatedStateReadInComposition` guards a per-frame recomposition. A gate only
+the author runs is not a gate.
+
+**2. `:detekt-rules:test` runs nowhere at all.** `detekt-rules` is a JVM module,
+so `testDebugUnitTest` never touches it. A rule that silently stops matching
+leaves the build green, which is strictly worse than having no rule: the team
+believes something is guarded when it is not.
+
+Sodogku hit exactly that. A newly added rule compiled, was in the jar, was listed
+in the provider bytecode and was enabled in config, and detekt ran it **zero
+times** — the Gradle daemon caches the ruleset ClassLoader by classpath *path*,
+not by jar contents, so it kept serving a classloader built from the previous
+jar. `--rerun-tasks` does not help; `./gradlew --stop` does. The pre-existing
+rules keep working throughout, which is what makes it so misleading.
+`build/reports/detekt/detekt.sarif` lists what actually loaded and is the way to
+check.
+
+**Fix.** One step in the CI job:
+
+```yaml
+      - name: Lint with the custom ruleset
+        run: ./gradlew detekt :detekt-rules:test
+```
+
+Worth doing here rather than only downstream, so a project generated from this
+template has the rules enforced on day one instead of discovering years later
+that a hook nobody installed was the only thing holding the line.
+
+**Also worth taking:** Sodogku's `NoRawDesignValues` (rejects raw colours and
+dimensions so the palette stays the palette) and `ScrollInsideBottomSheet` (see
+the bottom sheet entry above) are both general to any app built on this
+template, not Sodogku-specific.
