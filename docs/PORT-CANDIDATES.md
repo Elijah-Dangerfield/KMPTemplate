@@ -7,6 +7,54 @@ only avoided, live in AGENTS.md → "Known landmines".
 
 ---
 
+## Nobody can test the paywall twice, and the four ways to fix that are not interchangeable
+
+**Found by:** Moving Eyes, 2026-09-11. Landed there as `docs/testing-purchases.md`
+plus `apps/ios/Products.storekit`.
+
+The billing library deliberately never revokes a grant: a store that says
+"owned" always wins, and no failure path clears an existing unlock. That is the
+right call for customers and it means **buying is easy and un-buying is not**,
+which nobody discovers until the second time they open the paywall.
+
+It bit hardest on TestFlight. Purchases there are free and sandboxed, but they
+belong to the tester's **real Apple Account**, and Apple offers no "clear
+purchase history" for one. So the first sandbox purchase sticks permanently.
+Clearing the cached entitlement from the QA menu looks broken, because
+`refresh()` runs on the next launch, `Transaction.currentEntitlements` still
+reports the purchase, and the grant comes straight back. Two people lost an
+afternoon to that before the cause was obvious.
+
+**What to port is the map, not the mechanism.** There are four ways to exercise
+the money path and they prove different things, which is the part that is
+genuinely not obvious:
+
+| | Serves the catalog | Owns the purchase | Proves the real store works |
+|---|---|---|---|
+| Fake billing client | our own class | in-memory | no |
+| StoreKit configuration file | a local JSON file | Xcode, deletable | no |
+| Sandbox tester | Apple | throwaway account, wipeable | yes |
+| TestFlight | Apple | real Apple Account, permanent | yes |
+
+The trap is reaching for the StoreKit configuration file to investigate a
+store-side bug. It is the best development loop by a distance: Xcode's
+Manage Transactions deletes a purchase outright, and its settings can force
+Load Products to fail, which reproduces a whole class of App Store rejection
+locally. But it works by replacing Apple's catalog with a file, so it can
+never tell you whether the real catalog resolves.
+
+Also worth writing down because it reads as a misconfiguration and is not: an
+empty **Users and Access → Sandbox** list is normal, reviewers never use it, and
+the accounts under **Users and Access → People** are the development team and
+have nothing to do with purchases.
+
+**Copy:** `docs/testing-purchases.md`. A `.storekit` file is per-app, but the
+template should ship one for its example product and wire the scheme's Run
+action at it, so a generated project has the loop on day one rather than
+discovering it after a rejection.
+
+---
+
 ## A tall `BottomSheet` snaps back to the top mid-drag
 
 **Found by:** Sodogku, 2026-09-09. Fixed there in `430cc88`.
