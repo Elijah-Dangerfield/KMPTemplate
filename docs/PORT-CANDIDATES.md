@@ -399,9 +399,46 @@ UP-TO-DATE and the whole thing is green while checking nothing. Sodogku has four
 recorded instances of exactly that hole, one of which passed while reading five
 files because the exclusion matched an absolute path.
 
-**If one example dashboard ships with the template**, make it app-health rather
-than product: crashes, cold start, network failures. Anything about funnels or
-retention is a question about a product that does not exist yet.
+**Which dashboards could ship, and the order to do it in.** More of Sodogku's
+event surface is app-shaped rather than game-shaped than it first looks:
+
+```
+app.launched  app.startup  app.jank  app.foregrounded  app.backgrounded
+net.backend_unreachable   net.offline_banner   conn.reconnecting
+iap.paywall_shown   iap.purchase_result   iap.restore_result
+```
+
+That supports two dashboards a generated app would keep on day one, and a third
+with a caveat:
+
+- **App health.** Cold start, jank by screen, crash-free sessions, backend
+  unreachable rate. Answers "is it working" for any app at all.
+- **Purchase funnel.** Paywall shown, purchase result by outcome, restore result.
+  The most valuable of the three, because it is the one most likely to be wrong
+  in a way nobody notices. See the R8 entry above: Sodogku's version of exactly
+  this board would have read zero on Android through its whole first release.
+- **Active users**, with a caveat. Sessions per install, returning against new,
+  foreground time. Least portable of the three, because what counts as active
+  depends on what the app is for, and a daily puzzle and a tax filing app do not
+  share an answer. Ship it as a starting point that expects editing, or not at
+  all.
+
+The ad funnel is halfway generic. It ports if the template assumes AdMob, which
+is worth deciding out loud rather than inheriting by accident.
+
+**Do it in this order, because the reverse does not work.** The template has the
+telemetry plumbing and no `ops/grafana` directory and no event registry. So:
+
+1. **Decide which events the template guarantees every generated app emits.**
+   This is the actual work and it is a design decision about the template, not a
+   copy job. A dashboard querying an event a generated app might not send is
+   worse than no dashboard.
+2. Write the registry markdown for that set.
+3. Then the dashboards, which are mechanical once 1 and 2 exist.
+4. Then the contract test, which holds all three to each other.
+
+Starting at 3 gives you boards that are wrong for most apps generated from this
+template, and no way to find out.
 
 `libraries/telemetry/impl/src/androidUnitTest/.../DashboardQueryContractTest.kt`
 is about 1,000 lines in Sodogku, most of it the LogQL parser and its self-tests.
