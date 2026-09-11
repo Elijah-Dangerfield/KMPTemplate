@@ -7,6 +7,88 @@ only avoided, live in AGENTS.md → "Known landmines".
 
 ---
 
+## Sentry setup should be one script, and today it is a blank string that means "off"
+
+**Found by:** Moving Eyes, 2026-09-11. Partially fixed there in `4735114`; the
+script below does not exist anywhere yet.
+
+### What is wrong now
+
+`loadTelemetryMetadata` resolves the DSN `env -> local.properties -> ""`, and
+nothing ever writes `local.properties`. So every fresh checkout of every
+generated app reports nothing from dev builds.
+
+The reason it goes unnoticed for months is the shape of the failure. Blank is a
+*supported* value meaning "reporting is off", so there is no warning, no build
+failure and no log line that looks wrong. Meanwhile `template/SETUP.md` promises
+the opposite: "Debug builds: shake -> QA dialog -> Expected: the event in Sentry
+within a minute." Moving Eyes shipped to the App Store, got rejected over a
+purchase bug, and had no dev telemetry to reproduce it with.
+
+Cards, which works, does the blunt thing: the DSN is a `const` in
+`AppTelemetry.kt`, in a public repo, with a comment explaining that one project
+plus the `environment` tag separates everything. That is correct. A DSN is a
+write-only ingest endpoint that ships inside every binary on both stores;
+anyone can read it out of an App Store build in minutes. Treating it as a
+secret buys nothing and costs the thing that matters.
+
+**The generated app should carry its DSN in source, not in a per-developer
+file.** Any design where each developer has to configure something locally
+produces exactly this bug, just later.
+
+### The script
+
+`scripts/setup_sentry.main.kts`, runnable immediately after `init_project`, and
+idempotent so re-running fixes drift rather than duplicating.
+
+**Input: one user auth token.** This is the part that needs care, and it is
+where a naive implementation dies. Sentry has two token types and they are not
+interchangeable:
+
+| Token | Where | Scopes | Can it create a project or read a DSN |
+|---|---|---|---|
+| Organization (`sntrys_…`) | Settings -> Organization Tokens | exactly `org:ci`, not selectable | **No.** 403s every read endpoint |
+| User | Settings -> Account -> API -> Auth Tokens | selectable | Yes, with `project:read`, `project:write`, `org:read` |
+
+The org token is what CI needs and the only one SETUP.md currently mentions. A
+setup script that tries to create a project or fetch a DSN with it gets a 403
+and looks broken. So the script asks for a **user** token, uses it only during
+setup, and never stores it.
+
+**What it does, in order:**
+
+1. Resolve the org slug and project slug. Default the project to the app id,
+   and cache the org in the shared secrets folder so app two onwards never
+   answers it again.
+2. Create the Sentry project if it does not exist, else adopt it.
+3. Read the DSN from the project's client keys.
+4. Write the DSN into the generated app as the build-time default, so a fresh
+   clone reports with no local setup.
+5. Push CI config with `gh`: `SENTRY_DSN` and `SENTRY_AUTH_TOKEN` as secrets,
+   `SENTRY_ORG` and `SENTRY_PROJECT` as variables. The org token can be reused
+   from the shared secrets folder rather than pasted per app.
+6. **Prove it.** `sentry-cli send-event -m "setup check"` against the new DSN,
+   then poll the issues endpoint with the user token until the event appears.
+   This is the whole point: the script should say "an event arrived" before
+   anyone builds anything, because the failure mode being fixed is silence.
+
+### Dev versus prod needs no extra work
+
+Cards already has the right model and the template inherits it: one project,
+with `environment` set to `{releaseChannel}-{platform}-{buildType}`, giving
+`dev-android-debug` through `store-ios-release`. Nothing to configure. Worth
+having the script create the saved searches or alert rules for the `store-*`
+environments, so production noise is separable on day one, but that is polish.
+
+### And a guard, so it cannot regress quietly
+
+The script is worth little if the next change can silently blank the DSN again.
+A release build with no DSN should fail the build, not ship dark. A one-line
+check in the release workflow, or a Gradle assertion on release variants, is
+enough. This is the part that would have caught Moving Eyes.
+
+---
+
 ## The OTel exporters smuggle in a Ktor engine that cannot do TLS on iOS
 
 **Found by:** Moving Eyes, 2026-09-11. Fixed there in `6f65f88`.
