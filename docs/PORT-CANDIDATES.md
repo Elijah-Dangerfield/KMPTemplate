@@ -304,3 +304,105 @@ Two details worth copying: snap the first placement, since there is nothing to
 travel from and springing in from the origin is an unasked-for entrance; and read
 the spring inside `Modifier.offset { }` rather than in composition, or the whole
 subtree recomposes every frame of the travel.
+
+---
+
+## Analytics attributes spelled with a class name are renamed by R8, and no test can see it
+
+**Found by:** Sodogku, 2026-09-10. Fixed there in `2a4cad1`.
+
+**Symptom.** A dashboard panel reads zero on Android while the store console
+shows the sales it is meant to be counting. Nothing errors, nothing is logged,
+and the panel is not empty, because the other values in its filter still match.
+iOS is unaffected, which makes it look like a platform bug rather than a build
+one.
+
+**Cause.** The event was emitted as `logEvent("iap.purchase_result", "outcome" to
+result::class.simpleName)`. `PurchaseOutcome.Success` and its siblings are plain
+sealed objects: not `@Serializable`, not `Throwable`. Release minification is on,
+and the only name-keeping rule in `proguard-rules.pro` is `-keepnames class *
+extends java.lang.Throwable`, which does not cover them. So the release build
+sends whatever R8 renamed the class to, while the dashboard filters on
+`outcome="Success"`.
+
+Confirmed rather than reasoned: a real `minifyRelease` build's `mapping.txt` has
+`com.sodogku.libraries.billing.PurchaseOutcome$Success -> ta.l`, so the attribute
+arrived as the letter `l`.
+
+**This template does not have the bug and does have the setup that produces it.**
+Minification is on, the same Throwable-only keep rule is the only one, and
+several `::class.simpleName` reads exist. They are all inside log *messages*,
+which a human reads, so an obfuscated name there is ugly and not wrong. The
+moment somebody feeds one to an analytics attribute, this happens.
+
+**Two things checked on the way that are worth not re-deriving.** Throwable names
+really are kept, so `simpleName` on an exception is safe. And enum `.name`
+survives even though R8 renames the constant fields, because the string is baked
+into the class initializer: disassembling `<clinit>` shows `const-string
+v1, "Rewarded"` intact.
+
+**Fix.** Give each type an explicit `val name` literal and emit that.
+A `-keepnames` rule also works and is worse: the dashboards are keyed on these
+strings, and nobody renaming a class will think to open a ProGuard file.
+
+**What to port is the guard, not the fix.**
+`noAttributeIsSpelledWithAClassNameR8CanRename` in `DashboardQueryContractTest`
+fails when any `logEvent` argument contains `::class.simpleName`,
+`::class.qualifiedName` or the `::class.java` forms. It is honest about its limit
+in its own KDoc: a class name laundered through a helper is invisible to it.
+
+It is worth porting even though this template has no dashboards, because the
+cost of adding it now is a few lines and the cost of finding this in a shipped
+app is a quarter of missing revenue data.
+
+---
+
+## Grafana dashboards as files in the repo, with a test that holds them to the code
+
+**Found by:** Sodogku, 2026-09-08 onward. Six dashboards in `ops/grafana/`.
+
+**What it is.** Grafana exports a dashboard as JSON and imports it back, so
+keeping the JSON in git makes a dashboard reviewable and versioned like code
+instead of clicked together in a browser and lost when somebody leaves. One file
+per dashboard, plus a README with a table of file, uid, and the question the
+board answers.
+
+**Do not port the dashboards.** Every panel in Sodogku's six asks a question
+about that specific game. What is portable is the convention and, much more
+importantly, the thing that keeps it from rotting.
+
+**The part that earns its keep is `DashboardQueryContractTest`.** Dashboards in a
+repo are a liability without it: a query drifts from the code that feeds it, the
+panel quietly reads zero or reads less than it claims, and nobody finds out,
+because a wrong number looks exactly like a real one. It parses the LogQL out of
+every panel and holds four things:
+
+- Every attribute a dashboard queries is emitted on the event it is queried
+  against. Renaming at either end goes red, and the emit site can be in a
+  different module.
+- Every emitted event has a row in the events registry markdown, and every row
+  names an event something emits. This catches an event deleted with its feature
+  while its row and its panel live on.
+- Every value a dashboard filters on is one some emit site can produce. This is
+  the one Sodogku needed twice: once for the R8 bug above, and once for a panel
+  filtering `outcome=~"Rewarded|Completed"` where `Completed` had been deleted
+  with the interstitial two days earlier and nothing looked wrong because
+  `Rewarded` still matched.
+- A guard against the guard: every check that could silently stop checking, for
+  example by failing to extract a vocabulary, has to say why in an exemption list,
+  and a stale exemption fails too.
+
+**The trap to port with it.** A Gradle test task cannot see files a test reads at
+runtime, so the dashboards, the registry markdown and the scanned source tree all
+have to be declared with `inputs.files(...)`. Without that the task stays
+UP-TO-DATE and the whole thing is green while checking nothing. Sodogku has four
+recorded instances of exactly that hole, one of which passed while reading five
+files because the exclusion matched an absolute path.
+
+**If one example dashboard ships with the template**, make it app-health rather
+than product: crashes, cold start, network failures. Anything about funnels or
+retention is a question about a product that does not exist yet.
+
+`libraries/telemetry/impl/src/androidUnitTest/.../DashboardQueryContractTest.kt`
+is about 1,000 lines in Sodogku, most of it the LogQL parser and its self-tests.
+Porting it means porting the parser; the four assertions on top are short.
