@@ -7,6 +7,54 @@ only avoided, live in AGENTS.md → "Known landmines".
 
 ---
 
+## The OTel exporters smuggle in a Ktor engine that cannot do TLS on iOS
+
+**Found by:** Moving Eyes, 2026-09-11. Fixed there in `6f65f88`.
+
+**Symptom:** every https request from the iOS app fails with
+`IllegalStateException: TLS sessions are not supported on Native platform`,
+logged by whichever caller happened to make it. In Moving Eyes that was remote
+config, so config silently never updated on iOS and nothing looked broken
+enough to chase.
+
+**Cause.** `io.opentelemetry.kotlin:exporters-*` depends on
+`ktor-client-cio`, and CIO on Kotlin/Native has no TLS. We never ask for it:
+the modules that make requests declare `ktor-client-darwin` for iOS. But
+`HttpClient { }` built without an explicit engine resolves one off the
+classpath, and with both present there is no guarantee which it picks.
+
+**This template has the same graph.** `./gradlew :apps:compose:dependencies
+--configuration iosSimulatorArm64CompileKlibraries` shows
+`ktor-client-cio:3.5.1` sitting alongside `ktor-client-darwin:3.3.3` today.
+
+That it has not bitten every downstream app is the interesting part, and the
+reason it is worth writing down rather than fixing quietly: the engine is
+chosen by a race, so an app whose backend works perfectly is not evidence of
+absence. It is evidence that Darwin won that time.
+
+**Fix.** In the module that pulls the exporters:
+
+```kotlin
+configurations.configureEach {
+    exclude(group = "io.ktor", module = "ktor-client-cio")
+}
+```
+
+Configuration level rather than per-dependency because the version-catalog
+`Provider` form takes no configuration block inside a KMP source set.
+
+**Worth considering instead, or as well:** pass the engine explicitly at every
+`HttpClient` construction via an `expect`/`actual` factory. The exclusion fixes
+today's graph; an explicit engine makes the next stray transitive engine a
+non-event.
+
+**Not yet proven at runtime.** The dependency is gone from the iOS compile
+graph, and the error has not been observed since, but nobody has watched a
+successful https call on a build with the exclusion. Confirm before trusting
+it.
+
+---
+
 ## A tall `BottomSheet` snaps back to the top mid-drag
 
 **Found by:** Sodogku, 2026-09-09. Fixed there in `430cc88`.
