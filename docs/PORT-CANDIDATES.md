@@ -177,45 +177,6 @@ file.
 
 ---
 
-## Shake-to-report fires on resume, then never works again
-
-**Found by:** Sodogku, 2026-09-09. Fixed there in `90a4c6c`.
-
-**Symptom:** the report dialog appears by itself when the app returns from the
-background, and after that shaking does nothing for the rest of the process.
-
-**Three defects, all in code this template ships.**
-
-1. `ShakeHandler.onDialogDismissed()` — the only thing that clears
-   `isShowingDialog` — **has zero callers**. The flag latches on the first shake
-   and the dialog can never appear again. Check `ShakeHandler.kt:45` here; it is
-   still uncalled.
-2. `stop()` never cancels the collector `start()` launched, and the detector's
-   `shakeEvents` was a single-consumer `Channel.receiveAsFlow()`, so each
-   foreground cycle leaked another collector onto a stream where every event goes
-   to exactly one of them.
-3. **The one that produces the phantom.** `App.kt` binds the detector with a
-   `DisposableEffect`, which only tears down when the composition goes away —
-   backgrounding does not. So the accelerometer keeps running in a pocket, while
-   `DelegatingRouter` drains its navigation queue under
-   `repeatOnLifecycle(STARTED)`. A jostle queues a navigate that is held until the
-   app comes back. Proven on a device: two queued navigations while backgrounded
-   with the old effect, none with `LifecycleStartEffect`.
-
-**Also worth carrying over:** the two platform detectors had silently diverged —
-Android measured m/s² divided by elapsed time, iOS measured raw g and never
-divided, leaving iOS roughly twice as hard to trigger. Sodogku moved the gesture
-logic into a shared, testable recognizer.
-
-**And a latent iOS crash next door:** `ShakeDialogRoute` was a `data object`,
-which AGENTS.md already names as a SIGSEGV at navigate time on iOS.
-
-The generalisable lesson is defect 3: a sensor scoped to the composition feeding
-a queue gated on the lifecycle. The symptom appears on resume and looks nothing
-like the cause.
-
----
-
 ## The custom detekt rules are enforced only by a hook, and their own tests never run
 
 **Found by:** Sodogku, 2026-09-09. Fixed there by adding one CI step.
@@ -370,43 +331,6 @@ This template is **already better here**: its `onCleared` is debug-gated with a
 message that explains itself. Worth keeping that way, and worth knowing why: the
 fix for a screen that genuinely needs to survive process death is to make its
 state Bundle-able, never to raise this back to a warning.
-
----
-
-## The shake detector is duplicated per platform, untestable, and fires when you put the phone down
-
-**Found by:** Sodogku, 2026-09-09. Fixed there across `90a4c6c` and `1d78cd6`.
-
-This template still has the shape Sodogku started from: `AndroidShakeDetector`
-and `IosShakeDetector` each implementing the gesture themselves, with their own
-thresholds and their own `ShakeIntensity`. The two disagreed — Android divided by
-elapsed time and iOS did not, Android measured m/s² and iOS measured multiples of
-gravity — and neither could be unit tested, because constructing a `SensorEvent`
-or a `CMAccelerometerData` is not something a test does. That is why the
-baseline-on-resume bug survived for as long as it did.
-
-**Fix, in two parts.**
-
-Pull the gesture into a `ShakeRecognizer` in `commonMain` that takes
-`(x, y, z, atMs)` and returns a boolean. The platform detectors shrink to
-register/unregister plus a unit conversion, and every rule becomes testable.
-
-Then retune it, because the numbers are too loose. Sodogku's inherited values
-were two qualifying samples anywhere inside a full second, over a bar of 8.0 m/s²
-per 100ms. The bar is the lesser problem — 8.0 is under 1g of *change*, which a
-firm set-down clears — but the real looseness is that two of those had a whole
-second to find each other, so any two unrelated bumps in the same second read as
-a shake. Four inside 700ms asks for roughly 6Hz of sustained direction reversal:
-what a hand shaking a phone does, and what nothing else in normal handling does.
-
-Also drop `ShakeIntensity` unless something reads it. In Sodogku it existed only
-to flavour randomly generated dialog copy that had already been deleted, so both
-platforms were classifying a magnitude with no reader.
-
-**One trap when testing the retune.** A burst-window test whose gap is longer
-than any plausible window passes with the window widened back, because the burst
-resets under either value. Pin the window with three tight reversals and a
-straggler just outside it.
 
 ---
 

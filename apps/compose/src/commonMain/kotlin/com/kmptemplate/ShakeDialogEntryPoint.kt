@@ -1,5 +1,6 @@
 package com.kmptemplate
 
+import androidx.compose.runtime.DisposableEffect
 import androidx.navigation.NavGraphBuilder
 import com.kmptemplate.features.profile.BugReportRoute
 import com.kmptemplate.libraries.core.BuildInfo
@@ -20,11 +21,21 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 @Inject
 class ShakeDialogEntryPoint(
     private val networkInspector: NetworkInspector,
+    private val shakeHandler: ShakeHandler,
 ) : FeatureEntryPoint {
 
     override fun NavGraphBuilder.buildNavGraph(router: Router) {
         dialog<ShakeDialogRoute> { backStackEntry, dialogState ->
             val route = backStackEntry.toRouteOrNull<ShakeDialogRoute>()
+
+            // The handler latches "a dialog is up" when it navigates here and
+            // has no other way to learn it came down. Hanging the release off
+            // the destination leaving the back stack covers every exit —
+            // including system back and a scrim tap, which no button callback
+            // sees.
+            DisposableEffect(Unit) {
+                onDispose { shakeHandler.onDialogDismissed() }
+            }
 
             ShakeDialog(
                 state = dialogState,
