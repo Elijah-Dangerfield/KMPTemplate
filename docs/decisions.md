@@ -94,3 +94,30 @@ that app's setup and notices the gap.
 
 **Why here rather than the port queue:** the queue is work waiting to happen, and
 these are closed questions. Keeping them there made an empty queue impossible.
+
+## 2026-09-14 — Grafana dashboards stay out; the events registry comes in
+
+**Decision:** this template ships no dashboard JSON and no dashboard contract
+test. It does ship [telemetry-events.md](telemetry-events.md), a description of
+what a generated project emits before anyone adds a feature.
+
+**Why:** a downstream app re-proposed the dashboards with a sharper argument —
+that more of its event surface is app-shaped than game-shaped, and that a
+purchase-funnel board in particular is the one most likely to be wrong in a way
+nobody notices. Both true. But its own recommended order starts with "decide
+which events the template *guarantees* every generated app emits", and that is a
+design decision nobody has made. A board querying an event a generated app might
+not send reads zero forever and is indistinguishable from a real zero, which is
+strictly worse than no board.
+
+So the prerequisite landed and the boards did not. The registry is deliberately
+worded as a description rather than a contract, because promoting it to a
+guarantee is the decision still outstanding. Writing it surfaced one real bug
+immediately: `conn.reconnecting` exists only in a test fixture, so any panel
+built on it would have read zero forever.
+
+The contract test that holds queries to emit sites is the genuinely portable
+idea in that proposal, and it is worth writing the moment a generated project
+has boards worth holding. Its traps are recorded at the bottom of the registry
+so nobody re-derives them — in particular that a Gradle test task which does not
+declare `inputs.files(...)` stays UP-TO-DATE and passes while checking nothing.
