@@ -137,46 +137,6 @@ it.
 
 ---
 
-## A tall `BottomSheet` snaps back to the top mid-drag
-
-**Found by:** Sodogku, 2026-09-09. Fixed there in `430cc88`.
-
-**Symptom, as reported by a player:** with sheet content tall enough to fill the
-screen, scrolling works but dragging the sheet back down to close jumps, and can
-be made to bounce near the top indefinitely without ever closing. Worse on iOS,
-present on both.
-
-**Cause.** Material3 derives the sheet's Expanded anchor from the sheet's
-*measured* height (`Expanded at fullHeight - sheetSize.height`), recomputes the
-anchors on every measure pass, and snaps to the recomputed target whenever the
-new anchors differ from the old. A sheet whose height is decided by its content
-can therefore be re-measured mid-drag and yanked back to Expanded. Frame-by-frame
-logging on a device showed the offset climbing 2 → 22 → 42 → 72 → 86 and then
-going to exactly 0.0 in two frames, eight times in a row, with `targetValue`
-never leaving Expanded.
-
-It only bites once content is tall enough to be clamped against the available
-height. Short content gives a stable measured height and identical anchors on
-every pass, so there is nothing to snap to — which is why this can sit unnoticed
-until the first long sheet.
-
-**Fix.** Add a `scrollableContent: Boolean` parameter to `BottomSheet` that both
-owns the scroll and pins the sheet to the full height. Identical anchors on every
-recompute means `updateAnchors` has nothing to do. Callers stop hand-rolling
-`Column(verticalScroll)` inside the content lambda, so the next long sheet
-inherits the fix instead of rediscovering the bug. Sodogku also added a detekt
-rule for the hand-rolled case.
-
-**Two things that look like the cause and are not**, recorded so they are not
-retried: it is not overscroll (providing `LocalOverscrollFactory = null` changed
-nothing), and it is not navigation (the router logged one navigate and one go
-back per reproduction).
-
-`libraries/ui/.../components/dialog/bottomsheet/BottomSheet.kt` here is the same
-file.
-
----
-
 ## Shake-to-report fires on resume, then never works again
 
 **Found by:** Sodogku, 2026-09-09. Fixed there in `90a4c6c`.
@@ -259,9 +219,9 @@ template has the rules enforced on day one instead of discovering years later
 that a hook nobody installed was the only thing holding the line.
 
 **Also worth taking:** Sodogku's `NoRawDesignValues` (rejects raw colours and
-dimensions so the palette stays the palette) and `ScrollInsideBottomSheet` (see
-the bottom sheet entry above) are both general to any app built on this
-template, not Sodogku-specific.
+dimensions so the palette stays the palette) is general to any app built on this
+template, not Sodogku-specific. `ScrollInsideBottomSheet` has already landed
+here, and is a live example of the second gap: nothing on the server runs it.
 
 ---
 
@@ -333,33 +293,6 @@ platforms were classifying a magnitude with no reader.
 than any plausible window passes with the window widened back, because the burst
 resets under either value. Pin the window with three tight reversals and a
 straggler just outside it.
-
----
-
-## `animatePlacement`: a modifier that makes anything slide when its parent moves it
-
-**Found by:** Sodogku, 2026-09-09. Added there in `ef0f6e8`.
-
-Not a bug, and small, but it is the kind of thing every app rewrites badly once.
-
-Anything positioned relative to something else — a tooltip, a coach mark, a
-popover — eventually needs to travel when its anchor changes rather than
-teleport. The tempting implementation animates inside the positioning component,
-and it goes wrong the same way every time: animation needs a coroutine, a layout
-pass cannot start one, so the placement maths gets dragged into composition where
-the content's measured size is not known yet. What follows is a sentinel for "not
-measured", a hidden first frame, and a measure-to-state-to-layout loop.
-
-Split it. A `Layout` measures the content and places it — one pass, no unknown
-size, and the placement rule falls out as a pure function you can unit test. A
-separate `Modifier.animatePlacement()` watches where it was actually placed via
-`onPlaced`, and if that is somewhere new, springs the delta back to zero. It
-knows nothing about anchors and works on anything.
-
-Two details worth copying: snap the first placement, since there is nothing to
-travel from and springing in from the origin is an unasked-for entrance; and read
-the spring inside `Modifier.offset { }` rather than in composition, or the whole
-subtree recomposes every frame of the travel.
 
 ---
 

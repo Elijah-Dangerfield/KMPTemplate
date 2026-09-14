@@ -16,3 +16,5 @@ kmptemplate:
     active: true
   ClassNameInTelemetryAttribute:
     active: true
+  ScrollInsideBottomSheet:
+    active: true

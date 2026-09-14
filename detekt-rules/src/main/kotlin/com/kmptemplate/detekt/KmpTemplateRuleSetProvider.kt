@@ -18,6 +18,7 @@ class KmpTemplateRuleSetProvider : RuleSetProvider {
             ::VerifyStrings,
             ::AnimatedStateReadInComposition,
             ::ClassNameInTelemetryAttribute,
+            ::ScrollInsideBottomSheet,
         ),
     )
 }
