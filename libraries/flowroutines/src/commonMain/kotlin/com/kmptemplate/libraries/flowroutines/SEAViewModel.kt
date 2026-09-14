@@ -11,6 +11,7 @@ import com.kmptemplate.libraries.core.logOnFailure
 import com.kmptemplate.libraries.core.throwIfDebug
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +23,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 class IllegalViewModelStateException(
     override val message: String?,
     override val cause: Throwable? = null
 ): Exception()
+
+private class SentEvent<E : Any>(val event: E, val sentAt: TimeMark)
 
 
 /**
@@ -55,10 +60,11 @@ class IllegalViewModelStateException(
 abstract class SEAViewModel<S : Any, E : Any, A : Any>(
     private val initialStateArg: S? = null,
     private val savedStateHandle: SavedStateHandle = SavedStateHandle(),
+    private val timeSource: TimeSource = TimeSource.Monotonic,
 ) : ViewModel() {
 
     private val actions = Channel<A>(Channel.UNLIMITED)
-    private val events = Channel<E>(Channel.UNLIMITED)
+    private val events = Channel<SentEvent<E>>(Channel.UNLIMITED)
     private val actionDebouncer = ConcurrentHashMap<String, Channel<suspend (S) -> S>>()
     private val _initialState: S by lazy { initialState() }
 
@@ -89,9 +95,23 @@ abstract class SEAViewModel<S : Any, E : Any, A : Any>(
     }
 
     /**
-     * The flow exposing events from the view mode
+     * The flow exposing events from the view mode.
+     *
+     * Events that waited longer than [EVENT_EXPIRY] for a collector are dropped
+     * here rather than delivered late. See [sendEvent] for why.
      */
-    val eventFlow = events.receiveAsFlow()
+    val eventFlow: Flow<E> = events.receiveAsFlow().mapNotNull { sent ->
+        val age = sent.sentAt.elapsedNow()
+        if (age > EVENT_EXPIRY) {
+            KLog.w(
+                "Dropping ${sent.event::class.simpleName} after ${age.inWholeMilliseconds}ms " +
+                    "with no collector — it is a stale side effect now, not a fresh one.",
+            )
+            null
+        } else {
+            sent.event
+        }
+    }
 
     /**
      * The current state value
@@ -185,10 +205,22 @@ abstract class SEAViewModel<S : Any, E : Any, A : Any>(
      * - Navigation
      * - Showing a toast
      * - etc...
+     *
+     * Events carry the time they were sent and expire after [EVENT_EXPIRY].
+     * The channel is unbounded and the collector is lifecycle-gated, so a screen
+     * below STARTED banks side effects instead of losing them, then replays the
+     * whole pile the instant collection resumes. Downstream that looked like an
+     * app that had stopped navigating while still logging every send, and ended
+     * minutes later with a dozen navigations to the same route arriving
+     * milliseconds apart and NavController refusing to pop a destination that
+     * was no longer on top of the back stack.
+     *
+     * A shake is only meaningful in the moment it happens, and so is a
+     * navigation. Dropping the stale ones is the whole fix.
      */
     fun sendEvent(event: E) {
         KLog.i("Sending event ${event::class.simpleName}")
-        events.trySend(event)
+        events.trySend(SentEvent(event, timeSource.markNow()))
     }
 
     /**
@@ -259,6 +291,25 @@ abstract class SEAViewModel<S : Any, E : Any, A : Any>(
 
     companion object {
         private const val STATE_KEY = "state"
+
+        /**
+         * How long an event may wait for a collector before it is dropped.
+         *
+         * This threshold only bites when *nothing* is collecting. With a
+         * collector attached, `receiveAsFlow()` hands the event over
+         * immediately and it is microseconds old when it is checked, so no
+         * value here can drop an event merely because the view model was slow
+         * to send it or the UI was slow to handle the previous one.
+         *
+         * The case that must not break is the normal one: a view model sends in
+         * `init` and the screen composes its collector a frame or two later.
+         * That gap is milliseconds, and a zero threshold would strand exactly
+         * those events. So keep this comfortably longer than composition —
+         * seconds, not milliseconds. Anything still queued after that is a
+         * backgrounded screen banking side effects, which is the case worth
+         * discarding.
+         */
+        private val EVENT_EXPIRY = 5.seconds
     }
 }
 
