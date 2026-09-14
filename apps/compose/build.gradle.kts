@@ -103,7 +103,8 @@ kotlin {
             implementation(projects.features.onboarding.impl)
 
             implementation(libs.atomicfu)
-            
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
