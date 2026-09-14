@@ -343,8 +343,10 @@ fun main(cli: CliConfig?) {
         printYellow("→ Open SETUP.md for the full action-item checklist")
         printYellow("   (GH secrets, store setup, first-release notes).")
         printYellow("→ Run ./scripts/install_hooks.sh before your first commit.")
+        printYellow("→ Run ./scripts/setup_sentry.main.kts to turn crash reporting on.")
+        printYellow("   It ships off, and off looks exactly like working.")
         println()
-        printYellow("   On GitHub secrets: all but SENTRY_DSN and SENTRY_PROJECT are")
+        printYellow("   On GitHub secrets: all but SENTRY_PROJECT are")
         printYellow("   account-wide and identical to your other apps. If you keep the")
         printYellow("   shared signing material in one folder, push it in one command")
         printYellow("   rather than filling fifteen fields by hand. SETUP.md explains.")
@@ -439,6 +441,7 @@ fun ensureExecutableBits(projectDir: File) {
         "scripts/cleanup.sh",
         "scripts/create_module.main.kts",
         "scripts/rotate_apple_sign_in_token.main.kts",
+        "scripts/setup_sentry.main.kts",
         ".githooks/commit-msg",
         ".githooks/post-commit",
         ".githooks/pre-push",

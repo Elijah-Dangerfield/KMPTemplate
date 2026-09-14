@@ -44,6 +44,24 @@ Creates new KMP modules with proper structure and configuration.
 ./scripts/create_module.main.kts library user:preferences  # sub-module
 ```
 
+## setup_sentry.main.kts
+
+Turns crash reporting on. Run once, right after init:
+
+```bash
+./scripts/setup_sentry.main.kts
+```
+
+Asks for a Sentry **user** auth token (`project:read`, `project:write`,
+`org:read` — an organization `sntrys_…` token has only `org:ci` and 403s every
+read endpoint), creates or adopts the project, writes the DSN into the
+committed `telemetry.properties`, sets the CI variables and secret, then sends
+a test event and waits for it to arrive before declaring success. Idempotent.
+
+Commit `telemetry.properties` afterwards. A DSN is a write-only ingest
+endpoint shipped inside every store binary, not a secret — keeping it per
+developer is what leaves fresh clones silently reporting nothing.
+
 ## rotate_apple_sign_in_token.main.kts
 
 Rotates the Apple Sign In client secret (it expires at most every 6 months).
