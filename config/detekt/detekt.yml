@@ -14,3 +14,5 @@ kmptemplate:
     excludes: ['**/apps/admin/**']
   AnimatedStateReadInComposition:
     active: true
+  ClassNameInTelemetryAttribute:
+    active: true
