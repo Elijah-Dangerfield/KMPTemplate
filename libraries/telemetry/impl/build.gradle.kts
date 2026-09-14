@@ -11,6 +11,28 @@ android {
     namespace = "com.kmptemplate.libraries.telemetry.impl"
 }
 
+// The OTel exporters depend on `ktor-client-cio`, and CIO on Kotlin/Native has
+// NO TLS: any https request that resolves to it dies with "TLS sessions are not
+// supported on Native platform". We never ask for CIO — every HttpClient in this
+// project is built with `platformHttpEngineFactory` (OkHttp on Android, Darwin on
+// iOS), which is the real defence and the reason this has not bitten us. But a
+// `HttpClient { }` written without that factory resolves an engine off the
+// classpath, and with two engines present which one wins is a race. An app whose
+// backend works is not evidence of absence; it is evidence that Darwin won.
+//
+// Excluded here rather than globally: `:apps:server` uses CIO deliberately, on
+// the JVM, where it has TLS.
+//
+// It also drags in a NEWER ktor than the catalog pins (3.5.1 against 3.3.3),
+// so removing it takes a version skew out of the graph as well.
+//
+// Verify with:
+//   ./gradlew :apps:compose:dependencies \
+//     --configuration iosSimulatorArm64CompileKlibraries | grep ktor-client
+configurations.configureEach {
+    exclude(group = "io.ktor", module = "ktor-client-cio")
+}
+
 kotlin {
     sourceSets {
         commonMain.dependencies {
