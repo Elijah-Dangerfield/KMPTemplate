@@ -63,6 +63,25 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
+      - name: Lint with the custom ruleset
+        # `:check` is the ROOT project's check only — detekt plus the
+        # composeResources string-escape guard — not a full `check` across every
+        # module, which would re-run every test. Anything wired into the root
+        # `check` later is picked up here for free.
+        #
+        # Before this existed the only thing running detekt was
+        # .githooks/pre-push: per-machine, requires install_hooks.sh to have
+        # been run, and skippable with SKIP_DETEKT=1. These are not style rules
+        # — VerifyStrings guards a crash on a missing key, and
+        # AnimatedStateReadInComposition guards a per-frame recomposition that
+        # has caused production ANRs. A gate only the author runs is not a gate.
+        #
+        # :detekt-rules:test is a JVM module, so `testDebugUnitTest` never
+        # touches it. A rule that silently stops matching otherwise leaves the
+        # build green, which is worse than having no rule at all: the team
+        # believes something is guarded when it is not.
+        run: ./gradlew :check :detekt-rules:test
+
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
