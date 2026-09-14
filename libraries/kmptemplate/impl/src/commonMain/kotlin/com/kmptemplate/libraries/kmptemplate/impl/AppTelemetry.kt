@@ -117,6 +117,10 @@ private class ConfiguredTelemetry(
         name: String?,
         id: String?
     ) {
+        // Same guard as every other scope mutator below: with a blank DSN
+        // Sentry.init never ran, so there is no scope to write to and this is
+        // pure overhead on a path the sign-in flow hits on every session.
+        if (!Sentry.isEnabled()) return
         Sentry.setUser(
             User(
                 id = id,
