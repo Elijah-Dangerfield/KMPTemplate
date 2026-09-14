@@ -83,7 +83,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build-number:
-    name: Resolve build number
+    name: Resolve build number + preflight
     needs: resolve-tag
     runs-on: ubuntu-latest
     outputs:
@@ -102,6 +102,30 @@ jobs:
         # count); github.run_number regressed below them and Play rejected the
         # rollout. Needs fetch-depth: 0 or the count is 1 on a shallow clone.
         run: echo "value=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Guard — a store build must not ship dark
+        # A blank Sentry DSN is a SUPPORTED value meaning "reporting is off",
+        # so shipping without one produces no warning, no failed build and no
+        # odd log line. That silence is exactly how an app reaches the App
+        # Store with no crash reporting and nothing to debug a rejection with.
+        # Fail here instead, before either platform builds.
+        #
+        # This job is a dependency of both `android` and `ios`, and both gate
+        # on it succeeding, so one check covers the whole ship.
+        #
+        # Fix: run ./scripts/setup_sentry.main.kts and commit telemetry.properties.
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          COMMITTED=""
+          if [ -f telemetry.properties ]; then
+            COMMITTED=$(grep -E '^sentry\.dsn=' telemetry.properties | cut -d= -f2- | tr -d '[:space:]')
+          fi
+          if [ -z "$SENTRY_DSN" ] && [ -z "$COMMITTED" ]; then
+            echo "::error::No Sentry DSN. A release build with crash reporting disabled ships blind. Run ./scripts/setup_sentry.main.kts and commit telemetry.properties (or set the SENTRY_DSN secret)."
+            exit 1
+          fi
+          echo "Sentry DSN present — crash reporting will be live in this build."
 
   android:
     name: Android AAB + Play submit
