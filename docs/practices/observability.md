@@ -81,7 +81,15 @@ code that produced it.
 
 All client telemetry credentials are build-time injected and env-optional (`loadTelemetryMetadata`
 in build-logic → `TelemetryInfo` in `:libraries:core`): blank `SENTRY_DSN` disables crash
-reporting; blank Grafana values leave the OTLP pipe dormant. Nothing breaks in a fresh clone.
+reporting (`Sentry.init` is never called, so it costs nothing at runtime); blank Grafana values
+leave the OTLP pipe dormant. Nothing breaks in a fresh clone.
+
+The Sentry DSN resolves env → `local.properties` → the committed
+`telemetry.properties`, and the committed file is where it is supposed to live: a DSN is a
+write-only ingest endpoint that ships inside every store binary, so it is not a secret, and a
+per-developer file means every fresh clone reports nothing with no signal that anything is wrong.
+`scripts/setup_sentry.main.kts` fills it in and proves an event arrives. The release workflow
+refuses to build a store binary when no DSN resolves at all.
 
 At runtime, remote config owns the levers (`:libraries:telemetry:impl` `TelemetryConfigValues`):
 `telemetry.appEventsEnabled` (instant kill switch), `telemetry.appEventsSampleRate` (per-session

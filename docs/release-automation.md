@@ -116,12 +116,12 @@ Set under **Settings → Secrets and variables → Actions**. Secrets are encryp
 
 ### Only one of these is per-app
 
-Worth knowing before you do this the second time: of the thirteen secrets below, twelve are properties of your Apple team, your Play developer account, and your Sentry org. They are identical for every app you will ever generate from this template.
+Worth knowing before you do this the second time: every secret below is a property of your Apple team, your Play developer account, or your Sentry org. They are identical for every app you will ever generate from this template. The only per-app Sentry value, the DSN, is not a secret at all — it lives in the committed `telemetry.properties`, written by `scripts/setup_sentry.main.kts`.
 
 | Scope | Secrets |
 |---|---|
 | Account-wide, write once, reuse forever | `APPLE_TEAM_ID`, `APPLE_DIST_CERT_P12_BASE64`, `APPLE_DIST_CERT_PASSWORD`, `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_KEY_P8_BASE64`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`, `SENTRY_AUTH_TOKEN` |
-| Per app | `SENTRY_DSN`, because it points at a Sentry project |
+| Per app, but not secrets | `SENTRY_ORG` / `SENTRY_PROJECT` repo variables, plus `sentry.dsn` in the committed `telemetry.properties` — all three set by `scripts/setup_sentry.main.kts` |
 
 One Apple distribution certificate signs every app on the team. One App Store Connect API key covers the team. One Play service account covers the developer account, once you grant it access to each app. One upload keystore can sign all of them: with Play App Signing the upload key only proves *you* sent the build, and Google holds the key users actually verify.
 
