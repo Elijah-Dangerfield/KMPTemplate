@@ -17,6 +17,7 @@ import co.touchlab.kermit.Logger as KermitLogger
 import co.touchlab.kermit.Severity as KermitSeverity
 import io.sentry.kotlin.multiplatform.Attachment
 import io.sentry.kotlin.multiplatform.Sentry
+import io.sentry.kotlin.multiplatform.SentryLevel
 import io.sentry.kotlin.multiplatform.SentryOptions
 import io.sentry.kotlin.multiplatform.protocol.User
 import io.sentry.kotlin.multiplatform.protocol.UserFeedback
@@ -204,8 +205,30 @@ private class ConfiguredTelemetry(
         // Local scope means none of this leaks onto later events.
         val logDump = sentryLogTree?.snapshot()?.takeIf { it.isNotBlank() }
         val feedbackId = Uuid.random().toString()
+
+        // Composed once and used twice: as the legacy UserFeedback comment
+        // below, and on the carrier event itself. The duplication is the point.
+        // The KMP SDK only has the LEGACY User Feedback API — 0.22.0 has no
+        // `captureFeedback` and no `SentryFeedback`, checked against the
+        // published sources, so upgrading does not help. Legacy feedback renders
+        // wherever the org's feedback settings decide, which downstream meant
+        // the words the user actually typed were the one thing missing from the
+        // issue: log attachment there, screenshot there, message nowhere.
+        // Extras and attachments render on the issue page unconditionally, and
+        // that is the page where the rest of the evidence already is.
+        val reportBody = buildFeedbackBody(isBugReport, errorCode, eventId, payload)
+
         val sentryId = Sentry.captureMessage(if (isBugReport) "Bug report" else "User feedback") { scope ->
             scope.setTag(FEEDBACK_EVENT_TAG, feedbackId)
+            // Explicit, not inherited. A report is not a fault: left at the
+            // default this sorts and alerts alongside crashes, and a triage
+            // queue that mixes "the app died" with "I have a suggestion" gets
+            // ignored at the wrong end.
+            scope.level = SentryLevel.INFO
+            scope.setExtra(FEEDBACK_BODY_KEY, reportBody)
+            scope.addAttachment(
+                Attachment(reportBody.encodeToByteArray(), "feedback.txt", "text/plain"),
+            )
             if (logDump != null) {
                 scope.addAttachment(Attachment(logDump.encodeToByteArray(), "session-log.txt", "text/plain"))
             }
@@ -221,18 +244,7 @@ private class ConfiguredTelemetry(
         }
 
         val feedback = UserFeedback(sentryId).apply {
-            comments = buildString {
-                // Build provenance up top so triage can tell which code
-                // produced the report without cross-referencing tags —
-                // and whether it's already fixed on a later commit.
-                append("Build: ${BuildInfo.versionString()} @ ${BuildInfo.commitSha} (${BuildInfo.commitBranch})\n")
-                if (isBugReport) {
-                    errorCode?.let { append("Error code: $it\n") }
-                    eventId?.let { append("Log ID: $it\n") }
-                }
-                append('\n')
-                append(payload)
-            }
+            comments = reportBody
             sanitizedEmail?.let { this.email = it }
         }
 
@@ -250,6 +262,31 @@ private class ConfiguredTelemetry(
         }
     }
 }
+
+/**
+ * The human-readable body of a feedback report.
+ *
+ * Provenance up top so triage can tell which code produced the report without
+ * cross-referencing tags, and whether it is already fixed on a later commit.
+ */
+private fun buildFeedbackBody(
+    isBugReport: Boolean,
+    errorCode: Int?,
+    eventId: String?,
+    payload: String,
+): String = buildString {
+    append("Build: ${BuildInfo.versionString()} @ ${BuildInfo.commitSha} (${BuildInfo.commitBranch})\n")
+    if (isBugReport) {
+        errorCode?.let { append("Error code: $it\n") }
+        eventId?.let { append("Log ID: $it\n") }
+    }
+    append('\n')
+    append(payload)
+}
+
+// The typed report, mirrored onto the carrier event. Legacy User Feedback
+// renders at the org's discretion; an extra always renders on the issue page.
+private const val FEEDBACK_BODY_KEY = "feedback_body"
 
 // Scope key for the current navigation route (set via [Telemetry.setCurrentRoute]).
 // Shared by the tag and the extra so they read identically in Sentry.
