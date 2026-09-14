@@ -81,7 +81,10 @@ class DelegatingRouter(
             controller.awaitGraphAttachment()
             navigationRequests
                 .receiveAsFlow()
-                .observeWithLifecycle(lifecycle = lifecycle) { command ->
+                .observeWithLifecycle(
+                    lifecycle = lifecycle,
+                    tag = "DelegatingRouter navigation queue",
+                ) { command ->
                     command(controller)
                 }
         }
