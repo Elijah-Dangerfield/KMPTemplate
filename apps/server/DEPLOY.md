@@ -13,13 +13,13 @@ The template ships a dev/prod pair with a load-bearing naming convention:
 | prod | `<yourapp>-server-prod` | `fly.prod.toml` | manually triggered, behind a GitHub Environment approval gate |
 
 The `-dev`/`-prod` suffix matters: the server derives its `environment` tag
-(Sentry + OTel) from `FLY_APP_NAME` — any app name ending in `-prod` reports
+(Sentry + OTel) from `FLY_APP_NAME`, any app name ending in `-prod` reports
 `prod`, everything else reports `dev`. Point each app at its own Supabase
 project so a dev migration can never touch prod data.
 
 The staged CI workflows (`server-deploy.yml` dev-auto, `server-deploy-prod.yml`
 prod with a `confirm: "prod"` input + environment approval) wire this split
-end-to-end — see SETUP.md for the GitHub secrets.
+end-to-end, see SETUP.md for the GitHub secrets.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ end-to-end — see SETUP.md for the GitHub secrets.
 fly apps create your-server-name-dev
 fly apps create your-server-name-prod
 
-# 2. Set secrets (injected as env at runtime — never baked into the image).
+# 2. Set secrets (injected as env at runtime, never baked into the image).
 fly secrets set \
   DATABASE_URL='postgresql://postgres:<url-encoded-pw>@db.<ref>.supabase.co:5432/postgres' \
   SUPABASE_URL='https://<ref>.supabase.co' \
@@ -65,8 +65,8 @@ Day-to-day: `fly logs`, `fly status`, `fly ssh console`, `fly releases` (and
 
 This is a KMP monorepo; the server is one Gradle module among Android/iOS
 clients. The Docker build passes `-DserverOnly=true`, which makes
-[`settings.gradle.kts`](../../settings.gradle.kts) include **only** `:apps:server`
-— so the image build needs no Android SDK or Kotlin/Native toolchain. (The flag
+[`settings.gradle.kts`](../../settings.gradle.kts) include **only** `:apps:server`,
+so the image build needs no Android SDK or Kotlin/Native toolchain. (The flag
 name is project-agnostic on purpose, so renaming the project can't desync it from
 the Dockerfile.)
 
@@ -88,7 +88,7 @@ docker run --rm -p 8080:8080 -e DATABASE_URL=... -e SUPABASE_URL=... kmptemplate
 All config is env vars (see [`.env.example`](.env.example) and
 [`README.md`](README.md#environment-variables)). In prod, set them via
 `fly secrets set`; OS env always wins over the local `.env` file. `DATABASE_URL`
-and `SUPABASE_URL` are the two that unlock the full feature set — the server
+and `SUPABASE_URL` are the two that unlock the full feature set, the server
 boots without them (limited mode) so a misconfigured deploy still answers
 `/_health`.
 

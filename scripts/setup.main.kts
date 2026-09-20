@@ -154,7 +154,7 @@ fun runStep(step: Step): Boolean {
     println("  ${step.what}")
     step.blockedBy?.let {
         yellow("  Skipping: $it.")
-        yellow("  Run ./${step.script} once that is sorted — it skips whatever is already done.")
+        yellow("  Run ./${step.script} once that is sorted, it skips whatever is already done.")
         return false
     }
     if (step.alreadyDone == true) {
@@ -192,7 +192,7 @@ printStatus()
 val skipped = outcomes.filterValues { !it }.keys
 if (skipped.isNotEmpty()) {
     println("Not done this run: ${skipped.joinToString(", ")}")
-    println("Re-run ./scripts/setup.main.kts any time — it picks up where you left off.")
+    println("Re-run ./scripts/setup.main.kts any time, it picks up where you left off.")
     println()
 }
 

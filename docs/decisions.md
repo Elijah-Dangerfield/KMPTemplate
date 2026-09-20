@@ -6,7 +6,7 @@ the decision, alternatives considered, and *why*. Newest first.
 
 ---
 
-## 2026-09-20 — Provisioning is scripted per service, orchestrated by one entry point
+## 2026-09-20: Provisioning is scripted per service, orchestrated by one entry point
 
 **Decision:** each external service gets its own idempotent script
 (`setup_supabase`, `setup_fly`, `setup_sentry`, `setup_github_secrets`,
@@ -22,13 +22,13 @@ branching, and a failure halfway would leave no obvious re-entry point. Separate
 scripts mean "re-run the one that failed" is always the answer.
 
 **Why the orchestrator exists anyway:** the *order* is the part that is not
-obvious, and getting it wrong does not fail loudly — it half-configures things
+obvious, and getting it wrong does not fail loudly. It half-configures things
 and leaves you to work out which half.
 
 **Why init only offers it:** at the end of init there is no GitHub repo, so two
 of the five steps cannot run. Running the chain inline would half-finish by
-construction. The offer exists because the alternative — a wall of instructions
-nobody reads — is how this template already shipped a blank Sentry DSN.
+construction. The offer exists because the alternative, a wall of instructions
+nobody reads, is how this template already shipped a blank Sentry DSN.
 
 **What stays manual, permanently:** Play Console (app entry, service-account
 invite, data safety, content rating) has no API for any of it. App Store Connect
@@ -37,7 +37,7 @@ are called out as their own group in init's closing output rather than mixed in
 with the automatable steps, because a checklist that blurs "run this" with "go
 fill in a web form" is one people stop reading.
 
-## 2026-09-20 — Apple sign-in is native-only, so there is no secret to rotate
+## 2026-09-20: Apple sign-in is native-only, so there is no secret to rotate
 
 **Decision:** Apple sign-in runs through the iOS system sheet
 (`ASAuthorizationController` → identity token → Supabase
@@ -47,7 +47,7 @@ fields stay empty. `scripts/rotate_apple_sign_in_token.main.kts` is deleted,
 along with the two store keys that fed it.
 
 **Why:** the client secret belongs to Apple's browser OAuth flow, which nothing
-here calls — the UI only ever passes `OAuthProvider.Google` to
+here calls: the UI only ever passes `OAuthProvider.Google` to
 `signInWithOAuth`, and `AndroidAppleSignInCoordinator` is a deliberate no-op.
 Apple caps that secret at 180 days, so keeping the script meant every generated
 app inherited a recurring six-month chore for a flow it does not use, plus a
@@ -56,12 +56,12 @@ needs is worse than a missing feature: it gets done.
 
 **What it costs:** offering Apple sign-in on Android later means the browser
 flow, which means a Services ID, a client-secret JWT, and rotation before every
-expiry. The script that minted that JWT is in this repo's history — it signed
+expiry. The script that minted that JWT is in this repo's history. It signed
 an ES256 assertion from an Apple `.p8`, and the shape is the same one Supabase's
 own docs describe. `toSupabaseProvider` carries a comment at the dead Apple
 branch so the obligation is discovered at the code, not after shipping.
 
-## 2026-09-20 — Declining the backend at init is destructive, not staged
+## 2026-09-20: Declining the backend at init is destructive, not staged
 
 **Decision:** `init_project.main.kts` asks whether the project ships its own
 backend. Answering no **deletes** `:apps:server`, `:apps:admin`,
@@ -71,7 +71,7 @@ three root docs. Nothing is staged for a later opt-in.
 
 **Alternatives:** follow the CI precedent and stage the modules under
 `template/` for a `scripts/enable_backend.sh`. **Why not:** the CI opt-out can
-stage because installing CI afterwards is a pure file move — the staged files
+stage because installing CI afterwards is a pure file move: the staged files
 have already been through the rename and substitution passes, so
 `enable_ci.sh` just moves them. A backend is not a file move: it has to come
 back into `settings.gradle.kts`, into `ci.yml` and into two deploy workflows.
@@ -91,7 +91,7 @@ internet".
 affected passages breaks generation. It fails loudly rather than skipping the
 edit, and `verify_template.sh` generates a client-only project on every run.
 
-## 2026-09-20 — One machine-local store for setup credentials
+## 2026-09-20: One machine-local store for setup credentials
 
 **Decision:** the setup scripts resolve credentials environment variable →
 `~/.config/appsetup/credentials.properties` → prompt. The store holds only
@@ -105,7 +105,7 @@ working untouched and a one-off override stays possible.
 
 **Why the path says nothing about this template:** `init_project.main.kts`
 rewrites the template's name in every text file it copies, so a path
-containing it would be rewritten per project — and the entire point is that
+containing it would be rewritten per project, and the entire point is that
 the app you generate next month reads what you typed today. Same reasoning as
 the `serverOnly` system property being project-agnostic.
 
@@ -113,31 +113,31 @@ the `serverOnly` system property being project-agnostic.
 absent (another laptop, a CI runner, a contributor who is not you), so it is
 an accelerator and never a requirement. But a store that quietly fills some
 values and leaves others blank reproduces the blank-Sentry-DSN failure across
-every credential it touches — blank is a supported value that means "off", and
-off looks exactly like working. So every run says where each value came from
+every credential it touches. Blank is a supported value meaning "off", and off
+looks exactly like working. So every run says where each value came from
 before it starts, and what is still unset and what that costs when it
 finishes. A non-interactive run with a missing required value dies naming the
 value and how to supply it rather than proceeding with a blank.
 
 **Not stored:** whether `gh` is authenticated. That is probed live. A cached
 "yes" goes stale on token expiry, and a script that skips asking because of a
-stale flag then fails somewhere less obvious — the exact silent
+stale flag then fails somewhere less obvious, the exact silent
 misconfiguration this design exists to prevent.
 
-## 2026-06-21 — Server mirrors client conventions
+## 2026-06-21: Server mirrors client conventions
 
-**Decision:** `:apps:server` reuses the client's stack — kotlin-inject + anvil DI
+**Decision:** `:apps:server` reuses the client's stack, kotlin-inject + anvil DI
 (`ServerScope`/`ServerComponent`), the `domain/` interface + `data/` impl split,
 conventional commits, the version catalog. It's a plain JVM `application` module
 (no convention plugin; those are KMP-only).
 
 **Why:** one mental model across client and server. An agent (or human) moving
-between them doesn't re-learn DI, error handling, or module layout. The cost —
-the server can't use the KMP `:libraries:core` (`Catching`, logging) because that
-module has no JVM target — was accepted; the server keeps a couple of small local
+between them doesn't re-learn DI, error handling, or module layout. The cost was
+accepted: the server can't use the KMP `:libraries:core` (`Catching`, logging)
+because that module has no JVM target, so it keeps a couple of small local
 equivalents rather than forcing a `jvm()` target onto every client library.
 
-## 2026-06-21 — Graceful degradation over required config
+## 2026-06-21: Graceful degradation over required config
 
 **Decision:** `DATABASE_URL`, `SUPABASE_URL`, `SENTRY_DSN`, and the OTLP endpoint
 are all optional. With none set, the server boots and serves `/_health` +
@@ -145,21 +145,21 @@ are all optional. With none set, the server boots and serves `/_health` +
 no-ops, and OpenTelemetry exports to stdout.
 
 **Alternatives:** require `DATABASE_URL` + `SUPABASE_URL` like the Cards origin
-(fail-fast). **Why optional:** this is a template — "clone and run, see it boot"
+(fail-fast). **Why optional:** this is a template, "clone and run, see it boot"
 beats a fail-fast error on first run. The fail-fast discipline still applies per
 field via `Env.require` when a future field genuinely can't be defaulted.
 
-## 2026-06-21 — Auth is JWKS verification, never a shared secret
+## 2026-06-21: Auth is JWKS verification, never a shared secret
 
 **Decision:** the server verifies Supabase JWTs against the project's public keys
 (JWKS / ES256). The `JwtVerification` sealed seam has `Jwks` (prod) and `Static`
 (tests mint HS256 tokens against a known verifier).
 
-**Why:** no Supabase secret ever lives on the server, and auth — the highest-risk
-surface — is fully testable offline (route tests + `FullStackMeTest` run the real
+**Why:** no Supabase secret ever lives on the server, and auth. The highest-risk
+surface, is fully testable offline (route tests + `FullStackMeTest` run the real
 validate/challenge path with no network).
 
-## 2026-06-21 — `NoOpAuthTokenProvider` lives in the `:networking` api module
+## 2026-06-21: `NoOpAuthTokenProvider` lives in the `:networking` api module
 
 **Decision:** the default no-op `AuthTokenProvider` binding sits in
 `:libraries:networking` (api), not `:impl`.
@@ -171,7 +171,7 @@ default binding next to the interface it defaults keeps the replacement
 boundary-clean. (See also the `enforceModuleBoundaries` self-edge fix in
 `build-logic`.)
 
-## 2026-06-21 — `serverOnly` build slimming
+## 2026-06-21: `serverOnly` build slimming
 
 **Decision:** `-DserverOnly=true` makes `settings.gradle.kts` include only
 `:apps:server`, so a Docker image build needs no Android/iOS toolchain. The
@@ -183,7 +183,7 @@ configure every client module and need the Android SDK + Kotlin/Native. The
 server has no client-library deps today, so the gate is a pure settings change;
 if it gains one, add an always-included `include(...)` + a Dockerfile `COPY`.
 
-## 2026-06-21 — Flyway SQL is the schema source of truth
+## 2026-06-21: Flyway SQL is the schema source of truth
 
 **Decision:** migrations under `resources/db/migration` define the schema; the
 Exposed `Tables.kt` objects are read-side projections kept honest by
@@ -193,7 +193,7 @@ the arbiter rather than pre-checking for races.
 **Why:** one procedure for schema change (add the next `V##__name.sql`, never edit
 an applied one), and idempotency that's correct under concurrency.
 
-## 2026-09-09 — Ports considered and rejected
+## 2026-09-09: Ports considered and rejected
 
 **Decision:** three things a downstream app offered back are deliberately not in
 this template. Recorded so they don't get re-proposed each time someone reads
@@ -209,19 +209,19 @@ that app's setup and notices the gap.
   names. The *conventions* are portable and already carried; the boards are not.
 - **The observability routine and its skills.** Genuinely useful, and shaped
   entirely around one project's dashboards, alert ids and inbox. Revisit only if
-  a second app wants the same thing — that is the point at which the generic
+  a second app wants the same thing. That is the point at which the generic
   shape becomes visible.
 
 **Why here rather than the port queue:** the queue is work waiting to happen, and
 these are closed questions. Keeping them there made an empty queue impossible.
 
-## 2026-09-14 — Grafana dashboards stay out; the events registry comes in
+## 2026-09-14: Grafana dashboards stay out; the events registry comes in
 
 **Decision:** this template ships no dashboard JSON and no dashboard contract
 test. It does ship [telemetry-events.md](telemetry-events.md), a description of
 what a generated project emits before anyone adds a feature.
 
-**Why:** a downstream app re-proposed the dashboards with a sharper argument —
+**Why:** a downstream app re-proposed the dashboards with a sharper argument:
 that more of its event surface is app-shaped than game-shaped, and that a
 purchase-funnel board in particular is the one most likely to be wrong in a way
 nobody notices. Both true. But its own recommended order starts with "decide
@@ -239,5 +239,5 @@ built on it would have read zero forever.
 The contract test that holds queries to emit sites is the genuinely portable
 idea in that proposal, and it is worth writing the moment a generated project
 has boards worth holding. Its traps are recorded at the bottom of the registry
-so nobody re-derives them — in particular that a Gradle test task which does not
+so nobody re-derives them, in particular that a Gradle test task which does not
 declare `inputs.files(...)` stays UP-TO-DATE and passes while checking nothing.

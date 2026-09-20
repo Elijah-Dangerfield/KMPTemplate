@@ -44,7 +44,7 @@ fun record(name: String, outcome: String) {
 
 fun push(secret: Secret) {
     if (secret.value.isNullOrBlank()) {
-        record(secret.name, "skipped — ${secret.note}")
+        record(secret.name, "skipped, ${secret.note}")
         return
     }
     if (dryRun) {
@@ -54,7 +54,7 @@ fun push(secret: Secret) {
     if (setGhSecret(secret.name, secret.value)) {
         record(secret.name, "set")
     } else {
-        record(secret.name, "FAILED — set it by hand")
+        record(secret.name, "FAILED, set it by hand")
     }
 }
 
@@ -111,7 +111,7 @@ val values = SetupValues(interactive = interactive)
 
 bold("\n━━ GitHub release secrets ━━")
 println("Pushes the signing material CI needs, from one folder plus your credential store.")
-if (dryRun) yellow("Dry run — nothing will be written.")
+if (dryRun) yellow("Dry run, nothing will be written.")
 
 when (githubCliState()) {
     GithubCliState.NOT_INSTALLED -> die("The gh CLI is not installed. `brew install gh`, then `gh auth login`.")
@@ -249,14 +249,14 @@ if (failed > 0) {
     exitProcess(1)
 }
 if (missing > 0) {
-    yellow("$missing secret(s) are still unset — see the reasons above.")
+    yellow("$missing secret(s) are still unset, see the reasons above.")
     yellow("The pipeline will build, and fail at whichever step needs the missing one.")
 } else {
     green("Every release secret is set.")
 }
 println()
 println("Not covered here, because they have no API:")
-println("  • SENTRY_* — ./scripts/setup_sentry.main.kts does those")
+println("  • SENTRY_*, ./scripts/setup_sentry.main.kts does those")
 println("  • Inviting your Play service account to the developer account (once, ever)")
 println("  • Store listings, data safety, content rating")
 

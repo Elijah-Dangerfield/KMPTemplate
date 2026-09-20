@@ -1,4 +1,4 @@
-# `:apps:server` — Ktor backend
+# `:apps:server`: Ktor backend
 
 A small, opinionated Ktor + Postgres backend with Supabase JWT auth. It mirrors
 the client's conventions (kotlin-inject DI, `domain/`↔`data` split, one blessed
@@ -19,7 +19,7 @@ curl localhost:8080/v1/example        # {"message":"…","items":[…]}
 To enable the database-backed + authenticated routes, set env vars (copy
 `apps/server/.env.example` → `apps/server/.env`, which is gitignored):
 
-1. **Database** — start the bundled Postgres and point at it:
+1. **Database**: start the bundled Postgres and point at it:
    ```bash
    docker compose -f apps/server/docker-compose.yml up -d
    # in apps/server/.env:
@@ -27,7 +27,7 @@ To enable the database-backed + authenticated routes, set env vars (copy
    ```
    On boot, Flyway applies everything in `src/main/resources/db/migration`.
 
-2. **Supabase auth** — set `SUPABASE_URL=https://<project>.supabase.co` to mount
+2. **Supabase auth**: set `SUPABASE_URL=https://<project>.supabase.co` to mount
    `/v1/me`. The server verifies the client's Supabase JWTs against the project's
    public keys (JWKS); no secret is stored server-side.
 
@@ -59,7 +59,7 @@ the seam full-stack tests reuse (real graph, real DB, `JwtVerification.Static`).
 
 ## Conventions (copy these)
 
-### Add a config value — `config/ServerConfig.kt`
+### Add a config value: `config/ServerConfig.kt`
 `Env` is the only place env vars are read. Pick by criticality:
 - boot-critical → `env.require("KEY")` (fail fast)
 - optional w/ default → `env.int("KEY", 8080)` / `env["KEY"] ?: "x"`
@@ -68,7 +68,7 @@ the seam full-stack tests reuse (real graph, real DB, `JwtVerification.Static`).
 Group related vars into a `data class XxxConfig` with a `fromEnv(env)` companion.
 Document the var in `.env.example`.
 
-### Add a service — `domain/` interface + `data/` impl
+### Add a service: `domain/` interface + `data/` impl
 ```kotlin
 // domain/Thing.kt
 interface ThingRepository { suspend fun get(id: UserId): Thing }
@@ -83,7 +83,7 @@ Then expose it on `ServerComponent` as `abstract val thingRepository: ThingRepos
 anvil + KSP wire the rest. The impl prefix names the backing store
 (`InMemory*`, `Postgres*`, `Http*`).
 
-### Add a route — `routes/XxxRoutes.kt` + `XxxDto.kt`
+### Add a route: `routes/XxxRoutes.kt` + `XxxDto.kt`
 ```kotlin
 fun Route.thingRoutes(repo: ThingRepository) {
     authenticate(SUPABASE_JWT_AUTH) {                 // omit for public routes
@@ -96,14 +96,14 @@ fun Route.thingRoutes(repo: ThingRepository) {
 ```
 - real paths are versioned under `/v1`; `/_health` is the deliberate exception.
 - DTOs live in `XxxDto.kt`, named `*Response` / `*Request`; map with `Thing.toResponse()`.
-- the caller's id is the JWT `sub` via `call.userId()` — never trust a body field.
+- the caller's id is the JWT `sub` via `call.userId()`: never trust a body field.
 - map domain outcomes to status codes with an exhaustive `when`; errors use the
   one `ProblemResponse` envelope (`call.respond(status, problem("code", "msg"))`).
 - mount it in `installApp`.
 
-### Add a migration — `resources/db/migration/V<n>__snake.sql`
+### Add a migration: `resources/db/migration/V<n>__snake.sql`
 Flyway SQL is the **source of truth** for the schema; the Exposed objects in
-`db/Tables.kt` are read-side projections. Never edit an applied migration — add
+`db/Tables.kt` are read-side projections. Never edit an applied migration, add
 the next one. Mirror schema changes into `Tables.kt` and add a line to
 `DatabaseSchemaTest`. Repositories run every method in `database.transaction { }`,
 take an injected `Clock`, and treat a unique-violation (SQLSTATE `23505`) as the
@@ -112,7 +112,7 @@ arbiter rather than pre-checking.
 ## Auth
 
 The server is a pure resource server: it **verifies** Supabase JWTs, it never
-issues them. `plugins/Authentication.kt` exposes a `JwtVerification` seam —
+issues them. `plugins/Authentication.kt` exposes a `JwtVerification` seam:
 `Jwks` (production: ES256 via the project JWKS endpoint) and `Static` (tests:
 a caller-supplied verifier, so tests mint HS256 tokens with no network). Inside
 `authenticate(SUPABASE_JWT_AUTH) { }`, `call.userId()` is the `sub` claim and
@@ -127,7 +127,7 @@ creating dependent rows.
 > The **client** half lives in `:libraries:identity(:impl)`. It signs in via
 > supabase-kt (`AuthRepository.signInAnonymously()`) and binds a
 > `SupabaseAuthTokenProvider` that supplies the bearer token to the network
-> client — replacing the default `NoOpAuthTokenProvider`. Point it at your
+> client, replacing the default `NoOpAuthTokenProvider`. Point it at your
 > Supabase project by setting `supabase.projectId` / `supabase.anonKey` in
 > `local.properties` (read via `:libraries:core` `SupabaseInfo`); until then it
 > returns no token and requests go out unauthenticated.
@@ -135,13 +135,13 @@ creating dependent rows.
 ## Testing
 
 Three patterns, each with a copyable example:
-- **Route test** (`routes/MeRoutesTest.kt`, `routes/ExampleRoutesTest.kt`) —
+- **Route test** (`routes/MeRoutesTest.kt`, `routes/ExampleRoutesTest.kt`):
   `testApplication` + the real plugins + a fake passed as a plain arg. Auth is
   faked by minting an HS256 token + `JwtVerification.Static`.
-- **Repository test** (`data/PostgresProfileRepositoryTest.kt`) — real Postgres
+- **Repository test** (`data/PostgresProfileRepositoryTest.kt`): real Postgres
   via Testcontainers (`DatabaseTest`), `@After` table cleanup, injected clock.
   Skips cleanly (JUnit `Assume`) when Docker is absent.
-- **Full-stack test** (`FullStackMeTest.kt`) — the real DI graph + real Postgres
+- **Full-stack test** (`FullStackMeTest.kt`): the real DI graph + real Postgres
   through the `installApp` seam; proves auth + repo + route integrate.
 
 ```bash
@@ -152,10 +152,10 @@ Three patterns, each with a copyable example:
 
 | Var | Required | Default | Notes |
 |---|---|---|---|
-| `DATABASE_URL` | no | — | `postgresql://user:pass@host:port/db`. Unset → limited mode. URL-encode `$`→`%24`. |
+| `DATABASE_URL` | no |, | `postgresql://user:pass@host:port/db`. Unset → limited mode. URL-encode `$`→`%24`. |
 | `DATABASE_POOL_MAX_SIZE` | no | 10 | |
 | `DATABASE_POOL_MIN_IDLE` | no | 2 | |
-| `SUPABASE_URL` | no | — | `https://<project>.supabase.co`. Unset → `/v1/me` not mounted. |
+| `SUPABASE_URL` | no |, | `https://<project>.supabase.co`. Unset → `/v1/me` not mounted. |
 | `SERVER_HOST` | no | `0.0.0.0` | |
 | `SERVER_PORT` | no | 8080 | |
 

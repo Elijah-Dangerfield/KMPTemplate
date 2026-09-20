@@ -6,7 +6,7 @@ This guide tracks the two recurring decisions you’ll make when mixing Kotlin M
 
 - The `apps/compose` Gradle module uses the shared convention plugin to declare a `framework { baseName = "ComposeApp" ... }` block. Gradle compiles the Kotlin sources plus the modules listed in its `export(...)` calls into `ComposeApp.xcframework` under `apps/compose/build/xcode-frameworks/`, and Xcode’s Embed-and-Sign phase pulls that artifact into the app target.
 - Because exports are transitive (with the occasional need for manual `export` entries), most shared classes become available to Swift via `import ComposeApp`. That’s why the iOS host app can call repositories, logging utilities, and DI facades directly.
-- Any module can publish its own framework. Add another `binaries.framework("<Name>") { export(<module>) }` stanza, run the XCFramework tasks, and point another Xcode target (like an extension) at the resulting `<Name>.xcframework`. This keeps extensions lightweight—you can hand them just `libraries/core` for logging instead of the entire app surface.
+- Any module can publish its own framework. Add another `binaries.framework("<Name>") { export(<module>) }` stanza, run the XCFramework tasks, and point another Xcode target (like an extension) at the resulting `<Name>.xcframework`. This keeps extensions lightweight, you can hand them just `libraries/core` for logging instead of the entire app surface.
 
 ## 2. Swift ↔ Kotlin Communication Patterns
 
@@ -22,7 +22,7 @@ A quick toolbelt for deciding how shared Kotlin code and native Swift code shoul
 
 - **Definition:** Same interface lives in `commonMain`, Android still provides the Kotlin implementation, but iOS leaves the Kotlin side empty. Instead, Swift creates the concrete implementation, passes it into `App()` (or another entry point), and DI binds that Swift object.
 - **Use When:** The real implementation must be written in Swift (e.g., Screen Time APIs, UIKit-only surfaces) but Kotlin still needs to depend on the abstraction.
-- **Notes:** Callback contracts fall under this bucket—Swift conforms to the generated protocol and Kotlin stores it through DI.
+- **Notes:** Callback contracts fall under this bucket: Swift conforms to the generated protocol and Kotlin stores it through DI.
 
 ### 2.3 Component Access (Direct DI Surface)
 

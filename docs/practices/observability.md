@@ -1,6 +1,6 @@
 # Observability: one id, three systems
 
-The stack is Sentry (crashes, user feedback, stack traces), Loki (logs — client app events and
+The stack is Sentry (crashes, user feedback, stack traces), Loki (logs: client app events and
 server request logs), and Tempo (server traces). What ties them together is a single correlation
 id: **`session_id`**, the UUID of the current client app session.
 
@@ -17,7 +17,7 @@ fresh UUID, and that one value is stamped everywhere:
   (plus `X-Install-Id`).
 - **Server → Tempo.** `installHttpServerTracing` (apps/server `plugins/Tracing.kt`) pins
   `session_id`/`install_id` onto the HTTP root span from the headers, and carries them in OTel
-  Baggage so `BaggageAttributeSpanProcessor` copies them onto **every child span** — the whole
+  Baggage so `BaggageAttributeSpanProcessor` copies them onto **every child span**, the whole
   trace tree matches `{ .session_id = "…" }`, not just the root.
 - **Server → Loki.** CallLogging lifts the same headers into MDC (`plugins/Observability.kt`),
   and the logback OTel appender forwards MDC as log attributes (`captureMdcAttributes` in
@@ -29,14 +29,14 @@ fresh UUID, and that one value is stamped everywhere:
   `install_id` / `is_offline` on every app-event record it exports.
 
 The key naming rule: it is always the underscore form `session_id`, in all systems, so one query
-string works everywhere. The same rule applies to any context you add — if a key exists on backend
+string works everywhere. The same rule applies to any context you add: if a key exists on backend
 spans and client Sentry tags, spell it identically (`Telemetry.setContext(key, value)` client-side,
 `SpanAttrs` server-side).
 
 ## Loki label conventions
 
-Stream labels are only `service_name` + `deployment_environment`. Everything else — `event_name`,
-`session_id`, `install_id`, event attributes, `detected_level` — is **structured metadata**: filter
+Stream labels are only `service_name` + `deployment_environment`. Everything else, `event_name`,
+`session_id`, `install_id`, event attributes, `detected_level`. Is **structured metadata**: filter
 with pipes, never line filters.
 
 ```
@@ -46,7 +46,7 @@ with pipes, never line filters.
 # One event type
 {service_name="kmptemplate-client"} | event_name="app.launched"
 
-# Client Warn+ logs (no event_name — that's how you tell them from events)
+# Client Warn+ logs (no event_name, that's how you tell them from events)
 {service_name="kmptemplate-client"} | detected_level=~"warn|error"
 
 # Server logs for one session
@@ -63,9 +63,9 @@ Start from wherever the report landed and pivot on the id:
 
 1. **From a Sentry issue or feedback report:** copy the `session_id` tag.
 2. **Client side of the story:** `{service_name="kmptemplate-client"} | session_id="<uuid>"` in
-   Loki — the app events and Warn+ logs for that session, each stamped with `is_offline` *at emit
+   Loki, the app events and Warn+ logs for that session, each stamped with `is_offline` *at emit
    time* (a record that shipped later from the disk buffer still says what connectivity looked
-   like when it happened). Feedback reports also carry a `session-log.txt` attachment — the
+   like when it happened). Feedback reports also carry a `session-log.txt` attachment, the
    in-memory ring buffer of fine-grained logs that never left the device.
 3. **Backend side:** `{service_name="kmptemplate-server"} | session_id="<uuid>"` for logs;
    `{ .session_id = "<uuid>" }` in Tempo for every request trace the session produced.
@@ -74,7 +74,7 @@ Start from wherever the report landed and pivot on the id:
    client story in one hop.
 
 Build provenance closes the loop: client Sentry events are tagged `commit_sha`/`commit_branch`
-(injected at build time — see `loadVersionMetadata` in build-logic), so a report pins to the exact
+(injected at build time, see `loadVersionMetadata` in build-logic), so a report pins to the exact
 code that produced it.
 
 ## Credentials and kill switches

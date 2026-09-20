@@ -113,7 +113,7 @@ if (!flyConfig.exists()) {
         "apps/server/fly.toml not found.\n" +
             "   This project was generated without a backend (--backend=no), so there is " +
             "nothing to deploy.\n" +
-            "   Nothing to do here — that is a valid configuration, not a missing step."
+            "   Nothing to do here, that is a valid configuration, not a missing step."
     )
 }
 
@@ -166,19 +166,19 @@ val pushable = listOf("DATABASE_URL", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY
 if (pushable.isEmpty()) {
     yellow("apps/server/.env has none of DATABASE_URL / SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY.")
     yellow("Run ./scripts/setup_supabase.main.kts first, or set them by hand, then re-run this.")
-    yellow("The server will still boot — in limited mode, with DB-backed routes off.")
+    yellow("The server will still boot, in limited mode, with DB-backed routes off.")
 } else {
     if (devReady && setFlySecrets(devApp, pushable)) {
         green("✓ Set ${pushable.keys.joinToString(", ")} on $devApp")
     }
-    dim("  Prod deliberately left alone — point it at a different database than dev.")
+    dim("  Prod deliberately left alone, point it at a different database than dev.")
     dim("  fly secrets set DATABASE_URL='…' -a $prodApp")
 }
 
 bold("\nCI deploy tokens")
 if (!hasGhRepo()) {
     yellow("No GitHub repo reachable via gh, so there is nowhere to put the deploy tokens yet.")
-    yellow("Once the repo exists, re-run this script — it will skip everything already done.")
+    yellow("Once the repo exists, re-run this script, it will skip everything already done.")
 } else {
     listOf(devApp to "FLY_API_TOKEN_DEV", prodApp to "FLY_API_TOKEN_PROD").forEach { (app, secret) ->
         if (!flyAppExists(app)) return@forEach
@@ -190,7 +190,7 @@ if (!hasGhRepo()) {
                 token,
             )
         } else {
-            yellow("Could not set $secret — `gh secret set $secret` it yourself.")
+            yellow("Could not set $secret, `gh secret set $secret` it yourself.")
         }
     }
     yellow("These expire in a year. When a deploy starts failing on auth, re-run this script.")

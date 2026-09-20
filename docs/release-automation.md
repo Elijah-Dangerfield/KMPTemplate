@@ -8,9 +8,9 @@
 
 > TL;DR: merge the "release" PR. That's it.
 
-1. There is always (well — whenever there are new `fix:`/`feat:`/`perf:` commits on main) an open PR titled **`chore(main): release vX.Y.Z`**, opened automatically by the release-please bot. It contains the version bump + changelog.
+1. There is always (well: whenever there are new `fix:`/`feat:`/`perf:` commits on main) an open PR titled **`chore(main): release vX.Y.Z`**, opened automatically by the release-please bot. It contains the version bump + changelog.
 2. **Merge that PR.** release-please creates the `vX.Y.Z` tag + GitHub Release.
-3. release-please.yml then dispatches [release.yml](../.github/workflows/release.yml) for that tag (it can't rely on the tag-push trigger — GitHub's default `GITHUB_TOKEN` deliberately doesn't cascade workflow triggers). release.yml:
+3. release-please.yml then dispatches [release.yml](../.github/workflows/release.yml) for that tag (it can't rely on the tag-push trigger, GitHub's default `GITHUB_TOKEN` deliberately doesn't cascade workflow triggers). release.yml:
    - Android → Play Console production track, 10% staged rollout
    - iOS → the TestFlight external group named by `TESTFLIGHT_EXTERNAL_GROUP` in [release.yml](../.github/workflows/release.yml) → submitted to App Store review with Apple's built-in phased release
 4. Apple review (1–3 days) and Play review (few hours) approve. Builds roll out automatically.
@@ -39,7 +39,7 @@ This is the one case the pipeline is not optimized for. Branch from the previous
 
 ## How automated fixes land (what the bots do)
 
-Sentry triage runs as a **Claude Code routine on the maintainer's machine**, not as a CI job — so it uses your normal Claude subscription and the Sentry MCP instead of a paid API key + curl. Schedule it weekly (or on demand) with the prompt at [scripts/prompts/sentry-triage.md](../scripts/prompts/sentry-triage.md). The prompt is the only thing you edit to change behavior.
+Sentry triage runs as a **Claude Code routine on the maintainer's machine**, not as a CI job. So it uses your normal Claude subscription and the Sentry MCP instead of a paid API key + curl. Schedule it weekly (or on demand) with the prompt at [scripts/prompts/sentry-triage.md](../scripts/prompts/sentry-triage.md). The prompt is the only thing you edit to change behavior.
 
 Each run:
 
@@ -50,7 +50,7 @@ Each run:
 
 `auto-merge.yml` watches for the `ai-autofix` label and enables GitHub's native auto-merge on the PR. When CI is green, GitHub squash-merges it. The fix is now on main and the next release PR from release-please includes it.
 
-**To block a specific PR from auto-merging**: remove the `ai-autofix` label or close the PR — GitHub's auto-merge cancels.
+**To block a specific PR from auto-merging**: remove the `ai-autofix` label or close the PR, GitHub's auto-merge cancels.
 
 **To pause triage entirely**: disable the routine in Claude Code. No CI to touch.
 
@@ -92,22 +92,22 @@ rollouts. Halt manually if crash-free rate tanks.
 
 | Workflow | Fires on | What it does |
 |---|---|---|
-| [ci.yml](../.github/workflows/ci.yml) | PRs, push to main | Compile + tests. No uploads — shipping happens via release.yml. Skipped on release-please's PR and its merge commit (bumps-only changes can't break the build). |
+| [ci.yml](../.github/workflows/ci.yml) | PRs, push to main | Compile + tests. No uploads. Shipping happens via release.yml. Skipped on release-please's PR and its merge commit (bumps-only changes can't break the build). |
 | [commitlint.yml](../.github/workflows/commitlint.yml) | PRs | Rejects non-conventional PR titles. |
 | [release-please.yml](../.github/workflows/release-please.yml) | push to main | Maintains the release PR, creates tag + GH Release on merge. |
 | [release.yml](../.github/workflows/release.yml) | dispatched by release-please.yml after tag creation; also `workflow_dispatch` with an explicit tag for re-runs; also fires on tag pushes made by a human | Full production release to both stores. |
 | [auto-merge.yml](../.github/workflows/auto-merge.yml) | PR labeled `ai-autofix` | Enables GitHub auto-merge. |
 
-Sentry triage is not a workflow — it runs as a Claude Code routine on the maintainer's machine. See [scripts/prompts/sentry-triage.md](../scripts/prompts/sentry-triage.md).
+Sentry triage is not a workflow. It runs as a Claude Code routine on the maintainer's machine. See [scripts/prompts/sentry-triage.md](../scripts/prompts/sentry-triage.md).
 
 ## Versioning
 
-- **`versionName` / `MARKETING_VERSION`** — owned by release-please. Do not edit in feature PRs. `x-release-please-start-version` / `x-release-please-end` markers in [versions.properties](../versions.properties) and [Config.xcconfig](../apps/ios/Configuration/Config.xcconfig) tell the bot where to write.
+- **`versionName` / `MARKETING_VERSION`**: owned by release-please. Do not edit in feature PRs. `x-release-please-start-version` / `x-release-please-end` markers in [versions.properties](../versions.properties) and [Config.xcconfig](../apps/ios/Configuration/Config.xcconfig) tell the bot where to write.
 
-  **Don't delete those markers, and don't add a file to `extra-files` without them.** release-please skips an unmarked `extra-files` entry *silently* — no warning, no error, exit 0 — so the symptom is not a failed release. It is a green release that tags and changelogs a new version while the version files stay behind, and ships the new code labelled with the old version to both stores. Use the block form: in a properties file `#` only starts a comment at the start of a line, so a trailing `# x-release-please-version` ends up inside the value. An xcconfig comments with `//`, not `#` — release-please matches the marker text wherever it appears on a line, but the file still has to parse.
+  **Don't delete those markers, and don't add a file to `extra-files` without them.** release-please skips an unmarked `extra-files` entry *silently*. No warning, no error, exit 0. So the symptom is not a failed release. It is a green release that tags and changelogs a new version while the version files stay behind, and ships the new code labelled with the old version to both stores. Use the block form: in a properties file `#` only starts a comment at the start of a line, so a trailing `# x-release-please-version` ends up inside the value. An xcconfig comments with `//`, not `#`. Release-please matches the marker text wherever it appears on a line, but the file still has to parse.
 
-  After changing anything about those files, verify by running a release-please dry run, or at minimum confirm the marker lines still bracket the value line and that `grep '^MARKETING_VERSION'` still returns it — `release.yml`, `beta.yml` and the Fastfile all read it that way.
-- **`versionCode` / iOS build number** — auto-overridden in CI with `GITHUB_RUN_NUMBER` via env vars `VERSION_CODE_OVERRIDE` and `BUILD_NUMBER_OVERRIDE`. They bump monotonically without commits. (See [Versioning.kt](../build-logic/src/main/java/com/kmptemplate/util/Versioning.kt).)
+  After changing anything about those files, verify by running a release-please dry run, or at minimum confirm the marker lines still bracket the value line and that `grep '^MARKETING_VERSION'` still returns it. `release.yml`, `beta.yml` and the Fastfile all read it that way.
+- **`versionCode` / iOS build number**: auto-overridden in CI with `GITHUB_RUN_NUMBER` via env vars `VERSION_CODE_OVERRIDE` and `BUILD_NUMBER_OVERRIDE`. They bump monotonically without commits. (See [Versioning.kt](../build-logic/src/main/java/com/kmptemplate/util/Versioning.kt).)
 - **Sentry release ID**: `kmptemplate@{version}+{build}` (e.g. `kmptemplate@0.2.0+42`). Created on both platforms in release.yml.
 
 ## Secrets and variables
@@ -116,12 +116,12 @@ Set under **Settings → Secrets and variables → Actions**. Secrets are encryp
 
 ### Only one of these is per-app
 
-Worth knowing before you do this the second time: every secret below is a property of your Apple team, your Play developer account, or your Sentry org. They are identical for every app you will ever generate from this template. The only per-app Sentry value, the DSN, is not a secret at all — it lives in the committed `telemetry.properties`, written by `scripts/setup_sentry.main.kts`.
+Worth knowing before you do this the second time: every secret below is a property of your Apple team, your Play developer account, or your Sentry org. They are identical for every app you will ever generate from this template. The only per-app Sentry value, the DSN, is not a secret at all. It lives in the committed `telemetry.properties`, written by `scripts/setup_sentry.main.kts`.
 
 | Scope | Secrets |
 |---|---|
 | Account-wide, write once, reuse forever | `APPLE_TEAM_ID`, `APPLE_DIST_CERT_P12_BASE64`, `APPLE_DIST_CERT_PASSWORD`, `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_KEY_P8_BASE64`, `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`, `SENTRY_AUTH_TOKEN` |
-| Per app, but not secrets | `SENTRY_ORG` / `SENTRY_PROJECT` repo variables, plus `sentry.dsn` in the committed `telemetry.properties` — all three set by `scripts/setup_sentry.main.kts` |
+| Per app, but not secrets | `SENTRY_ORG` / `SENTRY_PROJECT` repo variables, plus `sentry.dsn` in the committed `telemetry.properties`. All three set by `scripts/setup_sentry.main.kts` |
 
 One Apple distribution certificate signs every app on the team. One App Store Connect API key covers the team. One Play service account covers the developer account, once you grant it access to each app. One upload keystore can sign all of them: with Play App Signing the upload key only proves *you* sent the build, and Google holds the key users actually verify.
 
@@ -154,7 +154,7 @@ Without these, Xcode's automatic signing creates a new Apple Distribution cert o
    rm ~/apple-dist.p12                        # delete the local .p12
    ```
 
-The cert is valid for ~1 year — when it expires, re-export and update the secret.
+The cert is valid for ~1 year, when it expires, re-export and update the secret.
 
 ### Needed for Android production releases
 
@@ -185,7 +185,7 @@ Keep the `.p12` in 1Password **and** on disk. Losing both = you can never update
 
 All three empty = Sentry release creation is skipped; the pipeline otherwise runs fine.
 
-### Play service account — one-time setup
+### Play service account: one-time setup
 
 1. Google Cloud Console → new project "{{APP_NAME}} CI".
 2. APIs & Services → Library → **Google Play Android Developer API** → Enable.
@@ -204,7 +204,7 @@ The pipeline ships only the binary + release notes (`skip_metadata: true`, `skip
 - [ ] Description, keywords, support URL
 - [ ] Age rating + App Privacy declaration
 - [ ] Review info (contact, demo account if relevant)
-- [ ] External TestFlight group with invited testers, named to match `TESTFLIGHT_EXTERNAL_GROUP` in [release.yml](../.github/workflows/release.yml) (**External Testers** unless you changed it) — the pipeline uploads to this group by name, and a mismatch is close to silent: the binary reaches App Store Connect, `pilot` cannot find the group, and the Fastfile logs a non-fatal warning and carries on to App Store submission with nobody on external TestFlight. Read the value from the workflow rather than from here.
+- [ ] External TestFlight group with invited testers, named to match `TESTFLIGHT_EXTERNAL_GROUP` in [release.yml](../.github/workflows/release.yml) (**External Testers** unless you changed it). The pipeline uploads to this group by name, and a mismatch is close to silent: the binary reaches App Store Connect, `pilot` cannot find the group, and the Fastfile logs a non-fatal warning and carries on to App Store submission with nobody on external TestFlight. Read the value from the workflow rather than from here.
 
 ### One-time Play Console setup
 
@@ -221,14 +221,14 @@ Marketing/landing pages (`index.html`, `privacy.html`, `terms.html`, `style.css`
 
 | Symptom | First thing to check |
 |---|---|
-| No release PR appearing | No conventional-commit changes since last release — expected. Or check the latest run of `release-please.yml` in Actions. |
+| No release PR appearing | No conventional-commit changes since last release, expected. Or check the latest run of `release-please.yml` in Actions. |
 | commitlint blocking a PR | PR title isn't `type: lowercase subject`. Edit the title. |
 | `release.yml` Android job: keystore missing | One of the `ANDROID_*` secrets is empty. |
 | `release.yml` Android job: Play upload skipped with warning | `PLAY_SERVICE_ACCOUNT_JSON` is empty or malformed. |
-| Apple rejects submission | Usually metadata or privacy-related. Fix in App Store Connect — the binary is already uploaded, resubmit from ASC, no rebuild. |
+| Apple rejects submission | Usually metadata or privacy-related. Fix in App Store Connect (the binary is already uploaded), resubmit from ASC, no rebuild. |
 | Crash-free rate spikes after release | Halt phased rollout manually: App Store Connect → your app → Phased Release → **Pause Rollout**. Play Console → Production → **Halt rollout**. Ship a fix via normal flow; next release supersedes. |
-| Tag created but release.yml didn't fire | release-please.yml failed at the dispatch step (check its run). Manual remediation: Actions → Release → Run workflow → enter the tag. If a human pushed the tag (not release-please), the push trigger would have fired it — if that's not the case, the `v*` prefix is probably wrong. |
-| AI triage PR failed CI | Check the PR — if the fix is wrong, close it. `ai-autofix` PRs don't auto-merge without green CI. |
+| Tag created but release.yml didn't fire | release-please.yml failed at the dispatch step (check its run). Manual remediation: Actions → Release → Run workflow → enter the tag. If a human pushed the tag (not release-please), the push trigger would have fired it. If that's not the case, the `v*` prefix is probably wrong. |
+| AI triage PR failed CI | Check the PR, if the fix is wrong, close it. `ai-autofix` PRs don't auto-merge without green CI. |
 
 ## Extending the pipeline
 

@@ -7,7 +7,7 @@ and looks exactly like a real zero.
 
 This is a description of what exists, **not a contract**. Nothing enforces it
 yet. If you build dashboards on these, add a test that holds the queries to the
-emit sites — see "Dashboards" at the bottom.
+emit sites, see "Dashboards" at the bottom.
 
 Every record also carries install attribution (`genuine_install`, `is_emulator`,
 `is_sideloaded`, `is_rooted`, `installer_package`, `device_class`, `os_version`)
@@ -39,7 +39,7 @@ than a gap to fill:
 - **`app.startup`** needs a readable process-start clock. iOS has none short of
   `sysctl(KERN_PROC)`, which Kotlin/Native does not expose for Apple targets and
   which is a required-reason API. The right iOS source is MetricKit's
-  `MXAppLaunchMetric`, which is a daily histogram rather than one launch — so it
+  `MXAppLaunchMetric`, which is a daily histogram rather than one launch. So it
   belongs under its own event name, not this one.
 - **`app.jank`** needs per-frame timing with a "missed its deadline" signal.
   UIKit has no equivalent, and a lookalike number reconstructed from
@@ -80,7 +80,7 @@ panel querying any of them reads zero forever and looks healthy:
 - `purchase.failed`
 - `example.joined`, `example.completed`, `example.abandoned`
 
-They are fine as fixture data — a test needs *some* event name — but they are
+They are fine as fixture data: a test needs *some* event name. But they are
 not part of the app's surface. Either emit them for real or do not build on
 them.
 
@@ -92,7 +92,7 @@ entirely.
 
 ## Dashboards
 
-None ship here — see [decisions.md](decisions.md). The
+None ship here, see [decisions.md](decisions.md). The
 short version: a board's panels encode one app's questions, and the prerequisite
 for a portable one is deciding which events the template *guarantees*, which is
 a design decision nobody has made.
@@ -103,5 +103,5 @@ attribute and every filtered value is one some emit site can actually produce.
 Without it a query drifts from the code and the panel quietly reads less than it
 claims. One trap when you write that test: a Gradle test task cannot see files
 the test reads at runtime, so the dashboards, this file and the scanned source
-tree all have to be declared with `inputs.files(...)` — otherwise the task stays
+tree all have to be declared with `inputs.files(...)`, otherwise the task stays
 `UP-TO-DATE` and passes while checking nothing.

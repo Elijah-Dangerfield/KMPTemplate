@@ -2,7 +2,7 @@ Sentry triage routine.
 
 Weekly scheduled-task prompt. Pull the most impactful unresolved **production** Sentry issues for the app, pick the ones fixable from the codebase, open one pull request per fix.
 
-Tools at your disposal: Sentry MCP (search_issues, search_issue_events, get_event_attachment, etc.), gh CLI (already authed), local file tools, gradle. No API token or curl required — use the MCP.
+Tools at your disposal: Sentry MCP (search_issues, search_issue_events, get_event_attachment, etc.), gh CLI (already authed), local file tools, gradle. No API token or curl required; use the MCP.
 
 Procedure:
 
@@ -27,7 +27,7 @@ Procedure:
    - If the build fails and you can't fix it in one more attempt, abandon the branch and open a tracking issue
 
 4. Open one PR per fix:
-   - Title: fix: <terse description>  (conventional commit — release-please derives the changelog from this)
+   - Title: fix: <terse description>  (conventional commit, release-please derives the changelog from this)
    - Body: Sentry link, 1-2 sentence hypothesis of the root cause, what changed
    - Labels: ai-autofix (triggers auto-merge on green CI), sentry
 
@@ -36,6 +36,6 @@ Procedure:
 Hard limits:
 - Never modify anything under .github/workflows. Fixing CI is outside this routine.
 - Never bump dependency versions. If a dep is at fault, open a tracking issue instead.
-- Never edit versions.properties, CHANGELOG.md, or Config.xcconfig — release-please owns them.
+- Never edit versions.properties, CHANGELOG.md, or Config.xcconfig. release-please owns them.
 - Never force-push, rebase published branches, or delete branches you did not create.
-- If I say "dry run", do everything except gh pr create — print the intended diff and PR body instead.
+- If I say "dry run", do everything except gh pr create. Print the intended diff and PR body instead.

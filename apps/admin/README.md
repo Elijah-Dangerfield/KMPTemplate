@@ -17,7 +17,7 @@ talks to the server's token-gated `/v1/admin/config` API over HTTP.
   `/app/admin-web`, served by `installAdminWeb`). The console at a given origin
   manages that origin's server + database; the sibling environment is a link to
   its own console.
-- **Tokens are pasted at runtime, never baked in.** This repo is public — the
+- **Tokens are pasted at runtime, never baked in.** This repo is public: the
   bundle holds no secrets. On first use you paste the env's `ADMIN_API_TOKEN`;
   the console validates it with a real call, then keeps it in that browser's
   localStorage (per env, with a "Forget token" button). Every request carries
@@ -26,7 +26,7 @@ talks to the server's token-gated `/v1/admin/config` API over HTTP.
   isn't already in this public repo; every API call it can make is token-gated.
 - **Cross-origin still matters for local dev.** When you run the console
   locally against a deployed server, the browser preflights with the admin
-  headers and PUT/DELETE methods — both must be in the server's CORS allow-list
+  headers and PUT/DELETE methods, both must be in the server's CORS allow-list
   (`apps/server/.../plugins/Cors.kt`).
 
 ```
@@ -38,13 +38,13 @@ talks to the server's token-gated `/v1/admin/config` API over HTTP.
 
 **Normal use:** open the environment's `/admin/` URL, paste that env's
 `ADMIN_API_TOKEN` (Fly secrets are write-only, so the token's source of truth
-is wherever it was generated — ask, or rotate it), set **Actor** to your name,
-Connect. Done — the token is remembered by this browser until you forget it.
+is wherever it was generated, ask, or rotate it), set **Actor** to your name,
+Connect. Done, the token is remembered by this browser until you forget it.
 
 **Working on the console itself:** the **"Admin Web"** run config in the IDE, or:
 
 ```bash
-# hot-reloading dev server (recommended — rebuilds on save)
+# hot-reloading dev server (recommended, rebuilds on save)
 ./gradlew :apps:admin:jsBrowserDevelopmentRun --continuous
 ```
 
@@ -54,8 +54,8 @@ way.
 
 ## Using the tool
 
-- **Target lens.** Set a synthetic client — platform, app version, country,
-  locale, user id, install id — and hit *Resolve*. The flag table then shows,
+- **Target lens.** Set a synthetic client: platform, app version, country,
+  locale, user id, install id, and hit *Resolve*. The flag table then shows,
   per flag: **in-code default → DB base → which rule won → resolved value** for
   that target. This is how you answer "what does a 9.1 / US user actually get."
 - **Flags.** Each flag expands to a detail view: edit the base value, see its
@@ -65,7 +65,7 @@ way.
   platform, **semantic app-version bounds** (`> 1.0.1`), build-code range,
   country, locale, user-id allow/deny, staged rollout %. "Add rule for this
   target" pre-fills the conditions from the lens above.
-- **Versions.** What a captured build shipped with — the in-code defaults per
+- **Versions.** What a captured build shipped with: the in-code defaults per
   app version (see the manifest section below).
 - **Audit.** Every change, newest first, with before/after diffs.
 - **Kill switches.** The pinned panel above the tabs holds the emergency flags
@@ -82,7 +82,7 @@ resolved tree for ~30 seconds).
 
 ## Testing it end to end
 
-The page is just a client — it needs a **server that has these endpoints and the
+The page is just a client, it needs a **server that has these endpoints and the
 CORS allow-list**. Two ways to get one:
 
 ### A) Against a deployed environment (dev/prod)
@@ -102,7 +102,7 @@ Run the server on your machine and point the page at it with the **Local** env.
 # 1. a throwaway Postgres
 docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16
 
-# 2. the server — Flyway applies every migration (incl. the config tables) on boot.
+# 2. the server: Flyway applies every migration (incl. the config tables) on boot.
 #    Put these in apps/server/.env (gitignored) or export them, then run:
 #      DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 #      SUPABASE_URL=https://<your-project-ref>.supabase.co   # any valid URL; admin routes don't use JWT
@@ -114,13 +114,13 @@ docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16
 ```
 
 Local Postgres starts empty, so there are no flags until you add one (or upload a
-manifest — see below). This is the fastest way to exercise the full feature set,
+manifest, see below). This is the fastest way to exercise the full feature set,
 including the per-target resolve and the Versions tab, without touching a shared
 database.
 
 ## Previews?
 
-Compose **HTML** (what this module uses) has **no `@Preview`** — that's a
+Compose **HTML** (what this module uses) has **no `@Preview`**, that's a
 Compose-UI / Android feature, and this isn't Compose UI, it's DOM. The preview
 *is* the hot-reloading dev server: run `jsBrowserDevelopmentRun --continuous` and
 the browser updates on save. For a quick render check without a live server you
@@ -131,7 +131,7 @@ normal loop.
 ## Per-version defaults manifest (what a build shipped with)
 
 The admin tool can show the **in-code defaults a given app version shipped
-with** — the baseline a remote override replaces. Those defaults live in the
+with**, the baseline a remote override replaces. Those defaults live in the
 client's `ConfiguredValue` classes, which the JS admin module can't read, so the
 build exports them and uploads them per deploy.
 
@@ -166,7 +166,7 @@ module nor a JVM build task can read it directly). Two guards keep it from drift
   the build on any inconsistency.
 - A drift test that instantiates the **real** scalar `ConfiguredValue` classes and
   compares them to the registry is the second guard once an integration-test
-  module exists — until then the review discipline is manual.
+  module exists, until then the review discipline is manual.
 
 So: when you add, remove, or change a scalar `ConfiguredValue`, update
 `config-manifest-registry.json` in the same change.
@@ -177,7 +177,7 @@ Composite (`JsonConfigValue`) flags are intentionally omitted.
 An in-house tool over a hosted flag service: the whole config stack (client
 `ConfiguredValue`s, server targeting, this console) stays in one repo with no
 external dependency or per-seat pricing. Auth is a single shared admin token
-per environment (no per-user login/roles yet) — SSO/RBAC is a possible future
+per environment (no per-user login/roles yet), SSO/RBAC is a possible future
 step. localStorage tokens are readable by JS on the console's origin;
 acceptable here because the page loads no third-party scripts and Compose HTML
 escapes all text nodes.

@@ -49,3 +49,6 @@ apps/admin/admin-tokens.local.properties
 # show up in every recursive grep and status, which is how a stray nested
 # project has confused this repo's own smoke test before.
 .claude/
+
+# Scratch explainers written by the /explain skill. Not repo content.
+explain-*.md

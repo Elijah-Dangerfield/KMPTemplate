@@ -1,13 +1,13 @@
 # KMP Template
 
-A Kotlin Multiplatform template with the production systems already wired — not a hello-world scaffold. It carries the hardened patterns of a shipped KMP app (Compose Multiplatform client, Ktor server on Fly.io, Supabase auth) so a new project starts at "day 30", not day 0.
+A Kotlin Multiplatform template with the production systems already wired, not a hello-world scaffold. It carries the hardened patterns of a shipped KMP app (Compose Multiplatform client, Ktor server on Fly.io, Supabase auth) so a new project starts at "day 30", not day 0.
 
 ## What you get, working, on day one
 
 **Client (Android + iOS from one codebase)**
 - Anonymous-first **Supabase auth**: guest creation in onboarding, email/password + Sign in with Apple + browser OAuth, encrypted session storage (Keychain / EncryptedSharedPreferences), session self-heal, blocking screens for expired sessions and banned accounts
-- **Offline detection that tells the truth** — OS connectivity combined with witnessed request reachability, driving an offline banner and a `ConnectivityRegained` event
-- **Triggered sync**: implement one idempotent `sync()`, register it, and it runs on sign-in, foreground, and reconnect with retry — plus an offline-write outbox pattern with a shipped reference
+- **Offline detection that tells the truth**: OS connectivity combined with witnessed request reachability, driving an offline banner and a `ConnectivityRegained` event
+- **Triggered sync**: implement one idempotent `sync()`, register it, and it runs on sign-in, foreground, and reconnect with retry. Plus an offline-write outbox pattern with a shipped reference
 - **Remote config end-to-end**: typed `ConfiguredValue`s, offline-first fetch with kill-switch flags (`upgrade.maintenanceMode`, forced-upgrade), QA overrides, and a hosted **admin console** (Kotlin/JS) with targeting rules, audit log, and prod confirm-by-typing
 - **Telemetry that answers pages**: one `session_id` pivots Sentry issues, Grafana Loki logs, and Tempo traces; structured `logEvent`s ship over OTLP with disk-buffered durability; MetricKit exit reports on iOS
 - **Dev tooling**: shake for the QA dialog, on-device Wiretap network inspector (debug-only, noop artifact in store builds), a living design-system catalog, in-app review prompting with sane eligibility gates
@@ -19,25 +19,25 @@ A Kotlin Multiplatform template with the production systems already wired — no
 
 **Process**
 - CI from the first push: build + unit/server/integration test jobs, release-please versioning, TestFlight/Play release pipelines, detekt with a custom user-facing-strings rule, conventional-commit hooks
-- An **integration harness** that drives the real client stack against the real server over a real Postgres — in a unit test
+- An **integration harness** that drives the real client stack against the real server over a real Postgres, in a unit test
 - Docs that assume nothing: `SETUP.md` runbook from init to first release, practice guides for testing, observability, app events, and outboxes
 
 ## Quick Start
 
 ### Initialize Your Project
 
-**Run this first!** The init script creates a fresh copy of the template with your project name — the original template is left untouched. Run it from the repo root (it needs the `kotlin` CLI — `brew install kotlin`):
+**Run this first!** The init script creates a fresh copy of the template with your project name, the original template is left untouched. Run it from the repo root (it needs the `kotlin` CLI. `brew install kotlin`):
 
 ```shell
 ./scripts/init_project.main.kts
 ```
 
 You'll be prompted for:
-- **App Name** (e.g., "My Awesome App") — display name
-- **Package Name** (e.g., "com.example.myapp") — package declarations
-- **Contact email** — used in the privacy/terms pages
-- **Destination directory** — where to create the new project (defaults to the parent folder)
-- **CI** — whether to install the release automation now (you can opt in later with `./scripts/enable_ci.sh`)
+- **App Name** (e.g., "My Awesome App"): display name
+- **Package Name** (e.g., "com.example.myapp"): package declarations
+- **Contact email**: used in the privacy/terms pages
+- **Destination directory**: where to create the new project (defaults to the parent folder)
+- **CI**: whether to install the release automation now (you can opt in later with `./scripts/enable_ci.sh`)
 
 For automation there is a non-interactive mode where all flags are required together:
 
@@ -77,7 +77,7 @@ docker compose -f apps/server/docker-compose.yml up -d
 
 ### First-time setup
 
-See **[SETUP.md](SETUP.md)** for the hour-1/day-1 runbook — Supabase project + auth providers, Fly dev/prod apps, GitHub secrets, Sentry/Grafana keys, store listings, and the first-release manual-promotion gotcha. Each step has the command and the expected output.
+See **[SETUP.md](SETUP.md)** for the hour-1/day-1 runbook, Supabase project + auth providers, Fly dev/prod apps, GitHub secrets, Sentry/Grafana keys, store listings, and the first-release manual-promotion gotcha. Each step has the command and the expected output.
 
 Before your first commit:
 
@@ -99,7 +99,7 @@ libraries/<name>/      # Interfaces
 libraries/<name>/impl/ # Implementations
 ```
 
-Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/navigation patterns, and every convention live in **[AGENTS.md](AGENTS.md)** — it's written for AI agents and humans alike and is the single source of truth for how code here is shaped.
+Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/navigation patterns, and every convention live in **[AGENTS.md](AGENTS.md)**. It's written for AI agents and humans alike and is the single source of truth for how code here is shaped.
 
 ## Doc map
 
@@ -120,7 +120,7 @@ Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/nav
 
 Apps generated from here reach production before the template does. They hit the store review, the policy deadline, the R8 rule that only breaks at runtime, the Compose bug that only appears at 60fps with real data. That knowledge is worth more than anything written speculatively in this repo, and it only arrives if someone carries it back.
 
-So the flow runs both ways. A generated app takes the scaffolding; when it learns something a brand-new app would want on day one, that goes in [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md) — code, or just as often a one-line warning about a landmine that cost a day. Working in a generated app? Its AGENTS.md carries the rule. Working here? That file is the queue.
+So the flow runs both ways. A generated app takes the scaffolding; when it learns something a brand-new app would want on day one, that goes in [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md). Code, or just as often a one-line warning about a landmine that cost a day. Working in a generated app? Its AGENTS.md carries the rule. Working here? That file is the queue.
 
 ---
 

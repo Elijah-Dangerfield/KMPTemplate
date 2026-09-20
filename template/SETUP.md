@@ -1,4 +1,4 @@
-# Setup checklist — KMP Template
+# KMP Template setup checklist
 
 Action items after running `./scripts/init_project.main.kts`.
 
@@ -26,21 +26,21 @@ The rest of this page is the detail behind each of those, plus everything the
 scripts deliberately don't touch. Read the section for a step when it fails or
 when you want to know what it did.
 
-**Hour 1 — a running app:**
-- [ ] [Local dev](#local-dev) — hooks + first build
-- [ ] [Credential store](#credential-store-do-this-on-your-second-project) — skip on your first project
-- [ ] [Supabase auth](#supabase-auth-hour-1) — project, providers, redirect URLs
-- [ ] [Sentry](#sentry-one-script) — one script, then crash reporting is on everywhere
-- [ ] [Server deploy](#server-deploy-flyio) — dev Fly app + secrets + `/_health`
+**Hour 1: a running app**
+- [ ] [Local dev](#local-dev): hooks + first build
+- [ ] [Credential store](#credential-store-do-this-on-your-second-project): skip on your first project
+- [ ] [Supabase auth](#supabase-auth-hour-1): project, providers, redirect URLs
+- [ ] [Sentry](#sentry-one-script): one script, then crash reporting is on everywhere
+- [ ] [Server deploy](#server-deploy-flyio): dev Fly app + secrets + `/_health`
 
-**Day 1 — pipelines + visibility:**
+**Day 1: pipelines + visibility**
 - [ ] [GitHub secrets](#github-secrets-only-if-you-enabled-ci) (only if you enabled CI)
-- [ ] [Repo settings](#repo-settings) — Pages, Actions, branch protection, the `production` Environment
-- [ ] [Day-1 verification](#day-1-verification) — prove telemetry + deploys actually work
+- [ ] [Repo settings](#repo-settings): Pages, Actions, branch protection, the `production` Environment
+- [ ] [Day-1 verification](#day-1-verification): prove telemetry + deploys actually work
 
 **Before shipping:**
-- [ ] [Store listings](#store-listings) — Play Console + App Store Connect
-- [ ] [First release](#first-release) — the manual-promotion gotcha
+- [ ] [Store listings](#store-listings): Play Console + App Store Connect
+- [ ] [First release](#first-release): the manual-promotion gotcha
 - [ ] [App icons](#app-icons)
 
 ---
@@ -52,9 +52,9 @@ when you want to know what it did.
 ./gradlew build              # first sync + build
 ```
 
-The Gradle build fails with an install-hooks message if you skip `install_hooks.sh`. That's intentional — release-please derives version bumps from commit history, so every commit must be in Conventional-Commits form (`feat:`, `fix:`, etc.).
+The Gradle build fails with an install-hooks message if you skip `install_hooks.sh`. That's intentional, release-please derives version bumps from commit history, so every commit must be in Conventional-Commits form (`feat:`, `fix:`, etc.).
 
-To bypass in scripted contexts (not CI — `CI` env var is honored): `-Dkmptemplate.skipGitHooksCheck=true`.
+To bypass in scripted contexts (not CI, `CI` env var is honored): `-Dkmptemplate.skipGitHooksCheck=true`.
 
 ---
 
@@ -72,17 +72,17 @@ cannot find, and every script prints where each value came from before it
 starts and what is still unset when it finishes.
 
 On your first project there is nothing to reuse yet, so skip this and let the
-scripts collect values as they go — each one offers to remember what you typed.
+scripts collect values as they go, each one offers to remember what you typed.
 
 | | |
 | --- | --- |
-| Lives at | `~/.config/appsetup/credentials.properties` by default, mode 0600, outside every repo. `--move-to ~/Documents/appsetup` puts it somewhere iCloud syncs, which the scripts also search — a backup for what you cannot regenerate, a wider blast radius for what you can. |
+| Lives at | `~/.config/appsetup/credentials.properties` by default, mode 0600, outside every repo. `--move-to ~/Documents/appsetup` puts it somewhere iCloud syncs, which the scripts also search. A backup for what you cannot regenerate, a wider blast radius for what you can. |
 | Precedence | environment variable → store → prompt (so CI is unaffected) |
 | Holds | Sentry org + tokens, Supabase + Fly tokens and org slugs, Apple team / key IDs, signing passwords, and the *path* to your signing folder |
-| Does not hold | the signing files themselves, or anything per project — the Sentry project slug derives from the `applicationId`, the Fly app name from the project name |
+| Does not hold | the signing files themselves, or anything per project. The Sentry project slug derives from the `applicationId`, the Fly app name from the project name |
 | New machine | run the script again there |
 
-`--list` shows what is set (secrets masked); `--clear` forgets it all; `--import <file>` reads an env-format file, which is the quick path if you already keep a folder of shared release secrets — the store's keys are named after the CI secrets so most of them land untouched. The file
+`--list` shows what is set (secrets masked); `--clear` forgets it all; `--import <file>` reads an env-format file, which is the quick path if you already keep a folder of shared release secrets. The store's keys are named after the CI secrets so most of them land untouched. The file
 holds live deploy tokens in plain text, so if you copy it between machines,
 treat the copy like the tokens and keep it out of anything that syncs.
 
@@ -101,25 +101,33 @@ it on once and it is on for every developer and every build type:
 It asks for one thing, a Sentry **user** auth token, then creates or adopts the
 project, writes the DSN into `telemetry.properties`, sets the CI variables, and
 finishes by sending a real event and waiting for it to arrive. It prints
-whether that worked. If it says the event did not arrive, the setup is not done
-— the whole point of the check is that a broken Sentry setup otherwise looks
+whether that worked. If it says the event did not arrive, the setup is not done.
+The whole point of the check is that a broken Sentry setup otherwise looks
 identical to a working one.
 
 Re-run it any time; every step is an upsert.
 
 **Get the right token.** Sentry has two kinds and they are not interchangeable:
 
+**The prefix is how you tell them apart.** `sntryu_` is personal, `sntrys_` is organization.
+
 | Token | Where | Scopes | Use it for |
 | --- | --- | --- | --- |
-| **User** | Settings → Account → API → [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/) | Selectable — tick `project:read`, `project:write`, `org:read` | This script. Never written to the repo; saved to your [credential store](#credential-store-do-this-on-your-second-project) only if you say yes. |
-| **Organization** (`sntrys_…`) | Settings → Organization Tokens | Exactly `org:ci`, not selectable | CI only (`SENTRY_AUTH_TOKEN`). 403s every read endpoint, so the script cannot use it. |
+| **Personal** (`sntryu_`) | sentry.io, Account dropdown top left, then **Personal Tokens** ([direct link](https://sentry.io/settings/account/api/auth-tokens/)) | Selectable. Tick `project:read`, `project:write`, `org:read` | This script. Never written to the repo; saved to your [credential store](#credential-store-do-this-on-your-second-project) only if you say yes. |
+| **Organization** (`sntrys_`) | **Settings > Developer Settings > Organization Tokens** | Fixed, not selectable | CI only (`SENTRY_AUTH_TOKEN`). Answers 403 to every read endpoint, so the script cannot use it. |
 
-Handing the script an organization token gets a 403 from the first call and
-looks like a broken token. It isn't; it's the wrong one.
+If the page offers you permission checkboxes you are on the personal one. If it
+does not, you are on the organization one.
+
+The script checks the prefix before it makes a request, so handing it an
+organization token stops immediately with an explanation rather than a 403 that
+looks like a broken or under-scoped token. It isn't broken; it's the wrong kind,
+and no amount of re-issuing an organization token will help, because its
+permissions cannot be changed.
 
 Then **commit `telemetry.properties`.** The DSN belongs in git. It is a
-write-only ingest endpoint that ships inside every store binary — anyone can
-read it out of a published build in minutes — so it is not a secret, and any
+write-only ingest endpoint that ships inside every store binary, anyone can
+read it out of a published build in minutes, so it is not a secret, and any
 scheme where each developer configures it locally means fresh clones silently
 report nothing.
 
@@ -141,7 +149,7 @@ Set under **Settings → Secrets and variables → Actions**. All are required f
 
 pushes all of them. Keep the certificate, the `.p8`, the upload keystore and the service-account JSON in **one private folder outside any repo**; the script asks for that folder once and the [credential store](#credential-store-do-this-on-your-second-project) remembers the path (never the files). The passwords beside them are account-wide, so the store holds those too. A new app then costs two values, not fifteen. See [release-automation.md → Secrets and variables](docs/release-automation.md#secrets-and-variables).
 
-Anything it can't find is reported with what that specific gap costs, and everything else still goes up — so a partial folder is a useful run, not a failed one.
+Anything it can't find is reported with what that specific gap costs, and everything else still goes up. So a partial folder is a useful run, not a failed one.
 
 **Your Play service account can cover every app.** Invite it at the *account* level (Play Console → Users and permissions → Invite new user → grant permissions for the whole developer account rather than per-app) and future apps are covered automatically, so the JSON you save today keeps working for app number five. Verify after your next app appears: the service account should already be listed against it.
 
@@ -163,7 +171,7 @@ The one item that cannot be reissued is the Android upload keystore: once an app
 | --- | --- |
 | `APPLE_TEAM_ID` | Apple Developer → Membership → Team ID |
 | `ASC_KEY_ID` | App Store Connect → Users and Access → Keys → Key ID |
-| `ASC_ISSUER_ID` | Same page — Issuer ID (top of the Keys tab) |
+| `ASC_ISSUER_ID` | Same page, Issuer ID (top of the Keys tab) |
 | `ASC_KEY_P8_BASE64` | `base64 -i AuthKey_XXX.p8 \| pbcopy` |
 | `APPLE_DIST_CERT_P12_BASE64` | Export your Apple Distribution cert from Keychain as .p12, then `base64 -i dist.p12 \| pbcopy` |
 | `APPLE_DIST_CERT_PASSWORD` | Password you set when exporting the .p12 |
@@ -185,7 +193,7 @@ Variables** (not secrets):
 | `SENTRY_PROJECT` | Your Sentry project slug |
 
 There is no `SENTRY_DSN` secret. The DSN lives in the committed
-`telemetry.properties` — see [Sentry](#sentry-one-script) for why. The
+`telemetry.properties`, see [Sentry](#sentry-one-script) for why. The
 environment variable is still read first, so you can point one workflow
 somewhere else, but you should not need to. `release.yml` fails before it
 builds anything if neither is set: a store build with crash reporting off ships
@@ -194,14 +202,14 @@ blind, and that is not something to discover from a review rejection.
 ### Grafana Cloud telemetry (optional)
 
 Used by `beta.yml` and `release.yml` to bake client app-event credentials into
-store builds. Leave unset and the telemetry pipe stays dormant — the app builds
+store builds. Leave unset and the telemetry pipe stays dormant. The app builds
 and runs fine.
 
 | Secret | Notes |
 | --- | --- |
 | `GRAFANA_OTLP_BASE_URL` | Grafana Cloud → OpenTelemetry → OTLP endpoint base URL |
-| `GRAFANA_OTLP_INSTANCE_ID` | Same page — instance id (the numeric user) |
-| `GRAFANA_LOGS_WRITE_TOKEN` | A Grafana Cloud access-policy token with logs:write. Grafana auto-revokes `glc_` tokens it finds in public repos — never commit one. |
+| `GRAFANA_OTLP_INSTANCE_ID` | Same page, instance id (the numeric user) |
+| `GRAFANA_LOGS_WRITE_TOKEN` | A Grafana Cloud access-policy token with logs:write. Grafana auto-revokes `glc_` tokens it finds in public repos, never commit one. |
 
 ### Server deploy (Fly.io)
 
@@ -211,7 +219,7 @@ and runs fine.
 
 creates both apps, points the fly configs at them, pushes the Supabase values
 as Fly secrets, mints both tokens below into GitHub, and offers the first
-deploy. Run `fly auth login` first. Creating apps is free — only the first
+deploy. Run `fly auth login` first. Creating apps is free, only the first
 deploy starts a machine, and that step asks separately.
 
 `server-deploy.yml` auto-deploys the dev server on pushes to `main` that touch
@@ -222,12 +230,12 @@ approval. Requires the two Fly apps from `apps/server/DEPLOY.md`.
 | --- | --- |
 | `FLY_API_TOKEN_DEV` | `fly tokens create deploy -a <project>-server-dev --expiry 8760h` |
 | `FLY_API_TOKEN_PROD` | `fly tokens create deploy -a <project>-server-prod --expiry 8760h` |
-| `ADMIN_API_TOKEN_DEV` *(optional)* | The dev server's `ADMIN_API_TOKEN` — lets the deploy upload the per-version config manifest (see `apps/admin/README.md`). Skipped with a warning if unset. |
+| `ADMIN_API_TOKEN_DEV` *(optional)* | The dev server's `ADMIN_API_TOKEN`, lets the deploy upload the per-version config manifest (see `apps/admin/README.md`). Skipped with a warning if unset. |
 | `ADMIN_API_TOKEN_PROD` *(optional)* | Same, for prod. |
 
 Also create the **`production` GitHub Environment** (Settings → Environments →
 New environment → `production` → Required reviewers → add yourself).
-`server-deploy-prod.yml` pauses on it until a human approves the run — without
+`server-deploy-prod.yml` pauses on it until a human approves the run, without
 the environment the prod deploy runs unguarded.
 
 ---
@@ -248,9 +256,9 @@ the environment the prod deploy runs unguarded.
 Before `release.yml` can ship:
 
 1. **Play Console** → Create app → fill out store listing, data-safety form, content rating, pricing/distribution. Create at least one internal track tester.
-2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details. Note: Apple checks the binary's bundle name / display name for uniqueness at *delivery* time (ITMS-90129), not here — if your app name is a common word, the first upload may bounce; pick a more distinctive `CFBundleName`/`CFBundleDisplayName` in `apps/ios` and re-upload.
+2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details. Note: Apple checks the binary's bundle name / display name for uniqueness at *delivery* time (ITMS-90129), not here. If your app name is a common word, the first upload may bounce; pick a more distinctive `CFBundleName`/`CFBundleDisplayName` in `apps/ios` and re-upload.
 3. **TestFlight** external group: create a group named `External Testers` (or change `TESTFLIGHT_EXTERNAL_GROUP` in `release.yml`).
-4. Privacy policy + terms of service URLs — the `pages/` folder generates these; once Pages is enabled they're at `https://<you>.github.io/<repo>/privacy.html` etc. Paste the URLs into both store listings.
+4. Privacy policy + terms of service URLs: the `pages/` folder generates these; once Pages is enabled they're at `https://<you>.github.io/<repo>/privacy.html` etc. Paste the URLs into both store listings.
 
 ---
 
@@ -290,17 +298,17 @@ Drop your icons into:
 `:libraries:networking` ships a single configured `HttpClient` (plus an
 authenticated variant) for every repo and data source to share.
 
-**Set your base URL** — or deliberately don't. The shipped default leaves it
+**Set your base URL**, or deliberately don't. The shipped default leaves it
 blank, which is a real configuration: an app with no API of its own still signs
 in against Supabase and calls third parties by absolute URL. A *relative* path
 with no base URL is rejected before it leaves the device, with a message naming
-what to set. That is on purpose — Ktor would otherwise resolve it against
+what to set. That is on purpose, Ktor would otherwise resolve it against
 `http://localhost`, and the refused connection would trip the offline banner,
 so an unconfigured project would present as offline on a device with full
 signal.
 
 Bind your own `NetworkConfig` (see `DefaultNetworkConfig`) somewhere in your
-app — typically a class that reads the URL from BuildConfig per build variant:
+app, typically a class that reads the URL from BuildConfig per build variant:
 
 ```kotlin
 @SingleIn(AppScope::class)
@@ -332,11 +340,11 @@ encrypted session storage, `/v1/me` profile).
 ./scripts/setup_supabase.main.kts
 ```
 
-does steps 1 to 4 below — creates the project, turns on anonymous sign-ins,
+does steps 1 to 4 below, creates the project, turns on anonymous sign-ins,
 sets the redirect URLs, authorizes your bundle ID for Apple, and writes
 `local.properties`. It needs a Supabase personal access token (`sbp_…`) from
 <https://supabase.com/dashboard/account/tokens>, which the credential store
-keeps for next time. It prints the generated database password **once** — save
+keeps for next time. It prints the generated database password **once**, save
 it, the API will not hand it back.
 
 The steps below are what it does, and what to do if you'd rather do it by hand
@@ -344,7 +352,7 @@ or something failed:
 
 1. Create a Supabase project (free tier is fine). Note the project URL and
    the **publishable (anon) key** (Settings → API Keys).
-2. Client config — add to `local.properties` (or export as env vars in CI):
+2. Client config: add to `local.properties` (or export as env vars in CI):
    ```
    supabase.projectId=<ref>
    supabase.url=https://<ref>.supabase.co
@@ -355,7 +363,7 @@ or something failed:
    (confirm-email on), and optionally **Apple** / **Google**.
 
    **Apple is set-and-forget here, and it is worth knowing why.** This app
-   signs in with Apple *natively* on iOS — the system sheet returns an identity
+   signs in with Apple *natively* on iOS: the system sheet returns an identity
    token, which goes to Supabase as `signInWith(IDToken)`. Supabase validates
    that against the **Authorized Client IDs** list, so the only thing to fill in
    is your iOS bundle ID. Leave the Services ID and Secret Key fields empty.
@@ -374,12 +382,12 @@ or something failed:
    <yourscheme>://auth/confirmed
    ```
    The scheme is your project's lowercase name (see the intent filter in
-   `AndroidManifest.xml` / `CFBundleURLTypes` in `Info.plist` — both already
+   `AndroidManifest.xml` / `CFBundleURLTypes` in `Info.plist`; both are already
    enabled).
 5. Server env (see `apps/server/.env.example`): `SUPABASE_URL` for JWT
    verification, and `SUPABASE_SERVICE_ROLE_KEY` if you want in-app account
    deletion (`DELETE /v1/me`) and display-name mirroring. Treat the service
-   role key as a root password — server secrets only, never the client.
+   role key as a root password, server secrets only, never the client.
 6. Verify: launch the app → complete onboarding as a guest → a user appears
    in Supabase → Authentication → Users with `is_anonymous = true`, and
    `GET /v1/me` (through the app) creates the profile row.
@@ -387,7 +395,7 @@ or something failed:
 ## Deep links
 
 Compose NavHost handles the routing once URLs reach it. Per-route deep
-links go on `screen<Route>(deepLinks = ...)` — use `routeDeepLink<T>()`,
+links go on `screen<Route>(deepLinks = ...)`, use `routeDeepLink<T>()`,
 never bare `navDeepLink` (iOS crashes on the missing base-route NavTypes).
 
 The custom-scheme wiring is already enabled on both platforms (the auth
@@ -403,7 +411,7 @@ everything else into the nav graph.
 
 Inject `ReviewPrompter` and call `requestReview()` from a delighted-user
 moment (e.g. after the user completes a meaningful task, or after N
-sessions). The OS owns the throttling decision — both stores rate-limit how
+sessions). The OS owns the throttling decision: both stores rate-limit how
 often the dialog actually shows. Don't show your own UI before/after.
 
 ---
@@ -415,7 +423,7 @@ See `docs/release-automation.md` for the full pipeline runbook.
 ## Day-1 verification
 
 Prove the observability + deploy story end to end while everything is fresh.
-Each check has a definitive pass signal; if one fails, fix it now — these are
+Each check has a definitive pass signal; if one fails, fix it now. These are
 the tools you'll be debugging with later.
 
 1. **Server is live.**
@@ -429,12 +437,12 @@ the tools you'll be debugging with later.
    `profiles` table.
 3. **Find your session in Loki** (if Grafana is wired). In Grafana → Explore →
    Loki, query your client logs by the app's service name and filter
-   `session_id="<id>"` — grab the id from the app's debug shake dialog or
+   `session_id="<id>"`, grab the id from the app's debug shake dialog or
    logcat (`Session started`). Expected: the `app.launched` event and your
    request logs, and the SAME `session_id` on the server's request logs.
 4. **Trigger a test crash → Sentry.** Requires
    [`setup_sentry.main.kts`](#sentry-one-script) to have run and
-   `telemetry.properties` to be committed — with a blank DSN the SDK never
+   `telemetry.properties` to be committed, with a blank DSN the SDK never
    initialises and this check has nothing to find. Debug builds: shake → QA
    dialog → the test-crash affordance (or add a temporary `error()` behind a
    button). Expected: the event in Sentry within a minute under environment

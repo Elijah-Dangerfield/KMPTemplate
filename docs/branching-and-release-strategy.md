@@ -3,7 +3,7 @@
 This is a thinking document, not a rulebook. It walks through the
 branching models that exist, why each one came to be, what each one is
 actually solving, and what the tradeoffs look like for **this specific
-repo** — a solo project shipping a mobile app through two stores with
+repo**, a solo project shipping a mobile app through two stores with
 release-please driving the version bumps.
 
 It's long on purpose. The point is to build enough understanding that
@@ -67,7 +67,7 @@ product companies. Every CI/CD SaaS vendor's default assumption.
 
 - Post-release stabilization when `main` has already moved on. If you
   ship v1.0 from commit D and then a week later you find a v1.0 bug,
-  but `main` is now at commit K with a bunch of unrelated new work —
+  but `main` is now at commit K with a bunch of unrelated new work,
   the fix on `main` can't necessarily be delivered to v1.0 users
   without rolling the new work too.
 - Apple/Play store review cycles. You upload a build, Apple takes
@@ -158,7 +158,7 @@ being forced onto v-next.
 
 - Apple rejects your v1.0.1 submission. You land the fix on
   `release/1.0`, retag v1.0.1 from the release branch HEAD, ship. Main
-  can have already moved on to v1.1 work in parallel — it doesn't
+  can have already moved on to v1.1 work in parallel, it doesn't
   matter.
 - No "line in the sand" redraw. The line lives on its own branch
   forever.
@@ -175,7 +175,7 @@ being forced onto v-next.
   manual tags + manual changelog entries.
 - Merging release branches back to main creates conflicts if the same
   file changed on both sides (especially on `versions.properties` /
-  `CHANGELOG.md` / `Config.xcconfig` — the files release-please
+  `CHANGELOG.md` / `Config.xcconfig`, the files release-please
   rewrites).
 - "Which branch should I PR against?" becomes a live question for
   every contributor. With solo-you that's cheap. With a team it adds
@@ -186,7 +186,7 @@ being forced onto v-next.
 One branch (`main`), short-lived feature branches, deploy from main
 every merge. Popularized by GitHub the company, natural fit for SaaS.
 
-Basically TBD, with even less ceremony — no formal "release", just
+Basically TBD, with even less ceremony, no formal "release", just
 continuous deployment. Doesn't fit store-submitted mobile apps well
 because "deploy" isn't just pushing a binary, it's Apple's review
 queue.
@@ -195,20 +195,20 @@ queue.
 
 The pattern varies by constraint:
 
-- **SaaS, weekly/daily deploys, no store review gating** — TBD or
+- **SaaS, weekly/daily deploys, no store review gating**: TBD or
   GitHub Flow. Main is deployed. Versioning is often just "the
   timestamp" or "the build number." No real "release" event.
-- **Mobile app, store review, staged rollout** — TBD with release
+- **Mobile app, store review, staged rollout**: TBD with release
   branches for hotfixes, OR TBD with the discipline that rejections
   mean "bump the patch version and resubmit." The second is simpler;
   the first is what you reach for when you're big enough that v-next
   work can't pause waiting on the store queue.
-- **Desktop software, enterprise contracts, LTS versions** — TBD with
+- **Desktop software, enterprise contracts, LTS versions**: TBD with
   multiple long-lived release branches (release/1.x, release/2.x,
   release/3.x), each getting security fixes for years. Basically
   Chrome's model. Nobody would pick this voluntarily if they didn't
   have to.
-- **Regulated industries (banking, medical)** — GitFlow-ish, because
+- **Regulated industries (banking, medical)**: GitFlow-ish, because
   audit trails love "every release is a branch with a clear lineage."
 
 **The pattern that matters:** companies rarely pick a model for
@@ -233,7 +233,7 @@ When it's one person:
 Most solo mobile devs land in one of two camps:
 
 1. **Pure TBD with "just bump the patch."** Rejection = 1.0.2. Works
-   fine. Only downside is cosmetic — you end up with 1.0.2, 1.0.4 on
+   fine. Only downside is cosmetic, you end up with 1.0.2, 1.0.4 on
    your store page, looking like you ship more often than you do.
 2. **TBD with ad-hoc retagging.** Which is what we just did. Delete
    the tag, retag at HEAD of main. Works, but every time Apple
@@ -251,7 +251,7 @@ is happening while v1.0 is still in review, it pays off.
 - One app shipped to two stores.
 - release-please driving version bumps on merges to `main`.
 - Apple review cycle can take 1–7 days.
-- Play rollout is staged (10%) — once something ships to Play, backing
+- Play rollout is staged (10%): once something ships to Play, backing
   it out is a real operation.
 - The pain point: **Apple rejections force a re-ship for the same
   version, which means uploading a new binary under v1.0.1 after
@@ -286,7 +286,7 @@ the mechanics, it's remembering the dance and not forgetting a step.
   has sharp edges around CHANGELOG generation; the second loses the
   thing release-please is good at.
 - **You don't actually have v-next work in parallel.** When Apple
-  rejects 1.0.1, you're not mid-feature on 1.1 — you're focused on
+  rejects 1.0.1, you're not mid-feature on 1.1, you're focused on
   fixing the rejection. The parallelism benefit is hypothetical.
 - **Mobile store releases are already serialized.** Play rolls out
   one release at a time per track. You can't have 1.0.1 and 1.1.0
@@ -300,20 +300,20 @@ the mechanics, it's remembering the dance and not forgetting a step.
 
 ## What could actually help (without changing the model)
 
-The pain in the current setup isn't really the branching model — it's
+The pain in the current setup isn't really the branching model, it's
 the ritual. A few things could reduce the ritual without moving to
 release branches:
 
-1. **A one-shot `retag-release` action** — a workflow_dispatch that
+1. **A one-shot `retag-release` action**: a workflow_dispatch that
    takes a version string, deletes the existing tag + release, retags
    at main HEAD, and fires release.yml with `skip_play_store=true`.
    Same three commands, but one button in the Actions UI.
-2. **Make `skip_play_store` respected on tag push** — right now you
+2. **Make `skip_play_store` respected on tag push**: right now you
    have to cancel + redispatch because the push trigger doesn't see
    workflow_dispatch inputs. A tag-name convention (e.g. `v1.0.1-ios`
    or `v1.0.1-resubmit`) or a repo variable could carry the signal
    through push triggers.
-3. **A "what would release-please do" dry-run action** — lets you see
+3. **A "what would release-please do" dry-run action**: lets you see
    what a release-please merge would cut (1.0.2? 1.1.0?) before you
    merge its PR. Would've caught the "oh wait, it's going to bump to
    1.0.2 when I wanted 1.0.1 resubmit" confusion earlier.
@@ -348,19 +348,19 @@ keep.
 
 If you want the canonical sources:
 
-- **Trunk-based development:** https://trunkbaseddevelopment.com/ —
+- **Trunk-based development:** https://trunkbaseddevelopment.com/,
   Paul Hammant's site. Opinionated, good summary of why the model won
   in most shops.
-- **GitFlow original post:** https://nvie.com/posts/a-successful-git-branching-model/ —
+- **GitFlow original post:** https://nvie.com/posts/a-successful-git-branching-model/,
   the 2010 article. Author has since added a disclaimer that it's
   outdated for most teams now.
 - **Google's Monorepo paper:** *"Why Google Stores Billions of Lines
-  of Code in a Single Repository"* (CACM, 2016) — the scale at which
+  of Code in a Single Repository"* (CACM, 2016), the scale at which
   trunk-based stops being a preference and becomes a requirement.
-- **Chromium's branching docs:** https://www.chromium.org/developers/branches —
+- **Chromium's branching docs:** https://www.chromium.org/developers/branches,
   real-world example of TBD + release branches for an LTS-style
   product.
 - **release-please docs on branch strategies:**
-  https://github.com/googleapis/release-please — especially the
+  https://github.com/googleapis/release-please, especially the
   "release types" and "manifest" sections, to understand where the
   tool has sharp edges.

@@ -192,7 +192,7 @@ fun adoptOrCreateProject(): String {
     // Printed once and never stored: it is per project, so it does not belong
     // in the machine store, and the Management API will not hand it back.
     // Losing it means resetting the database password in the dashboard.
-    bold("\nDatabase password — save this now, it is not recoverable")
+    bold("\nDatabase password, save this now, it is not recoverable")
     println("  $databasePassword")
     println("  Connection string for apps/server/.env:")
     println("  postgresql://postgres:$databasePassword@db.$ref.supabase.co:5432/postgres")
@@ -203,7 +203,7 @@ fun adoptOrCreateProject(): String {
 val ref = adoptOrCreateProject()
 
 if (!awaitProjectReady(token, ref)) {
-    yellow("$ref is still provisioning. The config below will fail until it is up — re-run in a minute.")
+    yellow("$ref is still provisioning. The config below will fail until it is up, re-run in a minute.")
 }
 
 val projectUrl = "https://$ref.supabase.co"
@@ -240,7 +240,7 @@ upsertProperty(localProperties, "supabase.projectId", ref)
 upsertProperty(localProperties, "supabase.url", projectUrl)
 upsertProperty(localProperties, "supabase.anonKey", anonKey)
 green("✓ Wrote supabase.projectId / url / anonKey into local.properties")
-dim("  local.properties is gitignored — CI reads SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY instead.")
+dim("  local.properties is gitignored, CI reads SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY instead.")
 
 if (hasGhRepo()) {
     val projectOk = setGhSecret("SUPABASE_PROJECT_ID", ref)
@@ -248,10 +248,10 @@ if (hasGhRepo()) {
     if (projectOk && keyOk) {
         green("✓ Set repo secrets SUPABASE_PROJECT_ID and SUPABASE_ANON_KEY")
     } else {
-        yellow("Could not set the repo secrets — set SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY by hand.")
+        yellow("Could not set the repo secrets, set SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY by hand.")
     }
 } else {
-    yellow("No GitHub repo reachable via gh — set SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY yourself once there is one.")
+    yellow("No GitHub repo reachable via gh, set SUPABASE_PROJECT_ID / SUPABASE_ANON_KEY yourself once there is one.")
 }
 
 val serverEnvExample = File(root, "apps/server/.env.example")
@@ -270,7 +270,7 @@ if (serverEnvExample.exists()) {
         yellow("  Could not read the service role key. Copy it from Settings → API Keys if you want")
         yellow("  in-app account deletion and display-name mirroring.")
     }
-    dim("  DATABASE_URL is still yours to set — see the connection string above, or apps/server/.env.example.")
+    dim("  DATABASE_URL is still yours to set, see the connection string above, or apps/server/.env.example.")
     dim("  ./scripts/setup_fly.main.kts pushes these to the deployed server.")
 }
 
@@ -284,6 +284,6 @@ println("Next: rebuild, complete onboarding as a guest, and check")
 println("Authentication → Users for a row with is_anonymous = true.")
 println()
 println("Not done here: Google sign-in (needs a Google Cloud OAuth client).")
-println("The app runs without it — the button is simply not wired.")
+println("The app runs without it, the button is simply not wired.")
 
 exitProcess(0)

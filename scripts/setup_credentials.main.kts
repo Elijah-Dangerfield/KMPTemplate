@@ -57,10 +57,10 @@ fun list() {
     when (githubCliState()) {
         GithubCliState.READY -> green("  gh is installed and authenticated.")
         GithubCliState.NOT_AUTHENTICATED ->
-            yellow("  gh is installed but not authenticated — run `gh auth login` so the " +
+            yellow("  gh is installed but not authenticated, run `gh auth login` so the " +
                 "setup scripts can set repo secrets for you.")
         GithubCliState.NOT_INSTALLED ->
-            yellow("  gh is not installed — the setup scripts will print the commands for " +
+            yellow("  gh is not installed, the setup scripts will print the commands for " +
                 "you to run by hand instead.")
     }
     println()
@@ -98,7 +98,7 @@ fun import(path: String) {
     for (key in Keys.all) {
         val value = parsed[key.env] ?: continue
         if (store[key] == value) {
-            dim("  ${key.label} — already stored, unchanged")
+            dim("  ${key.label}, already stored, unchanged")
             continue
         }
         val existing = store[key]
@@ -217,7 +217,7 @@ fun moveTo(path: String) {
     // filesystems, and a half-moved credential store is worse than either end
     // of the move.
     store.file.copyTo(destination, overwrite = true)
-    if (destination.readText() != store.file.readText()) die("Copy did not match the original — left both in place.")
+    if (destination.readText() != store.file.readText()) die("Copy did not match the original, left both in place.")
     // The new directory as well as the file. `mkdirs` uses the process umask,
     // which is typically 755 — world-readable, and this is the one moment the
     // store lands somewhere that never had a permission set on it.
@@ -230,7 +230,7 @@ fun moveTo(path: String) {
 
 fun clear() {
     if (!store.exists) {
-        yellow("Nothing to clear — ${store.file.path} does not exist.")
+        yellow("Nothing to clear, ${store.file.path} does not exist.")
         return
     }
     if (!confirm("Delete every stored value in ${store.file.path}?", default = false)) {
@@ -247,7 +247,7 @@ fun edit() {
         """
         These are the values that are the same for every project you generate
         from this template. Fill in what you have; press Enter to skip anything
-        you do not. Nothing here is required — a script that cannot find a value
+        you do not. Nothing here is required, a script that cannot find a value
         asks for it, exactly as it does today.
 
         Stored at ${store.file.path}, owner-readable only, outside every repo.
@@ -302,7 +302,7 @@ fun edit() {
     println()
     dim(
         "Moving to a new machine: rerun this script there. Copying the file directly " +
-            "works too, but it holds live deploy tokens in plain text — treat that copy " +
+            "works too, but it holds live deploy tokens in plain text, treat that copy " +
             "like the tokens themselves, and do not put it anywhere that syncs."
     )
 }

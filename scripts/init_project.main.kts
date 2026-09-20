@@ -562,7 +562,7 @@ fun wantsBackend(cliBackendEnabled: Boolean?): Boolean {
  */
 fun substitutePlaceholders(projectDir: File, projectName: ProjectName, contactEmail: String) {
     val today = java.time.LocalDate.now().toString()
-    val tagline = "${projectName.displayName} — official site."
+    val tagline = "${projectName.displayName}, the official site."
     val description = "${projectName.displayName} is a cross-platform app built with Kotlin Multiplatform and Compose."
     val pairs = listOf(
         "{{APP_NAME}}" to projectName.displayName,
@@ -654,8 +654,8 @@ fun rewriteReadme(projectDir: File, projectName: ProjectName) {
             ""
         )
         .replace(
-            "that goes in [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md) — code,",
-            "that goes in the template's own `docs/PORT-CANDIDATES.md` — code,"
+            "that goes in [docs/PORT-CANDIDATES.md](docs/PORT-CANDIDATES.md). Code,",
+            "that goes in the template's own `docs/PORT-CANDIDATES.md`. Code,"
         )
 
     readmeFile.writeText(content)
@@ -1083,11 +1083,11 @@ fun removeBackend(projectDir: File, projectName: ProjectName) {
     // server stays: for this reader it is the most useful one in the file.
     val decisions = File(projectDir, "docs/decisions.md")
     listOf(
-        "## 2026-06-21 — Server mirrors client conventions",
-        "## 2026-06-21 — Graceful degradation over required config",
-        "## 2026-06-21 — Auth is JWKS verification, never a shared secret",
-        "## 2026-06-21 — `serverOnly` build slimming",
-        "## 2026-06-21 — Flyway SQL is the schema source of truth",
+        "## 2026-06-21: Server mirrors client conventions",
+        "## 2026-06-21: Graceful degradation over required config",
+        "## 2026-06-21: Auth is JWKS verification, never a shared secret",
+        "## 2026-06-21: `serverOnly` build slimming",
+        "## 2026-06-21: Flyway SQL is the schema source of truth",
     ).forEach { cutSection(decisions, it) }
     printGreen("   ✓ Removed the backend's architecture decisions")
 }
@@ -1165,7 +1165,7 @@ fun stripServerFromTestingDoc(file: File) {
     applyEdits(file, listOf(
         """
 
-        Integration tests aren't a substitute for unit tests — they're slower and
+        Integration tests aren't a substitute for unit tests, they're slower and
         harder to debug. Use them for the seam contract (real wire, real plumbing),
         not for every rule the lower layers already own.
         """.trimIndent() + "\n" to "",
@@ -1185,7 +1185,7 @@ fun stripServerFromObservabilityDoc(file: File, serviceName: String) {
     applyEdits(file, listOf(
         "# Observability: one id, three systems" to "# Observability: one id, two systems",
         """
-        The stack is Sentry (crashes, user feedback, stack traces), Loki (logs — client app events and
+        The stack is Sentry (crashes, user feedback, stack traces), Loki (logs: client app events and
         server request logs), and Tempo (server traces). What ties them together is a single correlation
         id: **`session_id`**, the UUID of the current client app session.
         """.trimIndent() to
@@ -1200,7 +1200,7 @@ fun stripServerFromObservabilityDoc(file: File, serviceName: String) {
                 "  `X-Session-Id` (plus `X-Install-Id`), so a backend that reads the header can correlate too.",
         """
         The key naming rule: it is always the underscore form `session_id`, in all systems, so one query
-        string works everywhere. The same rule applies to any context you add — if a key exists on backend
+        string works everywhere. The same rule applies to any context you add: if a key exists on backend
         spans and client Sentry tags, spell it identically (`Telemetry.setContext(key, value)` client-side,
         `SpanAttrs` server-side).
         """.trimIndent() to
@@ -1226,12 +1226,12 @@ fun stripServerFromSetupDoc(file: File) {
     cutSection(file, "### Server deploy (Fly.io)")
 
     applyEdits(file, listOf(
-        "- [ ] [Server deploy](#server-deploy-flyio) — dev Fly app + secrets + `/_health`\n" to "",
+        "- [ ] [Server deploy](#server-deploy-flyio): dev Fly app + secrets + `/_health`\n" to "",
         """
         5. Server env (see `apps/server/.env.example`): `SUPABASE_URL` for JWT
            verification, and `SUPABASE_SERVICE_ROLE_KEY` if you want in-app account
            deletion (`DELETE /v1/me`) and display-name mirroring. Treat the service
-           role key as a root password — server secrets only, never the client.
+           role key as a root password, server secrets only, never the client.
         6. Verify: launch the app → complete onboarding as a guest → a user appears
            in Supabase → Authentication → Users with `is_anonymous = true`, and
            `GET /v1/me` (through the app) creates the profile row.
@@ -1256,7 +1256,7 @@ fun stripServerFromSetupDoc(file: File) {
            `profiles` table.
         3. **Find your session in Loki** (if Grafana is wired). In Grafana → Explore →
            Loki, query your client logs by the app's service name and filter
-           `session_id="<id>"` — grab the id from the app's debug shake dialog or
+           `session_id="<id>"`, grab the id from the app's debug shake dialog or
            logcat (`Session started`). Expected: the `app.launched` event and your
            request logs, and the SAME `session_id` on the server's request logs.
         4. **Trigger a test crash → Sentry.** Requires
@@ -1299,10 +1299,10 @@ fun stripServerFromAgentsDoc(file: File) {
 
     applyEdits(file, listOf(
         """
-        Conventions (hand-rolled fakes only, dispatcher choice, which layer catches which bug) live in [`docs/practices/testing.md`](docs/practices/testing.md) — read it before adding tests. The end-to-end tier is `:apps:integration`: an Android-library module whose tests run on the host JVM (`./gradlew :apps:integration:testDebugUnitTest`, needs Docker) and drive the real client stack — real `HomeViewModel`, real repositories, real HTTP client — over real TCP against a real in-process Ktor server on a Testcontainers Postgres. `HarnessSmokeTest` is the worked example; `commonMain` stays empty so iOS never links the JVM-only server.
+        Conventions (hand-rolled fakes only, dispatcher choice, which layer catches which bug) live in [`docs/practices/testing.md`](docs/practices/testing.md). Read it before adding tests. The end-to-end tier is `:apps:integration`: an Android-library module whose tests run on the host JVM (`./gradlew :apps:integration:testDebugUnitTest`, needs Docker) and drive the real client stack (real `HomeViewModel`, real repositories, real HTTP client) over real TCP against a real in-process Ktor server on a Testcontainers Postgres. `HarnessSmokeTest` is the worked example; `commonMain` stays empty so iOS never links the JVM-only server.
         """.trimIndent() to
-            "Conventions (hand-rolled fakes only, dispatcher choice, which layer catches which bug) live in [`docs/practices/testing.md`](docs/practices/testing.md) — read it before adding tests.",
-        "\n- **On the server, `withSpan` parents to the *current* OTel context.** Correct inside a request handler, wrong anywhere the current context outlives the unit of work — a WebSocket upgrade span stays current for the life of the socket, and a shared `Dispatchers.Default` scope leaves contexts on pool threads for unrelated work to inherit. Downstream this produced one trace id spanning hours and several users, permanently stuck at \"root span not yet received\". Root a new trace per unit of work. Full detail in the `withSpan` KDoc in `apps/server/.../plugins/Tracing.kt`." to "",
+            "Conventions (hand-rolled fakes only, dispatcher choice, which layer catches which bug) live in [`docs/practices/testing.md`](docs/practices/testing.md). Read it before adding tests.",
+        "\n- **On the server, `withSpan` parents to the *current* OTel context.** Correct inside a request handler, wrong anywhere the current context outlives the unit of work. A WebSocket upgrade span stays current for the life of the socket, and a shared `Dispatchers.Default` scope leaves contexts on pool threads for unrelated work to inherit. Downstream this produced one trace id spanning hours and several users, permanently stuck at \"root span not yet received\". Root a new trace per unit of work. Full detail in the `withSpan` KDoc in `apps/server/.../plugins/Tracing.kt`." to "",
     ))
 }
 
@@ -1320,7 +1320,7 @@ fun stripServerFromReadme(file: File) {
         """.trimIndent() + "\n" to "",
         "- CI from the first push: build + unit/server/integration test jobs, release-please versioning" to
             "- CI from the first push: build + unit test jobs, release-please versioning",
-        "- An **integration harness** that drives the real client stack against the real server over a real Postgres — in a unit test\n" to "",
+        "- An **integration harness** that drives the real client stack against the real server over a real Postgres, in a unit test\n" to "",
         """
 
         # Server (boots in limited mode with zero config)
