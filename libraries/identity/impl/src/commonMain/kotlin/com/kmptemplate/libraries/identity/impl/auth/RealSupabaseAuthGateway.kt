@@ -177,6 +177,12 @@ class RealSupabaseAuthGateway(
     }
 
     private fun OAuthProvider.toSupabaseProvider(): SupabaseOAuthProvider = when (this) {
+        // Nothing routes Apple here today: the UI runs the native coordinator
+        // and exchanges an id token via [signInWithAppleIdToken], which needs
+        // only the bundle ID in Supabase's Authorized Client IDs. Send Apple
+        // through this browser flow instead and Supabase additionally requires
+        // a Services ID and a client-secret JWT that expires every six months.
+        // That is a setup obligation, not a code change — decide it on purpose.
         OAuthProvider.Apple -> Apple
         OAuthProvider.Google -> Google
     }
