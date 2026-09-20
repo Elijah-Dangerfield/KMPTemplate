@@ -80,6 +80,11 @@ purpose. Sourcing the file into your shell instead would look like it worked
 and persist nothing: env wins at read time, so the editor skips anything
 already set there.
 
+`FILE_*` entries are understood too. Paths resolve relative to the env file, a
+`*` in the filename is expanded (Apple bakes an unpredictable key id into the
+`.p8`), and the folder they share becomes the signing folder. Nothing in those
+files is read — only where they are.
+
 The values are per person and per machine, not per project: your Sentry org,
 your Fly deploy tokens, your Apple team. Fill them in once and every project
 you generate afterwards stops asking.

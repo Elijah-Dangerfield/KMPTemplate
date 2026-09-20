@@ -107,7 +107,10 @@ fun import(path: String) {
         green("  ✓ ${key.label} ← ${key.env}")
     }
 
-    val unknown = parsed.keys - Keys.all.map { it.env }.toSet()
+    imported += importFilePaths(file, parsed)
+
+    val handled = Keys.all.map { it.env }.toSet()
+    val unknown = parsed.keys.filterNot { it in handled || it.startsWith("FILE_") }
     if (unknown.isNotEmpty()) {
         println()
         dim("  Ignored (not values this store holds): ${unknown.sorted().joinToString(", ")}")
@@ -115,6 +118,58 @@ fun import(path: String) {
 
     println()
     if (imported == 0) green("Nothing new to import.") else green("✓ Imported $imported value(s).")
+}
+
+/**
+ * Derives the two path-shaped store values from `FILE_*` entries.
+ *
+ * A folder of shared release secrets tends to name its binary material this
+ * way, with paths relative to the env file and sometimes a glob, because Apple
+ * bakes an unpredictable key id into the `.p8` filename. The store wants the
+ * *folder* rather than four paths — `setup_github_secrets.main.kts` finds the
+ * files inside it — so the common parent is what gets kept.
+ *
+ * Nothing is read from these files here. Only where they are.
+ */
+fun importFilePaths(envFile: File, parsed: Map<String, String>): Int {
+    /** Resolves relative to the env file, expanding a `*` in the filename. */
+    fun resolve(path: String): File? {
+        val raw = File(path.replaceFirst("~", System.getProperty("user.home")))
+        val absolute = if (raw.isAbsolute) raw else File(envFile.parentFile, path)
+        if (!absolute.name.contains('*')) return absolute.takeIf { it.isFile }
+        // Regex.escape wraps the name in \Q…\E, so the `*` inside it is a plain
+        // character — break out of the quote around it rather than escaping it.
+        val pattern = Regex(Regex.escape(absolute.name).replace("*", "\\E.*\\Q"))
+        return absolute.parentFile?.listFiles()
+            ?.filter { it.isFile && pattern.matches(it.name) }
+            ?.singleOrNull()
+    }
+
+    val resolved = parsed.filterKeys { it.startsWith("FILE_") }
+        .mapNotNull { (name, path) -> resolve(path)?.let { name to it } }
+        .toMap()
+    if (resolved.isEmpty()) return 0
+
+    var imported = 0
+
+    fun store(key: SetupKey, value: String, from: String) {
+        if (store[key] == value) return
+        if (store[key] != null && !confirm("  Replace ${key.label}?", default = false)) return
+        store[key] = value
+        imported++
+        green("  ✓ ${key.label} ← $from")
+    }
+
+    // One shared parent or nothing: files scattered across directories are not
+    // a signing folder, and guessing one of them would send the release script
+    // somewhere it would find half the material.
+    resolved.values.map { it.parentFile }.distinctBy { it.canonicalPath }.singleOrNull()
+        ?.let { store(Keys.SIGNING_DIR, it.canonicalPath, "the folder FILE_* point into") }
+
+    resolved["FILE_ASC_KEY"]
+        ?.let { store(Keys.ASC_KEY_PATH, it.canonicalPath, "FILE_ASC_KEY") }
+
+    return imported
 }
 
 fun clear() {
