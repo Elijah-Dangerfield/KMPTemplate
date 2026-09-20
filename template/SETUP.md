@@ -76,7 +76,7 @@ scripts collect values as they go — each one offers to remember what you typed
 
 | | |
 | --- | --- |
-| Lives at | `~/.config/appsetup/credentials.properties`, mode 0600, outside every repo |
+| Lives at | `~/.config/appsetup/credentials.properties` by default, mode 0600, outside every repo. `--move-to ~/Documents/appsetup` puts it somewhere iCloud syncs, which the scripts also search — a backup for what you cannot regenerate, a wider blast radius for what you can. |
 | Precedence | environment variable → store → prompt (so CI is unaffected) |
 | Holds | Sentry org + tokens, Supabase + Fly tokens and org slugs, Apple team / key IDs, signing passwords, and the *path* to your signing folder |
 | Does not hold | the signing files themselves, or anything per project — the Sentry project slug derives from the `applicationId`, the Fly app name from the project name |

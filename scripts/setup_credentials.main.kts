@@ -13,6 +13,7 @@
  *   ./scripts/setup_credentials.main.kts                 # walk through every value
  *   ./scripts/setup_credentials.main.kts --list          # show what is set, masked
  *   ./scripts/setup_credentials.main.kts --import <file> # read an env-format file
+ *   ./scripts/setup_credentials.main.kts --move-to <dir> # relocate it (e.g. somewhere synced)
  *   ./scripts/setup_credentials.main.kts --clear         # forget everything
  *
  * This is also the recovery path on a new machine: run it once and you are back
@@ -172,6 +173,61 @@ fun importFilePaths(envFile: File, parsed: Map<String, String>): Int {
     return imported
 }
 
+/**
+ * Relocates the store, leaving nothing behind at the old path.
+ *
+ * The case this is for: putting it somewhere that syncs, so a new laptop has it
+ * without a second setup pass. That is a real trade and worth making with both
+ * halves in view — a keystore password you cannot regenerate is safer with a
+ * backup, and a live deploy token is more exposed once a copy leaves the
+ * machine. The script states both and does what it is told.
+ *
+ * `setupStoreCandidates` is what makes the move stick: the next run finds the
+ * store wherever it now is, on this machine or the next one.
+ */
+fun moveTo(path: String) {
+    val target = File(path.replaceFirst("~", System.getProperty("user.home")))
+    val destination = if (target.name == STORE_FILE_NAME) target else File(target, STORE_FILE_NAME)
+
+    if (!store.exists) die("There is no store at ${store.file.path} to move.")
+    if (destination.canonicalPath == store.file.canonicalPath) {
+        yellow("The store is already at ${store.file.path}.")
+        return
+    }
+
+    val known = setupStoreCandidates().any { it.canonicalPath == destination.parentFile.canonicalPath }
+    bold("\nMoving the store")
+    println("  from ${store.file.path}")
+    println("  to   ${destination.path}")
+    if (!known) {
+        yellow("  That folder is not one the scripts look in, so set APPSETUP_DIR=${destination.parent}")
+        yellow("  in your shell profile or they will not find it. Searched by default:")
+        setupStoreCandidates().forEach { yellow("    ${it.path}") }
+    }
+    dim("  It holds live deploy tokens in plain text. Somewhere that syncs is a")
+    dim("  backup for the credentials you cannot regenerate, and a wider blast")
+    dim("  radius for the ones you can. Both are true; pick deliberately.")
+    if (!confirm("  Move it?", default = true)) {
+        yellow("Left where it was.")
+        return
+    }
+
+    destination.parentFile?.mkdirs()
+    // Copy-then-verify-then-delete. A rename across volumes fails on some
+    // filesystems, and a half-moved credential store is worse than either end
+    // of the move.
+    store.file.copyTo(destination, overwrite = true)
+    if (destination.readText() != store.file.readText()) die("Copy did not match the original — left both in place.")
+    // The new directory as well as the file. `mkdirs` uses the process umask,
+    // which is typically 755 — world-readable, and this is the one moment the
+    // store lands somewhere that never had a permission set on it.
+    restrictToOwner(destination, executable = false)
+    destination.parentFile?.let { restrictToOwner(it, executable = true) }
+    store.file.delete()
+    green("✓ Moved. ${destination.path}")
+    dim("  ${destination.parent} is owner-only. Nothing else on this Mac can read it.")
+}
+
 fun clear() {
     if (!store.exists) {
         yellow("Nothing to clear — ${store.file.path} does not exist.")
@@ -260,9 +316,13 @@ when (args.firstOrNull()) {
         import(path)
         list()
     }
+    "--move-to" -> {
+        val path = args.getOrNull(1) ?: die("--move-to needs a directory")
+        moveTo(path)
+    }
     else -> {
         red("Unknown option: ${args.first()}")
-        println("Usage: setup_credentials.main.kts [--list|--clear|--import <file>]")
+        println("Usage: setup_credentials.main.kts [--list|--clear|--import <file>|--move-to <dir>]")
         exitProcess(2)
     }
 }

@@ -349,11 +349,49 @@ object Keys {
  * Outside every repo, so it is never committed and never copied into a
  * generated project.
  */
-fun setupStoreFile(): File {
+// Not `const`: a Kotlin script compiles to a class body, where const is illegal.
+val STORE_FILE_NAME = "credentials.properties"
+
+/**
+ * Where a store would go if none exists: outside every repo, and not in a
+ * folder that syncs anywhere by default.
+ *
+ * Conservative on purpose. A store holds live deploy tokens, and putting them
+ * somewhere that uploads itself is a decision for the person whose tokens they
+ * are — not one a script makes quietly on their behalf. `--move-to` is how you
+ * opt in, and [setupStoreCandidates] is what makes that opt-in survive a new
+ * machine.
+ */
+fun defaultStoreDirectory(): File {
     val home = System.getProperty("user.home")
     val configHome = System.getenv("XDG_CONFIG_HOME")?.takeIf { it.isNotBlank() } ?: "$home/.config"
-    return File("$configHome/appsetup/credentials.properties")
+    return File("$configHome/appsetup")
 }
+
+/**
+ * Every directory a store might be in, most explicit first.
+ *
+ * The search exists so relocating the store survives a machine change. Somebody
+ * who moves it into a synced folder — a reasonable trade for a keystore
+ * password you cannot regenerate — gets it back on a new laptop with no setup,
+ * because the sync brings the file down and this finds it. Without the search,
+ * the opt-in would silently un-opt itself the moment it mattered most.
+ */
+fun setupStoreCandidates(): List<File> {
+    val home = System.getProperty("user.home")
+    return listOfNotNull(
+        System.getenv("APPSETUP_DIR")?.takeIf { it.isNotBlank() }?.let { File(it) },
+        defaultStoreDirectory(),
+        // macOS syncs Desktop & Documents to iCloud when that is turned on, so
+        // this is the conventional place for a store someone chose to sync.
+        File("$home/Documents/appsetup"),
+    ).distinctBy { it.absolutePath }
+}
+
+fun setupStoreFile(): File =
+    setupStoreCandidates().firstOrNull { File(it, STORE_FILE_NAME).isFile }
+        ?.let { File(it, STORE_FILE_NAME) }
+        ?: File(defaultStoreDirectory(), STORE_FILE_NAME)
 
 /**
  * Reads and writes [setupStoreFile]. Every read tolerates the file being
@@ -382,7 +420,7 @@ class SetupStore(val file: File = setupStoreFile()) {
         if (!directory.exists() && !directory.mkdirs()) {
             die("Could not create ${directory.absolutePath}")
         }
-        restrictPermissions(directory, PosixFilePermission.OWNER_EXECUTE)
+        restrictPermissions(directory, executable = true)
         if (!file.exists()) {
             file.createNewFile()
             restrictPermissions(file)
@@ -409,16 +447,26 @@ class SetupStore(val file: File = setupStoreFile()) {
         restrictPermissions(file)
     }
 
-    private fun restrictPermissions(target: File, vararg extra: PosixFilePermission) {
-        val permissions = setOf(
-            PosixFilePermission.OWNER_READ,
-            PosixFilePermission.OWNER_WRITE,
-        ) + extra
-        // Windows and some network filesystems have no POSIX view. Failing to
-        // tighten permissions is worth a warning, never worth aborting setup.
-        runCatching { Files.setPosixFilePermissions(target.toPath(), permissions) }
-            .onFailure { yellow("⚠ Could not restrict permissions on ${target.absolutePath}: ${it.message}") }
-    }
+    private fun restrictPermissions(target: File, executable: Boolean = false) =
+        restrictToOwner(target, executable)
+}
+
+/**
+ * Makes [target] readable and writable by its owner and nobody else.
+ *
+ * Shared so the store's own writes and a relocation agree. A directory needs
+ * the execute bit as well or its owner cannot traverse into it. Failing to
+ * tighten permissions is worth a warning and never worth aborting setup —
+ * Windows and some network filesystems have no POSIX view at all.
+ */
+fun restrictToOwner(target: File, executable: Boolean) {
+    val permissions = setOfNotNull(
+        PosixFilePermission.OWNER_READ,
+        PosixFilePermission.OWNER_WRITE,
+        PosixFilePermission.OWNER_EXECUTE.takeIf { executable },
+    )
+    runCatching { Files.setPosixFilePermissions(target.toPath(), permissions) }
+        .onFailure { yellow("⚠ Could not restrict permissions on ${target.absolutePath}: ${it.message}") }
 }
 
 // ── resolution ──────────────────────────────────────────────────────────────

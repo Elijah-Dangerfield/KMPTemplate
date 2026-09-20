@@ -67,10 +67,11 @@ always a safe answer.
 Fills in the machine-local credential store the other setup scripts read.
 
 ```bash
-./scripts/setup_credentials.main.kts                  # walk through every value
-./scripts/setup_credentials.main.kts --list           # show what is set, masked
-./scripts/setup_credentials.main.kts --import <file>  # read an env-format file
-./scripts/setup_credentials.main.kts --clear          # forget everything
+./scripts/setup_credentials.main.kts                   # walk through every value
+./scripts/setup_credentials.main.kts --list            # show what is set, masked
+./scripts/setup_credentials.main.kts --import <file>   # read an env-format file
+./scripts/setup_credentials.main.kts --move-to <dir>   # relocate it
+./scripts/setup_credentials.main.kts --clear           # forget everything
 ```
 
 **Already keep a shared secrets folder?** If it has an env file naming values
@@ -87,22 +88,35 @@ files is read — only where they are.
 
 The values are per person and per machine, not per project: your Sentry org,
 your Fly deploy tokens, your Apple team. Fill them in once and every project
-you generate afterwards stops asking.
-
-The store lives at `~/.config/appsetup/credentials.properties` (owner-readable
-only), outside every repo, and its path deliberately says nothing about this
-template — a path carrying the project name would be rewritten per project by
-init, which is the opposite of the point. Nothing here is required. Every
-script that cannot find a value still prompts for it, and every script reports
-which values it found where, and what is still unset.
+you generate afterwards stops asking. Nothing here is required — every script
+that cannot find a value still prompts for it, and every script reports which
+values it found where, and what is still unset.
 
 Precedence is environment variable → store → prompt, so CI (which already sets
 these as environment variables) keeps working untouched and a one-off override
 stays possible.
 
-Moving to a new machine: run it again there. Copying the file works too, but it
-holds live deploy tokens in plain text — treat the copy like the tokens
-themselves and keep it out of anything that syncs.
+The path deliberately says nothing about this template: a path carrying the
+project name would be rewritten per project by init, which is the opposite of
+the point.
+
+### Where it lives is a trade worth making on purpose
+
+The default, `~/.config/appsetup/credentials.properties`, syncs nowhere — live
+deploy tokens stay on one machine. `--move-to` puts the store somewhere that
+does sync, which on a Mac with Desktop & Documents sync means
+`~/Documents/appsetup`. That backs up the credentials you cannot regenerate and
+widens the blast radius for the ones you can. Both halves are real; the script
+says both and does what it is told. Either way the file is `0600` and its
+directory `0700`, so nothing else on the machine can read it.
+
+The scripts search `$APPSETUP_DIR`, then the default, then
+`~/Documents/appsetup`, and use the first that actually holds a store. That
+search is the whole reason the opt-in survives a machine change: the sync
+brings the file down on the new laptop and the next run finds it with no setup.
+Move it anywhere outside those three and you need `APPSETUP_DIR` in your shell
+profile — which a new machine will not have, so the script warns when you pick
+such a path.
 
 ## setup_sentry.main.kts
 
