@@ -272,12 +272,15 @@ fun edit() {
             println("  Currently: ${if (key.secret) maskSecret(existing) else existing}")
             if (!confirm("  Replace it?", default = false)) continue
         }
-        // Not promptSecret: skipping has to stay possible, and a hidden prompt
-        // that accepts empty input cannot tell "skip" from "typed nothing".
-        print("  New value (Enter to ${if (existing != null) "keep" else "skip"}): ")
-        System.out.flush()
-        val input = (readlnOrNull() ?: break).trim()
-        if (input.isEmpty()) continue
+        val action = if (existing != null) "keep" else "skip"
+        val input = if (key.secret) {
+            promptSecretOrSkip("  New value")
+        } else {
+            print("  New value (Enter to $action): ")
+            System.out.flush()
+            (readlnOrNull() ?: break).trim().takeIf { it.isNotEmpty() }
+        }
+        if (input == null) continue
         store[key] = input
         saved++
         green("  ✓ Saved")

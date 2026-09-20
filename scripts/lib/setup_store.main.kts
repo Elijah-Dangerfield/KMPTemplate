@@ -98,6 +98,32 @@ fun promptSecret(label: String): String {
     }
 }
 
+/**
+ * Like [promptSecret], but an empty line means "skip" rather than "ask again".
+ *
+ * The editor needs a way to leave a field alone, and the obvious way to get one
+ * was a visible prompt, since a hidden prompt that loops on empty input cannot
+ * tell "skip" from "typed nothing". That reasoning was wrong and the cost was
+ * real: it echoed every secret the editor collected into the terminal
+ * scrollback, which is exactly what `promptSecret` exists to prevent. The
+ * console hands back an empty array for a bare Enter, so returning null on it
+ * gives both behaviours with the input still hidden.
+ */
+fun promptSecretOrSkip(label: String): String? {
+    val console = System.console()
+    if (console == null) {
+        // No console means output is redirected, and there is no way to stop
+        // the echo. Say so rather than quietly leaking.
+        print("$label (input will be VISIBLE, no console available; Enter to skip): ")
+        System.out.flush()
+        return readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() }
+    }
+    return console.readPassword("$label (hidden, Enter to skip): ")
+        ?.let { String(it) }
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+}
+
 fun confirm(label: String, default: Boolean = true): Boolean {
     val hint = if (default) "Y/n" else "y/N"
     print("$label ($hint): ")
@@ -378,10 +404,14 @@ fun defaultStoreDirectory(): File {
  * because the sync brings the file down and this finds it. Without the search,
  * the opt-in would silently un-opt itself the moment it mattered most.
  */
+/** An explicit override, which wins outright when set. */
+fun overriddenStoreDirectory(): File? =
+    System.getenv("APPSETUP_DIR")?.takeIf { it.isNotBlank() }?.let { File(it) }
+
 fun setupStoreCandidates(): List<File> {
     val home = System.getProperty("user.home")
-    return listOfNotNull(
-        System.getenv("APPSETUP_DIR")?.takeIf { it.isNotBlank() }?.let { File(it) },
+    overriddenStoreDirectory()?.let { return listOf(it) }
+    return listOf(
         defaultStoreDirectory(),
         // macOS syncs Desktop & Documents to iCloud when that is turned on, so
         // this is the conventional place for a store someone chose to sync.
@@ -389,10 +419,21 @@ fun setupStoreCandidates(): List<File> {
     ).distinctBy { it.absolutePath }
 }
 
-fun setupStoreFile(): File =
-    setupStoreCandidates().firstOrNull { File(it, STORE_FILE_NAME).isFile }
+/**
+ * The store to read and write.
+ *
+ * `APPSETUP_DIR` is authoritative rather than first-of-several: somebody who
+ * names a directory means that directory, and falling through to another one
+ * because the named one is empty is how a test run ends up pointed at a real
+ * store full of live credentials. The remaining two are a genuine search, so
+ * that a store relocated into a synced folder is found again on a new machine.
+ */
+fun setupStoreFile(): File {
+    overriddenStoreDirectory()?.let { return File(it, STORE_FILE_NAME) }
+    return setupStoreCandidates().firstOrNull { File(it, STORE_FILE_NAME).isFile }
         ?.let { File(it, STORE_FILE_NAME) }
         ?: File(defaultStoreDirectory(), STORE_FILE_NAME)
+}
 
 /**
  * Reads and writes [setupStoreFile]. Every read tolerates the file being

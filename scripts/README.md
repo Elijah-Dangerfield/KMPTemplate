@@ -110,8 +110,11 @@ widens the blast radius for the ones you can. Both halves are real; the script
 says both and does what it is told. Either way the file is `0600` and its
 directory `0700`, so nothing else on the machine can read it.
 
-The scripts search `$APPSETUP_DIR`, then the default, then
-`~/Documents/appsetup`, and use the first that actually holds a store. That
+`$APPSETUP_DIR` wins outright when it is set: naming a directory means that
+directory, and falling through to another one because the named one is empty is
+how a test run ends up pointed at a real store full of live credentials. With
+it unset, the scripts search the default and then `~/Documents/appsetup`, and
+use the first that actually holds a store. That
 search is the whole reason the opt-in survives a machine change: the sync
 brings the file down on the new laptop and the next run finds it with no setup.
 Move it anywhere outside those three and you need `APPSETUP_DIR` in your shell
