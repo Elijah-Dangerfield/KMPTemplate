@@ -10,14 +10,16 @@
  * project you generate afterwards stops asking. Nothing here is required —
  * every script still prompts for whatever it cannot find.
  *
- *   ./scripts/setup_credentials.main.kts           # walk through every value
- *   ./scripts/setup_credentials.main.kts --list    # show what is set, masked
- *   ./scripts/setup_credentials.main.kts --clear    # forget everything
+ *   ./scripts/setup_credentials.main.kts                 # walk through every value
+ *   ./scripts/setup_credentials.main.kts --list          # show what is set, masked
+ *   ./scripts/setup_credentials.main.kts --import <file> # read an env-format file
+ *   ./scripts/setup_credentials.main.kts --clear         # forget everything
  *
  * This is also the recovery path on a new machine: run it once and you are back
  * where you were.
  */
 
+import java.io.File
 import kotlin.system.exitProcess
 
 val store = SetupStore()
@@ -61,6 +63,58 @@ fun list() {
                 "you to run by hand instead.")
     }
     println()
+}
+
+/**
+ * Loads a `KEY=value` file into the store, matching on each key's environment
+ * variable name.
+ *
+ * For the folder of shared release secrets people already keep — the one
+ * `setup_github_secrets.main.kts` reads its files from usually has an env file
+ * beside them. Those files name their values after the CI secrets, which is
+ * exactly what [SetupKey.env] is, so most of them land with no typing.
+ *
+ * Sourcing that file into the shell instead would *look* like it worked — every
+ * value would show as set — but the editor skips anything already in the
+ * environment, on purpose, so nothing would persist and the next shell would be
+ * empty again. Hence an explicit import that writes.
+ */
+fun import(path: String) {
+    val file = File(path.replaceFirst("~", System.getProperty("user.home")))
+    if (!file.isFile) die("Not a file: ${file.absolutePath}")
+
+    val parsed = file.readLines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
+        .associate {
+            it.substringBefore('=').trim().removePrefix("export ").trim() to
+                it.substringAfter('=').trim().trim('\'', '"')
+        }
+        .filterValues { it.isNotEmpty() }
+
+    bold("\nImporting from ${file.absolutePath}")
+    var imported = 0
+    for (key in Keys.all) {
+        val value = parsed[key.env] ?: continue
+        if (store[key] == value) {
+            dim("  ${key.label} — already stored, unchanged")
+            continue
+        }
+        val existing = store[key]
+        if (existing != null && !confirm("  Replace ${key.label}?", default = false)) continue
+        store[key] = value
+        imported++
+        green("  ✓ ${key.label} ← ${key.env}")
+    }
+
+    val unknown = parsed.keys - Keys.all.map { it.env }.toSet()
+    if (unknown.isNotEmpty()) {
+        println()
+        dim("  Ignored (not values this store holds): ${unknown.sorted().joinToString(", ")}")
+    }
+
+    println()
+    if (imported == 0) green("Nothing new to import.") else green("✓ Imported $imported value(s).")
 }
 
 fun clear() {
@@ -146,9 +200,14 @@ when (args.firstOrNull()) {
     null -> { edit(); list() }
     "--list", "-l" -> list()
     "--clear" -> clear()
+    "--import" -> {
+        val path = args.getOrNull(1) ?: die("--import needs a file path")
+        import(path)
+        list()
+    }
     else -> {
         red("Unknown option: ${args.first()}")
-        println("Usage: setup_credentials.main.kts [--list|--clear]")
+        println("Usage: setup_credentials.main.kts [--list|--clear|--import <file>]")
         exitProcess(2)
     }
 }

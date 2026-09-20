@@ -82,7 +82,7 @@ scripts collect values as they go — each one offers to remember what you typed
 | Does not hold | the signing files themselves, or anything per project — the Sentry project slug derives from the `applicationId`, the Fly app name from the project name |
 | New machine | run the script again there |
 
-`--list` shows what is set (secrets masked); `--clear` forgets it all. The file
+`--list` shows what is set (secrets masked); `--clear` forgets it all; `--import <file>` reads an env-format file, which is the quick path if you already keep a folder of shared release secrets — the store's keys are named after the CI secrets so most of them land untouched. The file
 holds live deploy tokens in plain text, so if you copy it between machines,
 treat the copy like the tokens and keep it out of anything that syncs.
 

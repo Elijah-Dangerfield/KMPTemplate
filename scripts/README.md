@@ -67,10 +67,18 @@ always a safe answer.
 Fills in the machine-local credential store the other setup scripts read.
 
 ```bash
-./scripts/setup_credentials.main.kts           # walk through every value
-./scripts/setup_credentials.main.kts --list    # show what is set, masked
-./scripts/setup_credentials.main.kts --clear   # forget everything
+./scripts/setup_credentials.main.kts                  # walk through every value
+./scripts/setup_credentials.main.kts --list           # show what is set, masked
+./scripts/setup_credentials.main.kts --import <file>  # read an env-format file
+./scripts/setup_credentials.main.kts --clear          # forget everything
 ```
+
+**Already keep a shared secrets folder?** If it has an env file naming values
+after the CI secrets (`APPLE_TEAM_ID`, `ASC_KEY_ID`, `ANDROID_KEY_ALIAS`, …),
+`--import` reads it straight in — the store keys use those same names on
+purpose. Sourcing the file into your shell instead would look like it worked
+and persist nothing: env wins at read time, so the editor skips anything
+already set there.
 
 The values are per person and per machine, not per project: your Sentry org,
 your Fly deploy tokens, your Apple team. Fill them in once and every project

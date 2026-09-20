@@ -61,22 +61,41 @@ fun push(secret: Secret) {
 fun base64(file: File): String = Base64.getEncoder().encodeToString(file.readBytes())
 
 /**
- * The single file in [dir] matching [pattern], or null.
+ * The file in [dir] holding [what], matched on extension and then on a name
+ * hint.
  *
- * Refuses to guess when several match. Picking the first of two keystores would
- * sign the app with the wrong key, and on Android that is the one mistake you
- * cannot walk back without asking Google to reset the upload key.
+ * Extension alone is not enough. `keytool` has produced PKCS12 keystores by
+ * default since Java 9, so an upload keystore is as likely to be
+ * `upload-keystore.p12` as `upload-keystore.jks` — and an Apple distribution
+ * certificate is a `.p12` too. Keyed on extension alone, "the .p12" is
+ * ambiguous in exactly the folder this script exists to read.
+ *
+ * Top level only, deliberately: retired material tends to get moved into a
+ * subfolder rather than deleted, and a recursive search would offer
+ * `apple-distribution.p12.superseded-…` as a candidate.
+ *
+ * Refuses to guess when several still match. Picking the wrong keystore signs
+ * the app with the wrong key, and on Android that is the one mistake you cannot
+ * walk back without asking Google to reset the upload key.
  */
-fun findSigningFile(dir: File, pattern: Regex, what: String): File? {
-    val matches = dir.listFiles()?.filter { it.isFile && pattern.matches(it.name) }.orEmpty()
-    return when (matches.size) {
-        1 -> matches.single().also { dim("  $what → ${it.name}") }
-        0 -> null.also { yellow("  $what → nothing in ${dir.name} matches ${pattern.pattern}") }
+fun findSigningFile(dir: File, what: String, extensions: Set<String>, nameHints: List<String>): File? {
+    val byExtension = dir.listFiles()
+        .orEmpty()
+        .filter { it.isFile && it.extension.lowercase() in extensions }
+    val candidates = byExtension
+        .filter { file -> nameHints.any { it in file.name.lowercase() } }
+        .ifEmpty { byExtension }
+
+    return when (candidates.size) {
+        1 -> candidates.single().also { dim("  $what → ${it.name}") }
+        0 -> null.also {
+            yellow("  $what → nothing in ${dir.name} looks like ${extensions.joinToString("/") { ".$it" }}")
+        }
         else -> {
-            yellow("  $what → ${matches.size} candidates: ${matches.joinToString(", ") { it.name }}")
+            yellow("  $what → ${candidates.size} candidates: ${candidates.joinToString(", ") { it.name }}")
             if (!interactive) return null
-            val chosen = prompt("  Which one", matches.first().name)
-            matches.firstOrNull { it.name == chosen }
+            val chosen = prompt("  Which one", candidates.first().name)
+            candidates.firstOrNull { it.name == chosen }
         }
     }
 }
@@ -114,10 +133,26 @@ val signingDir = File(values.require(Keys.SIGNING_DIR).replaceFirst("~", System.
 if (!signingDir.isDirectory) die("Not a directory: ${signingDir.absolutePath}")
 
 bold("\nFiles")
-val keystore = findSigningFile(signingDir, Regex(".*\\.(jks|keystore)"), "Android upload keystore")
-val playJson = findSigningFile(signingDir, Regex(".*\\.json"), "Play service account")
-val ascKey = findSigningFile(signingDir, Regex("AuthKey_.*\\.p8"), "App Store Connect key")
-val distCert = findSigningFile(signingDir, Regex(".*\\.p12"), "Apple distribution certificate")
+val keystore = findSigningFile(
+    signingDir, "Android upload keystore",
+    extensions = setOf("jks", "keystore", "p12", "bks"),
+    nameHints = listOf("keystore", "upload", "android"),
+)
+val playJson = findSigningFile(
+    signingDir, "Play service account",
+    extensions = setOf("json"),
+    nameHints = listOf("play", "service-account", "service_account"),
+)
+val ascKey = findSigningFile(
+    signingDir, "App Store Connect key",
+    extensions = setOf("p8"),
+    nameHints = listOf("authkey", "asc"),
+)
+val distCert = findSigningFile(
+    signingDir, "Apple distribution certificate",
+    extensions = setOf("p12"),
+    nameHints = listOf("distribution", "dist", "apple", "cert"),
+)
 
 bold("\nPushing")
 
