@@ -11,7 +11,7 @@ COPY gradle/ gradle/
 COPY build-logic/ build-logic/
 COPY versions.properties gradlew gradlew.bat settings.gradle.kts build.gradle.kts gradle.properties ./
 
-# Only the server module is needed. `-Dkmptemplate.serverOnly=true` (see
+# Only the server module is needed. `-DserverOnly=true` (see
 # settings.gradle.kts) trims the build graph so no Android/iOS toolchain is
 # required. If apps/server gains a :libraries:* dep, COPY it here too.
 COPY apps/server/ apps/server/

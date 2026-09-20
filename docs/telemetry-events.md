@@ -92,7 +92,7 @@ entirely.
 
 ## Dashboards
 
-This template deliberately ships none — see [decisions.md](decisions.md). The
+None ship here — see [decisions.md](decisions.md). The
 short version: a board's panels encode one app's questions, and the prerequisite
 for a portable one is deciding which events the template *guarantees*, which is
 a design decision nobody has made.
