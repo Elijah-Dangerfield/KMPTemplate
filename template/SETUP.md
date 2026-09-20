@@ -1,9 +1,34 @@
 # Setup checklist — KMP Template
 
-Action items after running `./scripts/init_project.main.kts`. Work through these in order. Tick off as you go.
+Action items after running `./scripts/init_project.main.kts`.
+
+## Start here
+
+```sh
+./scripts/install_hooks.sh    # the build fails until you do this
+./scripts/setup.main.kts      # walks everything below that can be automated
+```
+
+`setup.main.kts` runs the steps in the order their dependencies allow and skips
+anything already done, so it is safe to re-run and safe to abandon halfway.
+`./scripts/setup.main.kts --status` answers "where am I" without changing
+anything.
+
+What it can do for you, and what it can't:
+
+| | |
+| --- | --- |
+| **One command** | Supabase project + auth config, Sentry project + DSN + CI vars, Fly apps + secrets + deploy tokens, every signing secret |
+| **Once per machine** | `gh auth login`, `fly auth login`, and filling the [credential store](#credential-store-do-this-on-your-second-project) |
+| **Always by hand** | Play Console app entry + service-account invite + data safety + content rating, App Store Connect app record + listing, promoting the first release in each store |
+
+The rest of this page is the detail behind each of those, plus everything the
+scripts deliberately don't touch. Read the section for a step when it fails or
+when you want to know what it did.
 
 **Hour 1 — a running app:**
 - [ ] [Local dev](#local-dev) — hooks + first build
+- [ ] [Credential store](#credential-store-do-this-on-your-second-project) — skip on your first project
 - [ ] [Supabase auth](#supabase-auth-hour-1) — project, providers, redirect URLs
 - [ ] [Sentry](#sentry-one-script) — one script, then crash reporting is on everywhere
 - [ ] [Server deploy](#server-deploy-flyio) — dev Fly app + secrets + `/_health`
@@ -33,6 +58,36 @@ To bypass in scripted contexts (not CI — `CI` env var is honored): `-Dkmptempl
 
 ---
 
+## Credential store (do this on your second project)
+
+```sh
+./scripts/setup_credentials.main.kts
+```
+
+Most of what this checklist asks for belongs to your Sentry org, your Fly
+account or your Apple team, and is identical for every app you generate. This
+saves those answers once, on your machine, so the next project stops asking.
+Everything here is optional: every setup script still prompts for whatever it
+cannot find, and every script prints where each value came from before it
+starts and what is still unset when it finishes.
+
+On your first project there is nothing to reuse yet, so skip this and let the
+scripts collect values as they go — each one offers to remember what you typed.
+
+| | |
+| --- | --- |
+| Lives at | `~/.config/appsetup/credentials.properties`, mode 0600, outside every repo |
+| Precedence | environment variable → store → prompt (so CI is unaffected) |
+| Holds | Sentry org + tokens, Supabase + Fly tokens and org slugs, Apple team / key IDs, signing passwords, and the *path* to your signing folder |
+| Does not hold | the signing files themselves, or anything per project — the Sentry project slug derives from the `applicationId`, the Fly app name from the project name |
+| New machine | run the script again there |
+
+`--list` shows what is set (secrets masked); `--clear` forgets it all. The file
+holds live deploy tokens in plain text, so if you copy it between machines,
+treat the copy like the tokens and keep it out of anything that syncs.
+
+---
+
 ## Sentry (one script)
 
 The app ships with crash reporting off: `telemetry.properties` has a blank
@@ -56,7 +111,7 @@ Re-run it any time; every step is an upsert.
 
 | Token | Where | Scopes | Use it for |
 | --- | --- | --- | --- |
-| **User** | Settings → Account → API → [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/) | Selectable — tick `project:read`, `project:write`, `org:read` | This script. Used during the run, never stored. |
+| **User** | Settings → Account → API → [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/) | Selectable — tick `project:read`, `project:write`, `org:read` | This script. Never written to the repo; saved to your [credential store](#credential-store-do-this-on-your-second-project) only if you say yes. |
 | **Organization** (`sntrys_…`) | Settings → Organization Tokens | Exactly `org:ci`, not selectable | CI only (`SENTRY_AUTH_TOKEN`). 403s every read endpoint, so the script cannot use it. |
 
 Handing the script an organization token gets a 403 from the first call and
@@ -78,7 +133,17 @@ Dev versus prod needs no extra work. One project takes everything; the
 
 Set under **Settings → Secrets and variables → Actions**. All are required for `release.yml` to ship.
 
-**Do this once, not once per app.** Every value below except `SENTRY_PROJECT` belongs to your Apple team, your Play developer account, or your Sentry org, and is identical for every project this template generates. Keep the certificate, the `.p8`, the upload keystore and the service-account JSON in one private folder outside any repo, with a script that runs `gh secret set` against a named repo. A new app then costs two values, not fifteen. See [release-automation.md → Secrets and variables](../docs/release-automation.md#secrets-and-variables).
+**Do this once, not once per app.** Every value below except `SENTRY_PROJECT` belongs to your Apple team, your Play developer account, or your Sentry org, and is identical for every project this template generates.
+
+```sh
+./scripts/setup_github_secrets.main.kts            # or --dry-run first
+```
+
+pushes all of them. Keep the certificate, the `.p8`, the upload keystore and the service-account JSON in **one private folder outside any repo**; the script asks for that folder once and the [credential store](#credential-store-do-this-on-your-second-project) remembers the path (never the files). The passwords beside them are account-wide, so the store holds those too. A new app then costs two values, not fifteen. See [release-automation.md → Secrets and variables](docs/release-automation.md#secrets-and-variables).
+
+Anything it can't find is reported with what that specific gap costs, and everything else still goes up — so a partial folder is a useful run, not a failed one.
+
+**Your Play service account can cover every app.** Invite it at the *account* level (Play Console → Users and permissions → Invite new user → grant permissions for the whole developer account rather than per-app) and future apps are covered automatically, so the JSON you save today keeps working for app number five. Verify after your next app appears: the service account should already be listed against it.
 
 The one item that cannot be reissued is the Android upload keystore: once an app has shipped a build signed with it, losing it means asking Google to reset the upload key. Everything else on this page can be regenerated from a console in minutes.
 
@@ -139,6 +204,15 @@ and runs fine.
 | `GRAFANA_LOGS_WRITE_TOKEN` | A Grafana Cloud access-policy token with logs:write. Grafana auto-revokes `glc_` tokens it finds in public repos — never commit one. |
 
 ### Server deploy (Fly.io)
+
+```sh
+./scripts/setup_fly.main.kts
+```
+
+creates both apps, points the fly configs at them, pushes the Supabase values
+as Fly secrets, mints both tokens below into GitHub, and offers the first
+deploy. Run `fly auth login` first. Creating apps is free — only the first
+deploy starts a machine, and that step asks separately.
 
 `server-deploy.yml` auto-deploys the dev server on pushes to `main` that touch
 server paths; `server-deploy-prod.yml` queues a prod deploy behind a manual
@@ -216,9 +290,17 @@ Drop your icons into:
 `:libraries:networking` ships a single configured `HttpClient` (plus an
 authenticated variant) for every repo and data source to share.
 
-**Set your base URL.** Bind your own `NetworkConfig` (see
-`DefaultNetworkConfig`) somewhere in your app — typically a class that reads
-the URL from BuildConfig per build variant:
+**Set your base URL** — or deliberately don't. The shipped default leaves it
+blank, which is a real configuration: an app with no API of its own still signs
+in against Supabase and calls third parties by absolute URL. A *relative* path
+with no base URL is rejected before it leaves the device, with a message naming
+what to set. That is on purpose — Ktor would otherwise resolve it against
+`http://localhost`, and the refused connection would trip the offline banner,
+so an unconfigured project would present as offline on a device with full
+signal.
+
+Bind your own `NetworkConfig` (see `DefaultNetworkConfig`) somewhere in your
+app — typically a class that reads the URL from BuildConfig per build variant:
 
 ```kotlin
 @SingleIn(AppScope::class)
@@ -244,7 +326,21 @@ fields throw) and lenient in release (so a backend tweak can't crash users).
 
 The app ships with anonymous-first Supabase auth wired end to end (guest
 creation in onboarding, email/password + Apple + browser-OAuth sign-in,
-encrypted session storage, `/v1/me` profile). To light it up:
+encrypted session storage, `/v1/me` profile).
+
+```sh
+./scripts/setup_supabase.main.kts
+```
+
+does steps 1 to 4 below — creates the project, turns on anonymous sign-ins,
+sets the redirect URLs, authorizes your bundle ID for Apple, and writes
+`local.properties`. It needs a Supabase personal access token (`sbp_…`) from
+<https://supabase.com/dashboard/account/tokens>, which the credential store
+keeps for next time. It prints the generated database password **once** — save
+it, the API will not hand it back.
+
+The steps below are what it does, and what to do if you'd rather do it by hand
+or something failed:
 
 1. Create a Supabase project (free tier is fine). Note the project URL and
    the **publishable (anon) key** (Settings → API Keys).
@@ -257,6 +353,19 @@ encrypted session storage, `/v1/me` profile). To light it up:
 3. Enable providers in the Supabase dashboard (Authentication → Providers):
    **Anonymous sign-ins** (required for the guest flow), **Email**
    (confirm-email on), and optionally **Apple** / **Google**.
+
+   **Apple is set-and-forget here, and it is worth knowing why.** This app
+   signs in with Apple *natively* on iOS — the system sheet returns an identity
+   token, which goes to Supabase as `signInWith(IDToken)`. Supabase validates
+   that against the **Authorized Client IDs** list, so the only thing to fill in
+   is your iOS bundle ID. Leave the Services ID and Secret Key fields empty.
+   Nothing expires and there is nothing to rotate.
+
+   Those two fields belong to Apple's *browser* OAuth flow, which this template
+   does not use. That flow needs a Services ID plus a client-secret JWT capped
+   at six months, so turning it on signs you up for a recurring chore. You would
+   only need it to offer Apple sign-in on Android. Apple's button is iOS-only
+   here (`AndroidAppleSignInCoordinator` is a deliberate no-op).
 4. Redirect URLs (Authentication → URL Configuration): add your custom
    scheme callbacks so browser OAuth and the verify-email link return to
    the app:

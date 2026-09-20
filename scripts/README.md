@@ -44,12 +44,60 @@ Creates new KMP modules with proper structure and configuration.
 ./scripts/create_module.main.kts library user:preferences  # sub-module
 ```
 
+## setup.main.kts
+
+The one entry point. Walks every setup step in the order its dependencies
+allow, offering each and skipping anything already done:
+
+```bash
+./scripts/setup.main.kts            # run the steps
+./scripts/setup.main.kts --status   # where am I, changes nothing
+```
+
+Order is the reason this exists. Supabase has to exist before its values can be
+pushed to Fly, and both GitHub-facing steps need a repo that does not exist at
+the moment a project is generated. Running the pieces out of order does not
+fail loudly — it half-configures things and leaves you to work out which half.
+
+Every step below is also standalone and re-runnable, so "skip for now" is
+always a safe answer.
+
+## setup_credentials.main.kts
+
+Fills in the machine-local credential store the other setup scripts read.
+
+```bash
+./scripts/setup_credentials.main.kts           # walk through every value
+./scripts/setup_credentials.main.kts --list    # show what is set, masked
+./scripts/setup_credentials.main.kts --clear   # forget everything
+```
+
+The values are per person and per machine, not per project: your Sentry org,
+your Fly deploy tokens, your Apple team. Fill them in once and every project
+you generate afterwards stops asking.
+
+The store lives at `~/.config/appsetup/credentials.properties` (owner-readable
+only), outside every repo, and its path deliberately says nothing about this
+template — a path carrying the project name would be rewritten per project by
+init, which is the opposite of the point. Nothing here is required. Every
+script that cannot find a value still prompts for it, and every script reports
+which values it found where, and what is still unset.
+
+Precedence is environment variable → store → prompt, so CI (which already sets
+these as environment variables) keeps working untouched and a one-off override
+stays possible.
+
+Moving to a new machine: run it again there. Copying the file works too, but it
+holds live deploy tokens in plain text — treat the copy like the tokens
+themselves and keep it out of anything that syncs.
+
 ## setup_sentry.main.kts
 
 Turns crash reporting on. Run once, right after init:
 
 ```bash
 ./scripts/setup_sentry.main.kts
+./scripts/setup_sentry.main.kts --non-interactive   # every value from env/store
 ```
 
 Asks for a Sentry **user** auth token (`project:read`, `project:write`,
@@ -62,9 +110,75 @@ Commit `telemetry.properties` afterwards. A DSN is a write-only ingest
 endpoint shipped inside every store binary, not a secret — keeping it per
 developer is what leaves fresh clones silently reporting nothing.
 
-## rotate_apple_sign_in_token.main.kts
+## setup_supabase.main.kts
 
-Rotates the Apple Sign In client secret (it expires at most every 6 months).
+Creates or adopts this project's Supabase project and configures the auth the
+app actually ships:
+
+```bash
+./scripts/setup_supabase.main.kts
+```
+
+Turns on anonymous sign-ins (the guest flow does not work without it), sets the
+site URL and redirect allow-list to this project's custom scheme, authorizes
+your iOS bundle ID for native Sign in with Apple, writes
+`supabase.projectId` / `url` / `anonKey` into `local.properties`, and fills the
+Supabase half of `apps/server/.env`. Needs a Supabase personal access token
+(`sbp_…`) — the credential store holds it after the first time.
+
+It prints the generated database password exactly once. That value is per
+project, so it is deliberately not stored, and the Management API will not hand
+it back.
+
+Not covered: Google sign-in, which needs an OAuth client from the Google Cloud
+console. The app runs fine without it.
+
+## setup_fly.main.kts
+
+Stands up the server's Fly apps and wires CI to deploy to them:
+
+```bash
+./scripts/setup_fly.main.kts
+```
+
+Creates the dev and prod apps, points `fly.toml` / `fly.prod.toml` at them,
+pushes the Supabase values from `apps/server/.env` as Fly secrets, mints a
+deploy token per app into `FLY_API_TOKEN_DEV` / `_PROD`, and offers the first
+deploy — then curls `/_health` to prove it. Creating apps is free; the first
+deploy starts a machine, so that step asks separately.
+
+Deleted from projects generated with `--backend=no`.
+
+## setup_github_secrets.main.kts
+
+Pushes every release secret from one folder plus the credential store:
+
+```bash
+./scripts/setup_github_secrets.main.kts
+./scripts/setup_github_secrets.main.kts --dry-run
+```
+
+The binary material (upload keystore, Apple `.p12`, ASC `.p8`, Play
+service-account JSON) lives in one folder outside every repo; the store
+remembers *where* it is, never what is in it. The passwords beside them are
+account-wide, so those the store does hold. Anything missing is reported with
+what it costs, and everything else still goes up.
+
+## lib/setup_store.main.kts
+
+Not run directly. The shared half of the setup scripts: prompting, the
+credential store, and the two summaries every setup run prints (where each
+value came from, and what is still unset and what that costs). Import it with
+`@file:Import("lib/setup_store.main.kts")`.
+
+Adding a value the scripts should remember is one entry in `Keys` plus naming
+it in the script's `plan(...)` call; `setup_credentials.main.kts` enumerates
+`Keys.all`, so it shows up in the editor for free.
+
+**Editing this file and seeing no change?** The `kotlin` CLI caches a compiled
+script keyed on the script you handed it, not on what that script imports — so
+an edit here does not invalidate the cache of anything that imports it. Clear
+it with `rm -rf ~/Library/Caches/main.kts.compiled.cache`.
 
 ## cleanup.sh
 

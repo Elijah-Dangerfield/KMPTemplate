@@ -1,5 +1,7 @@
 #!/usr/bin/env kotlin
 
+@file:Import("lib/setup_store.main.kts")
+
 /**
  * One-shot Sentry setup for a project generated from this template.
  *
@@ -14,16 +16,18 @@
  * Re-runnable. Everything it does is an upsert, so running it again repairs
  * drift instead of creating a second project.
  *
+ * Credentials come from the environment first, then the machine-local store
+ * (`scripts/lib/setup_store.main.kts`), then you. Nothing is required to be in
+ * the store; it only stops you re-typing the same org and tokens for every new
+ * project.
+ *
  * Run from the project root:
  *   ./scripts/setup_sentry.main.kts
+ *   ./scripts/setup_sentry.main.kts --non-interactive   # every value from env/store
  */
 
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
 import java.time.Instant
-import java.util.Properties
 import kotlin.system.exitProcess
 
 val SENTRY_API = "https://sentry.io/api/0"
@@ -32,125 +36,18 @@ val VERSIONS_FILE = "versions.properties"
 val POLL_ATTEMPTS = 30
 val POLL_INTERVAL_MS = 4000L
 
-// ── terminal ────────────────────────────────────────────────────────────────
+// Terminal helpers (green/yellow/red/bold/dim/die/prompt/promptSecret/confirm)
+// come from lib/setup_store.main.kts, so every setup script prompts the same way.
 
-fun green(text: String) = println("[32m$text[0m")
-fun yellow(text: String) = println("[33m$text[0m")
-fun red(text: String) = println("[31m$text[0m")
-fun bold(text: String) = println("[1m$text[0m")
+// HTTP (`request`/`Response`/`encode`), JSON, `gh` helpers and the
+// properties read/write live in lib/setup_store.main.kts.
 
-fun die(message: String): Nothing {
-    red("✗ $message")
-    exitProcess(1)
-}
-
-fun prompt(label: String, default: String? = null): String {
-    val suffix = default?.takeIf { it.isNotBlank() }?.let { " [$it]" } ?: ""
-    while (true) {
-        print("$label$suffix: ")
-        System.out.flush()
-        // Every prompt treats end-of-input as a hard stop. This script is
-        // interactive by nature, and a piped/empty stdin must not spin.
-        val input = (readlnOrNull() ?: die("No input on stdin — run this in a terminal.")).trim()
-        if (input.isNotEmpty()) return input
-        if (!default.isNullOrBlank()) return default
-    }
-}
-
-/** Hides typed input when the JVM has a real console; says so when it can't. */
-fun promptSecret(label: String): String {
-    val console = System.console()
-    while (true) {
-        val value = if (console != null) {
-            console.readPassword("$label: ")
-                ?.let { String(it) }
-                ?: die("No input on stdin — run this in a terminal.")
-        } else {
-            print("$label (input will be visible): ")
-            System.out.flush()
-            readlnOrNull() ?: die("No input on stdin — run this in a terminal.")
-        }.trim()
-        if (value.isNotEmpty()) return value
-    }
-}
-
-fun confirm(label: String, default: Boolean = true): Boolean {
-    val hint = if (default) "Y/n" else "y/N"
-    print("$label ($hint): ")
-    System.out.flush()
-    return when (readlnOrNull()?.trim()?.lowercase()) {
-        "y", "yes" -> true
-        "n", "no" -> false
-        else -> default
-    }
-}
-
-// ── http ────────────────────────────────────────────────────────────────────
-
-data class Response(val code: Int, val body: String) {
-    val isSuccess: Boolean get() = code in 200..299
-}
-
-fun request(
-    method: String,
-    url: String,
-    token: String? = null,
-    body: String? = null,
-    extraHeaders: Map<String, String> = emptyMap(),
-): Response {
-    val connection = (URL(url).openConnection() as HttpURLConnection).apply {
-        requestMethod = method
-        connectTimeout = 20_000
-        readTimeout = 30_000
-        token?.let { setRequestProperty("Authorization", "Bearer $it") }
-        setRequestProperty("Accept", "application/json")
-        extraHeaders.forEach { (key, value) -> setRequestProperty(key, value) }
-        if (body != null) {
-            doOutput = true
-            setRequestProperty("Content-Type", "application/json")
-        }
-    }
-    body?.let { connection.outputStream.use { stream -> stream.write(it.toByteArray()) } }
-    val code = connection.responseCode
-    val text = (if (code in 200..299) connection.inputStream else connection.errorStream)
-        ?.bufferedReader()?.use { it.readText() }.orEmpty()
-    connection.disconnect()
-    return Response(code, text)
-}
-
-/**
- * Enough JSON for this script's four fields. Sentry's payloads are large and
- * deeply nested; pulling one string key out of them by regex beats adding a
- * Maven dependency to a script whose whole point is that it runs immediately.
- */
+/** Sentry payloads are large; these scripts only ever want one key out of them. */
 fun stringValues(json: String, key: String): List<String> =
     Regex("\"${Regex.escape(key)}\"\\s*:\\s*\"([^\"]*)\"")
         .findAll(json)
         .map { it.groupValues[1] }
         .toList()
-
-fun encode(value: String): String = URLEncoder.encode(value, "UTF-8")
-
-// ── properties ──────────────────────────────────────────────────────────────
-
-fun readProperty(file: File, key: String): String? {
-    if (!file.exists()) return null
-    val properties = Properties()
-    file.inputStream().use(properties::load)
-    return properties.getProperty(key)?.takeIf { it.isNotBlank() }
-}
-
-/**
- * Rewrites a key in place, keeping the file's comments and ordering. The
- * comments in `telemetry.properties` explain why the DSN is committed, which is
- * the line that stops someone "tidying" it back into local.properties.
- */
-fun upsertProperty(file: File, key: String, value: String) {
-    val lines = if (file.exists()) file.readLines().toMutableList() else mutableListOf()
-    val index = lines.indexOfFirst { it.trimStart().startsWith("$key=") }
-    if (index >= 0) lines[index] = "$key=$value" else lines += "$key=$value"
-    file.writeText(lines.joinToString("\n").trimEnd() + "\n")
-}
 
 // ── sentry ──────────────────────────────────────────────────────────────────
 
@@ -173,13 +70,15 @@ fun explainTokenRequirement() {
                               separately at the end.
 
         Create one at https://sentry.io/settings/account/api/auth-tokens/
-        It is used for this run only and never written anywhere.
+        Nothing is written to this repo. If you say yes when asked, it is saved
+        to the machine-local store so your next project does not ask again —
+        see ./scripts/setup_credentials.main.kts.
         """.trimIndent()
     )
     println()
 }
 
-fun resolveOrg(token: String, suggested: String?): String {
+fun resolveOrg(token: String, suggested: String?, interactive: Boolean): String {
     val response = request("GET", "$SENTRY_API/organizations/", token)
     if (response.code == 401) die("Sentry rejected that token (401). Create a new user token and re-run.")
     if (response.code == 403) {
@@ -195,7 +94,7 @@ fun resolveOrg(token: String, suggested: String?): String {
     if (slugs.size > 1) println("Organizations visible to this token: ${slugs.joinToString(", ")}")
 
     val default = suggested?.takeIf { it in slugs } ?: slugs.first()
-    val chosen = prompt("Sentry org slug", default)
+    val chosen = if (interactive) prompt("Sentry org slug", default) else default
     if (chosen !in slugs) {
         val check = request("GET", "$SENTRY_API/organizations/$chosen/", token)
         if (!check.isSuccess) die("Org '$chosen' is not readable with this token (HTTP ${check.code}).")
@@ -203,17 +102,18 @@ fun resolveOrg(token: String, suggested: String?): String {
     return chosen
 }
 
-fun firstTeam(token: String, org: String): String {
+fun firstTeam(token: String, org: String, interactive: Boolean): String {
     val response = request("GET", "$SENTRY_API/organizations/$org/teams/", token)
     if (!response.isSuccess) die("Could not list teams in '$org' (HTTP ${response.code}).")
     val slugs = stringValues(response.body, "slug").distinct()
     if (slugs.isEmpty()) die("Org '$org' has no teams. Create one in Sentry, then re-run.")
     if (slugs.size == 1) return slugs.first()
     println("Teams in $org: ${slugs.joinToString(", ")}")
+    if (!interactive) return slugs.first()
     return prompt("Team to own the project", slugs.first())
 }
 
-fun ensureProject(token: String, org: String, project: String): Boolean {
+fun ensureProject(token: String, org: String, project: String, interactive: Boolean): Boolean {
     val existing = request("GET", "$SENTRY_API/projects/$org/$project/", token)
     if (existing.isSuccess) {
         green("✓ Adopted existing Sentry project $org/$project")
@@ -223,7 +123,7 @@ fun ensureProject(token: String, org: String, project: String): Boolean {
         die("Unexpected response looking up $org/$project (HTTP ${existing.code}): ${existing.body.take(300)}")
     }
 
-    val team = firstTeam(token, org)
+    val team = firstTeam(token, org, interactive)
     val payload = """{"name":"$project","slug":"$project","platform":"android"}"""
     val created = request("POST", "$SENTRY_API/teams/$org/$team/projects/", token, payload)
     if (created.code == 403) {
@@ -305,27 +205,6 @@ fun awaitEvent(token: String, org: String, project: String, marker: String): Boo
 
 // ── ci ──────────────────────────────────────────────────────────────────────
 
-fun hasGhRepo(): Boolean = try {
-    ProcessBuilder("gh", "repo", "view", "--json", "name")
-        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
-        .redirectError(ProcessBuilder.Redirect.DISCARD)
-        .start()
-        .waitFor() == 0
-} catch (_: Exception) {
-    false
-}
-
-fun runGh(vararg args: String, stdin: String? = null): Boolean = try {
-    val process = ProcessBuilder(listOf("gh") + args)
-        .redirectOutput(ProcessBuilder.Redirect.DISCARD)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .start()
-    if (stdin != null) process.outputStream.use { it.write(stdin.toByteArray()) } else process.outputStream.close()
-    process.waitFor() == 0
-} catch (_: Exception) {
-    false
-}
-
 fun printManualCiCommands(org: String, project: String) {
     yellow("\nSet these yourself once the repo exists (paste as-is; it prompts you):")
     println(
@@ -338,8 +217,13 @@ fun printManualCiCommands(org: String, project: String) {
     )
 }
 
-fun configureCi(org: String, project: String) {
+fun configureCi(org: String, project: String, values: SetupValues, interactive: Boolean) {
     bold("\nCI configuration")
+    when (githubCliState()) {
+        GithubCliState.NOT_INSTALLED -> yellow("gh is not installed.")
+        GithubCliState.NOT_AUTHENTICATED -> yellow("gh is installed but not authenticated — run `gh auth login`.")
+        GithubCliState.READY -> Unit
+    }
     if (!hasGhRepo()) {
         yellow("No GitHub repo reachable via gh (not installed, not authenticated, or no remote yet).")
         printManualCiCommands(org, project)
@@ -357,14 +241,19 @@ fun configureCi(org: String, project: String) {
     println(
         "\nCI uploads mappings and dSYMs with an ORGANIZATION token (sntrys_…), " +
             "not the user token above. One org token covers every project you generate, " +
-            "so reuse the one you already have."
+            "so this is the value the machine store earns its keep on."
     )
-    if (!confirm("Set the SENTRY_AUTH_TOKEN repo secret now?", default = true)) {
+    // Skipping is only offered when the token would otherwise have to be typed.
+    // Once the env or the store already has it there is nothing to weigh up.
+    val alreadyKnown = values.optional(Keys.SENTRY_CI_TOKEN) != null
+    if (!alreadyKnown && interactive &&
+        !confirm("Set the SENTRY_AUTH_TOKEN repo secret now?", default = true)
+    ) {
         yellow("Skipped. Release builds will still ship; mappings just won't upload.")
         printManualCiCommands(org, project)
         return
     }
-    val ciToken = promptSecret("Sentry organization token (sntrys_…)")
+    val ciToken = values.require(Keys.SENTRY_CI_TOKEN)
     if (!ciToken.startsWith("sntrys_")) {
         yellow("That does not look like an organization token. Setting it anyway — CI needs org:ci.")
     }
@@ -384,14 +273,23 @@ if (!telemetryFile.exists()) {
     die("$TELEMETRY_FILE not found. Run this from the project root.")
 }
 
+val interactive = "--non-interactive" !in args.toList()
+val values = SetupValues(interactive = interactive)
+
 bold("\n━━ Sentry setup ━━")
 println("Creates or adopts a Sentry project, commits its DSN, wires CI, and proves an event arrives.")
 
-explainTokenRequirement()
-val userToken = promptSecret("Sentry user auth token")
+values.plan(listOf(Keys.SENTRY_USER_TOKEN, Keys.SENTRY_ORG, Keys.SENTRY_CI_TOKEN))
 
-val knownOrg = readProperty(telemetryFile, "sentry.org")
-val org = resolveOrg(userToken, knownOrg)
+explainTokenRequirement()
+val userToken = values.require(Keys.SENTRY_USER_TOKEN)
+
+// This project's own telemetry.properties wins over the machine store: a repo
+// that already names an org is describing where its events actually go, and
+// pointing a re-run somewhere else would split one app's issues across two orgs.
+val knownOrg = readProperty(telemetryFile, "sentry.org") ?: values.optional(Keys.SENTRY_ORG)
+val org = resolveOrg(userToken, knownOrg, interactive)
+values.offerToRemember(Keys.SENTRY_ORG, org)
 
 // Derived from the app id rather than the directory name, so the Sentry slug
 // and the installed package stay recognisably the same app. Only the last two
@@ -403,9 +301,9 @@ val defaultProject = readProperty(telemetryFile, "sentry.project")
     ?: applicationId?.split('.')?.filter { it.isNotBlank() }?.takeLast(2)
         ?.joinToString("-")?.lowercase()?.replace(Regex("[^a-z0-9-]"), "-")
     ?: root.name.lowercase()
-val project = prompt("Sentry project slug", defaultProject)
+val project = if (interactive) prompt("Sentry project slug", defaultProject) else defaultProject
 
-ensureProject(userToken, org, project)
+ensureProject(userToken, org, project, interactive)
 val dsn = readDsn(userToken, org, project)
 val parsedDsn = parseDsn(dsn)
 
@@ -422,11 +320,17 @@ if (readProperty(File(root, "local.properties"), "sentry.dsn") != null) {
     )
 }
 
-configureCi(org, project)
+configureCi(org, project, values, interactive)
 
 bold("\nProving it works")
 val marker = "setupcheck" + java.util.UUID.randomUUID().toString().take(8).replace("-", "")
 val delivered = sendTestEvent(parsedDsn, marker) && awaitEvent(userToken, org, project, marker)
+
+// Before the verdict rather than after it, so the last thing on screen stays
+// the one line that says whether Sentry is actually on. Unconditional: a run
+// that ends green while leaving a credential blank is the failure this whole
+// script exists to stop.
+values.printUnconfigured()
 
 println()
 if (delivered) {

@@ -11,12 +11,14 @@ of the template with all naming rewritten. Steps, in order:
 1. **Copy** the whole tree into the destination dir. Skipped: `SKIP_DIRECTORIES`
    (`.git`, `build`, `.claude`, …), the `template/` staging folder, the root
    `.github/` (that's the template repo's own CI), and `local.properties`.
-2. **SETUP.md + CI choice** — `template/SETUP.md` is placed at the project
-   root. If CI is enabled, everything under `template/ci/` is copied into the
-   project preserving relative paths (`.github/workflows/`, fastlane files,
-   `pages/`, release-please config). If declined, `template/ci/` ships as-is
-   into the project alongside `scripts/enable_ci.sh` so it can be enabled
-   later with a pure file move.
+2. **SETUP.md + CI choice + backend choice** — `template/SETUP.md` is placed at
+   the project root. If CI is enabled, everything under `template/ci/` is
+   copied into the project preserving relative paths (`.github/workflows/`,
+   fastlane files, `pages/`, release-please config). If declined, `template/ci/`
+   ships as-is into the project alongside `scripts/enable_ci.sh` so it can be
+   enabled later with a pure file move. The backend question is asked here too
+   but applied in step 7, because its doc edits have to run after the rename
+   pass.
 3. **Content replacement** — every `kmptemplate`/`KMPTemplate`/`kmp-template`/…
    variant and the `com.kmptemplate` package prefix are rewritten in files
    matching `TEXT_FILE_EXTENSIONS` or the extensionless allowlist in
@@ -29,7 +31,8 @@ of the template with all naming rewritten. Steps, in order:
    CI/pages files.
 7. **Cleanup** — template-only artifacts are deleted (see
    `cleanupTemplateArtifacts`), README/AGENTS.md are rewritten from
-   template-framing to app-framing, executable bits are restored.
+   template-framing to app-framing, the backend is removed if it was declined
+   (see `removeBackend`), executable bits are restored.
 8. **Git reset** — old history removed, fresh `git init` + exactly one
    initial commit.
 
@@ -39,7 +42,7 @@ of the template with all naming rewritten. Steps, in order:
 ./scripts/init_project.main.kts \
   --name "My App" --package com.example.myapp \
   --email you@example.com --dir /path/to/new/project \
-  --ci=yes --yes
+  --ci=yes --backend=yes --yes
 ```
 
 All-or-nothing: any flag present requires all of them (including `--yes`).
@@ -73,6 +76,36 @@ When you add a module or a new kind of file, walk this list:
   projects as their accepted debt.
 - **`cleanupTemplateArtifacts`** (init script) — template-only files must be
   added to the deletion list or they ship into generated projects.
+- **`removeBackend`** (init script) — the `--backend=no` path rewrites the
+  Gradle files, the CI workflow, `.gitignore`, `detekt.yml`, the version
+  catalog, the three root docs, two practice docs, `libraries/config/README.md`,
+  three networking KDoc blocks and the decision log. Whole sections go through
+  `cutSection`, bullets through `dropListItems`, table rows through
+  `dropTableRows` — all keyed on headings and subjects, which are stable.
+  Single lines and sentences go through `applyEdits`, which matches **exact
+  text**: reword one of those and the anchor stops matching. Every helper fails
+  the run rather than skipping the edit, and `verify_template.sh` generates a
+  client-only project on every run, so breakage surfaces here — as "update the
+  anchor in init_project.main.kts", which is a job for whoever did the
+  rewording. Prefer the structural helpers when you add a removal; an exact
+  anchor spanning more than a few lines is a doc edit waiting to break the
+  generator.
+- **`Keys` in `scripts/lib/setup_store.main.kts`** — a credential the setup
+  scripts should stop re-asking for needs an entry here plus a mention in the
+  relevant script's `plan(...)`. `setup_credentials.main.kts` enumerates
+  `Keys.all`, so the editor picks it up automatically.
+- **A new `setup_*.main.kts`** needs three things: its path in
+  `ensureExecutableBits`, a `Step` in `scripts/setup.main.kts` placed after
+  whatever produces its inputs, and a section in `scripts/README.md`. If it only
+  applies to projects with a backend, add it to `removeBackend`'s deletion list
+  too.
+- **Any string literal in a template file that names the template** is rewritten
+  per project. That is usually what you want, and occasionally catastrophic: a
+  comparison against such a literal inverts in a generated project, and
+  `verify_template.sh`'s de-branding grep cannot catch it because a *renamed*
+  literal is exactly what that grep wants to see. Identifiers that must stay
+  equal across generated projects carry no project name (`serverOnly`, the
+  `appsetup` store directory). See AGENTS.md → Known landmines.
 - **`SKIP_DIRECTORIES`** (init script) — new machine-local or build-output
   dirs must be skipped.
 - **Run `scripts/verify_template.sh --fast`** before the closing commit of
@@ -81,7 +114,7 @@ When you add a module or a new kind of file, walk this list:
 ## verify_template.sh
 
 `scripts/verify_template.sh [--fast|--full]` generates a project into a temp
-dir (non-interactive, CI enabled) and asserts:
+dir (non-interactive, CI and backend enabled) and asserts:
 
 - zero residual template naming (`kmp[ ._-]?template`, case-insensitive)
 - zero Cards branding (`cards|downcard|warm-felt`, case-insensitive, small
@@ -93,6 +126,24 @@ dir (non-interactive, CI enabled) and asserts:
 - the generated project builds: `--fast` = Android compile + unit tests;
   `--full` adds the iOS Kotlin compile, server tests (needs Docker), the
   admin JS bundle and a server `docker build` once those exist.
+
+It then generates a **second** project with `--backend=no` and asserts that one
+separately: the three backend modules and both deploy workflows are gone, no
+`:apps:server` / `serverOnly` / `FLY_API_TOKEN` reference survives **anywhere
+in the tree** bar two allowlisted files, every client module is still in
+`settings.gradle.kts`, markdown links still resolve, and Gradle configuration
+succeeds. That middle pair is the point — the `if (!serverOnly)` block wraps
+every client module, so unwrapping it and deleting it both leave a settings
+file that parses, and only the module list tells them apart. This runs in both
+modes; it is configuration only, since no client module depends on a server
+module.
+
+The two allowlisted files are `docs/decisions.md` (a dated log records what was
+decided, and the entry explaining why this project has no server has to name
+the modules it removed) and `scripts/lib/setup_store.main.kts` (the credential
+store is shared across every project you generate, so it still carries Fly
+tokens for the ones that do have a backend). Adding to that allowlist should
+feel harder than fixing the reference.
 
 Env: `VERIFY_INCLUDE_SERVER_TESTS=1` adds server tests to `--fast` (template
 CI sets this — Ubuntu runners have Docker). `VERIFY_KEEP=1` keeps the

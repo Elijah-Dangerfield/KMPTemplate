@@ -13,8 +13,15 @@ This is **Kotlin Multiplatform**—most code is shared, but some platform featur
 ```shell
 ./gradlew :apps:compose:assembleDebug          # Android
 ./gradlew :apps:compose:compileKotlinIosSimulatorArm64  # iOS Kotlin
-xcodebuild -project apps/ios/iosApp.xcodeproj -scheme iOS -sdk iphonesimulator  # iOS full
+xcodebuild -project apps/ios/iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator  # iOS full
 ```
+
+`iosApp` is the only scheme, and it is **shared** — it lives at
+`apps/ios/iosApp.xcodeproj/xcshareddata/xcschemes/iosApp.xcscheme` and is
+tracked by git (`.gitignore` ignores `xcuserdata`, so a per-user scheme would
+not survive a fresh clone). If you ever add a target, share its scheme too:
+un-shared, `xcodebuild` autocreates one from the target, which works until the
+day it doesn't and leaves nobody a file to review.
 
 ## Module Structure
 
@@ -196,9 +203,24 @@ Default it to a noop, never `error("not provided")`. This keeps `@Preview` and u
 
 - Code like a staff engineer
 - Use `Catching { }` from libraries/core instead of `runCatching`
-- No comments in code
 - Custom UI components in libraries/ui—avoid Material directly
 - Check `ComposeApp.h` for Swift names of Kotlin types before using in Swift
+
+### Comments and docs earn their upkeep, or they lie
+
+A comment that records **why** a non-obvious choice was made ages well — it is the thing that stops the next person deleting the choice. A comment that restates a file name, a line number, a count, or the state of the world is a hostage to the next change: it is correct on the day it is written and silently wrong afterwards. Prefer the first, and write it where the choice lives.
+
+**Whatever describes a thing gets updated in the same commit that changes the thing.** Not the next commit, not the cleanup PR. Doc rot has no failing test and no compiler — it is invisible until somebody acts on it, and by then the cost is paid.
+
+The reason this is a rule and not a platitude is that the failures are specific and they all look like something else:
+
+- **AGENTS.md's own iOS build command named a scheme that has never existed** (`-scheme iOS`; the only scheme is `iosApp`). The error — `xcodebuild: error: The project does not contain a scheme named "iOS"` — reads as a broken Xcode install or a bad checkout, so people debug their machine.
+- **`docs/release-automation.md` told readers to create a TestFlight external group named `main`**, while `release.yml` and the Fastfile both looked for `External Testers`. Nothing is internally inconsistent — code agrees with code — so no gate could catch it. The symptom is a green release that reaches nobody on external TestFlight, and the natural conclusion is "my App Store Connect setup is wrong."
+- **Two `This template` placeholders shipped into every generated app's operator runbook** ("create a Google Cloud project called *This template CI*"). It reads as a copy-paste slip in a doc rather than a defect, so nobody files it and it lives as long as the app.
+- **Two build files named a Gradle property with a project prefix it does not have.** The prefix was a comment restating a literal that had deliberately moved — and the restatement was in a file the rename pass rewrites, so each generated project got its own wrong name while the real flag stayed constant. The neighbouring comment on the property itself explains exactly why it carries no prefix; the two copies did not read it.
+- **Docs cited source files by their package path**, and the generator rewrote the citation on one rule while moving the directory on another. Every such link pointed at nothing, in every generated project, and kept looking plausible while doing it.
+
+These were all found by someone hitting the symptom, not by anyone reading the doc. `scripts/verify_template.sh` now resolves every repo-relative markdown link in a generated project, which turns the subset of this class that is a dead path into a red build. The rest is discipline.
 
 ## This template is fed by the apps built from it
 
@@ -227,6 +249,8 @@ Each of these cost a downstream app real time. They are cheap to avoid and expen
 - **Reading an animated value during composition recomposes the whole subtree every frame.** `val x by animateFloatAsState(...)` read in a composable body is the single most common Compose performance bug; feeding text with it thrashes Skia's glyph cache and can wedge the RenderThread into an ANR. Read it in `graphicsLayer`/`drawBehind` instead. Enforced by the `AnimatedStateReadInComposition` detekt rule, which fails the build.
 - **A bottom sheet whose height comes from its content snaps back mid-drag.** Material3 derives the Expanded anchor from the sheet's *measured* height and recomputes the anchors on every measure pass, so tall content re-measured mid-drag yanks the sheet back to Expanded: dragging down to close jumps, and near the top it bounces without ever closing. Short content measures stably, so it stays invisible until the first long sheet. Pass `scrollableContent = true` to `BottomSheet` instead of wrapping the content in your own `Column(verticalScroll(...))` — enforced by the `ScrollInsideBottomSheet` detekt rule.
 - **A clean detekt run does not prove a custom rule ran.** A silently-undispatched rule and a working rule that finds nothing are identical from the build output. Two causes seen downstream: detekt `2.0.0-alpha.5` failed to dispatch custom rules at all (fixed in `alpha.6`, which this repo pins), and **the Gradle daemon caches detekt's worker classloader**, so an edited rule keeps running its previous jar until `./gradlew --stop`. Neither is universal — the method is the lesson. Prove dispatch by making the rule report unconditionally, confirm the flood, then revert.
+- **A string literal that names this project is a moving target in template code, and the de-branding grep cannot catch it.** `verify_template.sh` asserts that no generated project *contains* the template's name — so a literal that gets correctly renamed passes, even when renaming it is the bug. A status check in `scripts/setup.main.kts` compared a config value against the template's own name to ask "has this been changed from the default"; in a generated project that literal became the project's own name and the comparison inverted, reporting the opposite answer in the template and in the app. (This bullet deliberately does not quote the literal, for the same reason.) Two rules follow: an identifier that must stay equal across every generated project carries no project name at all — the build-slimming system property and the `appsetup` store directory are both named that way on purpose — and code asking "is this configured" should ask the service, not compare strings.
+- **Editing a `@file:Import`ed Kotlin script does not invalidate the compiled-script cache.** `kotlin foo.main.kts` caches its compilation in `~/Library/Caches/main.kts.compiled.cache` keyed on the script it was handed — not on the files that script imports. Edit `scripts/lib/setup_store.main.kts`, re-run `scripts/setup_credentials.main.kts`, and you get the old library with no warning and no recompile pause. Same shape as the stale detekt worker classloader below: the tool runs, it is green, and it is running code you deleted. `rm -rf ~/Library/Caches/main.kts.compiled.cache` before you conclude an edit had no effect.
 - **On the server, `withSpan` parents to the *current* OTel context.** Correct inside a request handler, wrong anywhere the current context outlives the unit of work — a WebSocket upgrade span stays current for the life of the socket, and a shared `Dispatchers.Default` scope leaves contexts on pool threads for unrelated work to inherit. Downstream this produced one trace id spanning hours and several users, permanently stuck at "root span not yet received". Root a new trace per unit of work. Full detail in the `withSpan` KDoc in `apps/server/.../plugins/Tracing.kt`.
 
 ## iOS Notes
