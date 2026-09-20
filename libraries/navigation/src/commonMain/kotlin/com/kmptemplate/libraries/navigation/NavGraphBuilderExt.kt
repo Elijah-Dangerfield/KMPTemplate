@@ -161,6 +161,24 @@ inline fun <reified T : Route> NavGraphBuilder.navigation(
     )
 }
 
+/**
+ * The `deepLinks` go on the builder, before [destination] is handed it.
+ *
+ * `NavGraphBuilder.destination(...)` returns `Unit` and has already built the
+ * destination by the time it does. Written the other way round, as
+ * `destination(Builder(...)).apply { deepLinks.forEach { deepLink(it) } }`, the
+ * receiver inside the `apply` is that `Unit`, so `deepLink(...)` resolves
+ * against the enclosing [NavGraphBuilder] instead and every link lands on the
+ * *graph* rather than on the sheet. Nothing about that fails loudly: it
+ * compiles, the graph builds, the destination resolves, and a deep link into a
+ * sheet simply never arrives. [screen] and [dialog] have always had it the right
+ * way round; this one did not until 2026-09-20.
+ *
+ * `NavGraph.matchDeepLink` searches a graph's own links as well as its
+ * children's, so it answers `true` either way. Asking the destination itself,
+ * via `NavDestination.hasDeepLink`, is the only public question whose answer
+ * tells the two apart.
+ */
 inline fun <reified T : Route> NavGraphBuilder.bottomSheet(
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
@@ -174,7 +192,8 @@ inline fun <reified T : Route> NavGraphBuilder.bottomSheet(
         ) { backStackEntry ->
             BottomSheetDestination(backStackEntry, content)
         }
-    ).apply {
-        deepLinks.forEach { deepLink -> deepLink(deepLink) }
-    }
+            .apply {
+                deepLinks.forEach { deepLink -> deepLink(deepLink) }
+            }
+    )
 }
