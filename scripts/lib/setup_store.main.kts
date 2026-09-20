@@ -75,7 +75,7 @@ fun prompt(label: String, default: String? = null): String {
         System.out.flush()
         // Every prompt treats end-of-input as a hard stop. These scripts are
         // interactive by nature, and a piped/empty stdin must not spin.
-        val input = (readlnOrNull() ?: die("No input on stdin — run this in a terminal.")).trim()
+        val input = (readlnOrNull() ?: die("No input on stdin, run this in a terminal.")).trim()
         if (input.isNotEmpty()) return input
         if (!default.isNullOrBlank()) return default
     }
@@ -88,11 +88,11 @@ fun promptSecret(label: String): String {
         val value = if (console != null) {
             console.readPassword("$label: ")
                 ?.let { String(it) }
-                ?: die("No input on stdin — run this in a terminal.")
+                ?: die("No input on stdin, run this in a terminal.")
         } else {
             print("$label (input will be visible): ")
             System.out.flush()
-            readlnOrNull() ?: die("No input on stdin — run this in a terminal.")
+            readlnOrNull() ?: die("No input on stdin, run this in a terminal.")
         }.trim()
         if (value.isNotEmpty()) return value
     }
@@ -158,9 +158,10 @@ object Keys {
     val SENTRY_USER_TOKEN = SetupKey(
         storeKey = "sentry.userToken",
         env = "SENTRY_USER_TOKEN",
-        label = "Sentry user auth token",
+        label = "Sentry personal token (sntryu_...)",
         secret = true,
-        where = "Settings → Account → API → Auth Tokens (project:read, project:write, org:read)",
+        where = "sentry.io, Account dropdown top left, then Personal Tokens. " +
+            "Tick project:read, project:write, org:read. NOT the sntrys_ org token.",
         consequence = "setup_sentry.main.kts cannot run unattended and will ask for it each time.",
     )
     val SENTRY_ORG = SetupKey(
@@ -227,7 +228,7 @@ object Keys {
         env = "ASC_KEY_P8_PATH",
         label = "Path to your App Store Connect .p8",
         secret = false,
-        where = "wherever you saved the .p8 — App Store Connect lets you download it exactly once",
+        where = "wherever you saved the .p8, App Store Connect lets you download it exactly once",
         consequence = "TestFlight uploads have no key to sign with.",
     )
 
@@ -507,7 +508,7 @@ class SetupValues(
 
         bold("\nWhere this run's values come from")
         if (!store.exists) {
-            dim("  No machine store at ${store.file.path} — everything below is a prompt.")
+            dim("  No machine store at ${store.file.path}, everything below is a prompt.")
             dim("  Run ./scripts/setup_credentials.main.kts once to stop re-typing these.")
         }
         for (key in keys) {
@@ -591,7 +592,7 @@ class SetupValues(
             println("      Set ${key.env}, or save it with ./scripts/setup_credentials.main.kts")
         }
         for (key in unsaved) {
-            dim("  • ${key.label} — answered but not saved; the next project will ask again.")
+            dim("  • ${key.label}, answered but not saved; the next project will ask again.")
         }
         println()
     }

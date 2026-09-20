@@ -55,36 +55,69 @@ fun explainTokenRequirement() {
     bold("\nSentry auth token")
     println(
         """
-        This needs a USER token, not an organization token. They are not
-        interchangeable and picking the wrong one is the usual way this fails:
+        This needs a PERSONAL token. Sentry has two kinds and they are not
+        interchangeable. The prefix tells you which one you are holding:
 
-          User token          Settings → Account → API → Auth Tokens
-                              Scopes are selectable. Tick project:read,
-                              project:write and org:read.
+          sntryu_   Personal token. Account dropdown, top left of sentry.io,
+                    then Personal Tokens. Scopes are selectable: tick
+                    project:read, project:write and org:read.
+                    Direct link: https://sentry.io/settings/account/api/auth-tokens/
 
-          Organization token  Settings → Organization Tokens (sntrys_…)
-                              Carries exactly one scope, org:ci, and it is not
-                              selectable. It answers 403 to every read endpoint,
-                              so it cannot look up an org or read a DSN. It is
-                              what CI wants, and this script will ask for it
-                              separately at the end.
+          sntrys_   Organization token. Settings > Developer Settings >
+                    Organization Tokens. Its permissions are fixed and cannot
+                    be selected, so it answers 403 to every read endpoint and
+                    cannot look up an org or read a DSN. This is what CI wants,
+                    and the script asks for it separately at the end.
 
-        Create one at https://sentry.io/settings/account/api/auth-tokens/
+        If the page you are on offers you permission checkboxes, you are on the
+        personal one. If it does not, you are on the organization one.
+
         Nothing is written to this repo. If you say yes when asked, it is saved
-        to the machine-local store so your next project does not ask again —
-        see ./scripts/setup_credentials.main.kts.
+        to the machine-local store so your next project does not ask again. See
+        ./scripts/setup_credentials.main.kts.
         """.trimIndent()
     )
     println()
 }
 
+/**
+ * Names the wrong-token mistake before spending a network call on it.
+ *
+ * Sentry's prefixes are unambiguous: `sntryu_` personal, `sntrys_`
+ * organization, `sntrya_` user-app, `sntryi_` internal integration. An org
+ * token here fails with a 403 from the first read, which reads as a broken or
+ * under-scoped token rather than the wrong kind of token, and the natural next
+ * move is to go back and add scopes that an org token cannot have.
+ *
+ * Legacy tokens are bare 64-hex with no prefix, so an unrecognised shape is
+ * passed through rather than rejected.
+ */
+fun rejectWrongTokenKind(token: String) {
+    val problem = when {
+        token.startsWith("sntrys_") ->
+            "an ORGANIZATION token. Its permissions are fixed and exclude every read " +
+                "endpoint this script needs, so no amount of re-issuing it will help."
+        token.startsWith("sntryi_") ->
+            "an INTERNAL INTEGRATION token, which is org-scoped rather than user-scoped."
+        else -> return
+    }
+    die(
+        "That is $problem\n" +
+            "   You want a personal token, prefixed sntryu_: sentry.io, Account dropdown\n" +
+            "   in the top left, then Personal Tokens. Tick project:read, project:write\n" +
+            "   and org:read. Keep the one you just pasted, it is exactly what the CI\n" +
+            "   step at the end of this script asks for."
+    )
+}
+
 fun resolveOrg(token: String, suggested: String?, interactive: Boolean): String {
     val response = request("GET", "$SENTRY_API/organizations/", token)
-    if (response.code == 401) die("Sentry rejected that token (401). Create a new user token and re-run.")
+    if (response.code == 401) die("Sentry rejected that token (401). Create a new personal token and re-run.")
     if (response.code == 403) {
         die(
-            "That token answered 403 to /organizations/, which is what an organization " +
-                "(sntrys_…) token does. Create a USER token with org:read instead."
+            "That token answered 403 to /organizations/, so it cannot read an org. " +
+                "Organization tokens (sntrys_) do this by design. Use a personal token " +
+                "(sntryu_) with org:read instead."
         )
     }
     if (!response.isSuccess) die("Could not list organizations (HTTP ${response.code}): ${response.body.take(300)}")
@@ -221,7 +254,7 @@ fun configureCi(org: String, project: String, values: SetupValues, interactive: 
     bold("\nCI configuration")
     when (githubCliState()) {
         GithubCliState.NOT_INSTALLED -> yellow("gh is not installed.")
-        GithubCliState.NOT_AUTHENTICATED -> yellow("gh is installed but not authenticated — run `gh auth login`.")
+        GithubCliState.NOT_AUTHENTICATED -> yellow("gh is installed but not authenticated, run `gh auth login`.")
         GithubCliState.READY -> Unit
     }
     if (!hasGhRepo()) {
@@ -235,7 +268,7 @@ fun configureCi(org: String, project: String, values: SetupValues, interactive: 
     if (orgOk && projectOk) {
         green("✓ Set repo variables SENTRY_ORG=$org, SENTRY_PROJECT=$project")
     } else {
-        yellow("Could not set repo variables — set SENTRY_ORG / SENTRY_PROJECT by hand.")
+        yellow("Could not set repo variables, set SENTRY_ORG / SENTRY_PROJECT by hand.")
     }
 
     println(
@@ -255,7 +288,7 @@ fun configureCi(org: String, project: String, values: SetupValues, interactive: 
     }
     val ciToken = values.require(Keys.SENTRY_CI_TOKEN)
     if (!ciToken.startsWith("sntrys_")) {
-        yellow("That does not look like an organization token. Setting it anyway — CI needs org:ci.")
+        yellow("That does not look like an organization token. Setting it anyway, CI needs org:ci.")
     }
     if (runGh("secret", "set", "SENTRY_AUTH_TOKEN", stdin = ciToken)) {
         green("✓ Set repo secret SENTRY_AUTH_TOKEN")
@@ -282,7 +315,7 @@ println("Creates or adopts a Sentry project, commits its DSN, wires CI, and prov
 values.plan(listOf(Keys.SENTRY_USER_TOKEN, Keys.SENTRY_ORG, Keys.SENTRY_CI_TOKEN))
 
 explainTokenRequirement()
-val userToken = values.require(Keys.SENTRY_USER_TOKEN)
+val userToken = values.require(Keys.SENTRY_USER_TOKEN).also(::rejectWrongTokenKind)
 
 // This project's own telemetry.properties wins over the machine store: a repo
 // that already names an org is describing where its events actually go, and
@@ -310,7 +343,7 @@ val parsedDsn = parseDsn(dsn)
 upsertProperty(telemetryFile, "sentry.dsn", dsn)
 upsertProperty(telemetryFile, "sentry.org", org)
 upsertProperty(telemetryFile, "sentry.project", project)
-green("✓ Wrote the DSN into $TELEMETRY_FILE — commit it, so a fresh clone reports with no local setup")
+green("✓ Wrote the DSN into $TELEMETRY_FILE, commit it, so a fresh clone reports with no local setup")
 
 if (readProperty(File(root, "local.properties"), "sentry.dsn") != null) {
     yellow(
