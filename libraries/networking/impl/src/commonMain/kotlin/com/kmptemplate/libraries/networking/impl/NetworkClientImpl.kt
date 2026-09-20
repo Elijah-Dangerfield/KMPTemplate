@@ -111,7 +111,10 @@ class NetworkClientImpl(
         get() = sessionRejectionBus.rejectionEpoch
 }
 
-private fun HttpClientConfig<*>.applyCommonConfig(
+// `internal`, not private: NetworkClientImpl itself needs a DI graph to
+// construct, so the only way to test this configuration is to apply it to a
+// bare client over a MockEngine.
+internal fun HttpClientConfig<*>.applyCommonConfig(
     config: NetworkConfig,
     headersProvider: ClientHeadersProvider,
     reachability: NetworkReachability,
@@ -127,6 +130,12 @@ private fun HttpClientConfig<*>.applyCommonConfig(
     HttpResponseValidator {
         validateResponse { reachability.reportReachable() }
         handleResponseExceptionWithRequest { cause, _ ->
+            // Never left the device, so it says nothing about the network. Left
+            // to fall through it would raise the offline banner on a
+            // misconfiguration, which is the whole failure this guards.
+            if (cause is UnresolvedRelativeRequestException) {
+                return@handleResponseExceptionWithRequest
+            }
             // A ResponseException means the server answered (a 4xx/5xx) — the
             // network is fine. Anything else never reached the server.
             if (cause !is ResponseException) {
@@ -143,6 +152,11 @@ private fun HttpClientConfig<*>.applyCommonConfig(
         connectTimeoutMillis = config.requestTimeoutMillis
         socketTimeoutMillis = config.requestTimeoutMillis
     }
+    // Only when there is no base URL: with one configured, DefaultRequest has
+    // already resolved every relative path and the plugin would have nothing to
+    // catch. See RejectUnresolvedRelativeRequests for why this is not left to
+    // fail on its own.
+    if (config.baseUrl.isBlank()) install(RejectUnresolvedRelativeRequests)
     install(DefaultRequest) {
         if (config.baseUrl.isNotBlank()) url(config.baseUrl)
         headers.append(HttpHeaders.Accept, "application/json")

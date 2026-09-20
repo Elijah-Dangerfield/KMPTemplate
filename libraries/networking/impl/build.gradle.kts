@@ -30,6 +30,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.libraries.networking)
+            implementation(libs.ktor.client.mock)
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
 
@@ -51,6 +52,7 @@ kotlin {
             implementation(projects.libraries.flowroutines.testing)
             implementation(projects.libraries.core)
             implementation(projects.libraries.networking)
+            implementation(libs.ktor.client.mock)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
