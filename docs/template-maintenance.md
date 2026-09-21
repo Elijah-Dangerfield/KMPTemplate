@@ -14,7 +14,7 @@ of the template with all naming rewritten. Steps, in order:
 2. **SETUP.md + CI choice + backend choice**: `template/SETUP.md` is placed at
    the project root. If CI is enabled, everything under `template/ci/` is
    copied into the project preserving relative paths (`.github/workflows/`,
-   fastlane files, `pages/`, release-please config). If declined, `template/ci/`
+   fastlane files, `legal/`, release-please config). If declined, `template/ci/`
    ships as-is into the project alongside `scripts/enable_ci.sh` so it can be
    enabled later with a pure file move. The backend question is asked here too
    but applied in step 7, because its doc edits have to run after the rename

@@ -19,6 +19,7 @@ A Kotlin Multiplatform template with the production systems already wired, not a
 
 **Process**
 - CI from the first push: build + unit/server/integration test jobs, release-please versioning, TestFlight/Play release pipelines, detekt with a custom user-facing-strings rule, conventional-commit hooks
+- **Legal documents that stay true**: the privacy policy and terms are Markdown in `legal/`, next to the code they make claims about, and a workflow publishes them to the studio site by pull request. Keeping them in a marketing folder is how an app ends up telling people it serves no ads while it serves ads
 - An **integration harness** that drives the real client stack against the real server over a real Postgres, in a unit test
 - Docs that assume nothing: `SETUP.md` runbook from init to first release, practice guides for testing, observability, app events, and outboxes
 
@@ -35,7 +36,7 @@ A Kotlin Multiplatform template with the production systems already wired, not a
 You'll be prompted for:
 - **App Name** (e.g., "My Awesome App"): display name
 - **Package Name** (e.g., "com.example.myapp"): package declarations
-- **Contact email**: used in the privacy/terms pages
+- **Contact email**: used in the privacy policy and terms
 - **Destination directory**: where to create the new project (defaults to the parent folder)
 - **CI**: whether to install the release automation now (you can opt in later with `./scripts/enable_ci.sh`)
 

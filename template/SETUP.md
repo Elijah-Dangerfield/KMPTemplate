@@ -243,7 +243,6 @@ the environment the prod deploy runs unguarded.
 ## Repo settings
 
 - **Actions** → enable workflows.
-- **Pages** → Source: `Deploy from a branch`, Branch: `main` / folder: `/pages`. (The `pages.yml` workflow can also publish on push.)
 - **Branch protection** on `main`:
   - Require PR.
   - Require status checks: `CI / Build + test`, `commitlint / Validate PR title`.
@@ -258,7 +257,9 @@ Before `release.yml` can ship:
 1. **Play Console** → Create app → fill out store listing, data-safety form, content rating, pricing/distribution. Create at least one internal track tester.
 2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details. Note: Apple checks the binary's bundle name / display name for uniqueness at *delivery* time (ITMS-90129), not here. If your app name is a common word, the first upload may bounce; pick a more distinctive `CFBundleName`/`CFBundleDisplayName` in `apps/ios` and re-upload.
 3. **TestFlight** external group: create a group named `External Testers` (or change `TESTFLIGHT_EXTERNAL_GROUP` in `release.yml`).
-4. Privacy policy + terms of service URLs: the `pages/` folder generates these; once Pages is enabled they're at `https://<you>.github.io/<repo>/privacy.html` etc. Paste the URLs into both store listings.
+4. Privacy policy + terms of service URLs: written in [legal/](legal/) and published to `https://nightjarlabs.llc/<app-slug>/privacy` and `/terms`. Run `./scripts/setup_legal_sync.sh` once, merge the pull request it opens on the website repo, then paste those URLs into both store listings.
+
+   **Read `legal/privacy.md` against your code first.** It ships claiming no ad or analytics SDKs and no account, because that is true of the template and is the first thing to stop being true of a real app. A live privacy policy that denies serving ads while the app serves them is a store problem and a trust problem at once.
 
 ---
 
@@ -289,7 +290,7 @@ Drop your icons into:
 - **iOS** → `apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/` (replace the placeholder set).
 - **Android** → `apps/compose/src/androidMain/res/mipmap-*/` (replace `ic_launcher*.webp`).
 - **Shared** (used by Compose splash, about screens, etc.) → `libraries/resources/src/commonMain/composeResources/drawable/`.
-- **GitHub Pages** → `pages/app-icon.png`, `pages/favicon.png`, `pages/apple-touch-icon.png`.
+- **Website** → `public/apps/<app-slug>.png` in the studio site repo, which is where the app's page and legal documents live.
 
 ---
 

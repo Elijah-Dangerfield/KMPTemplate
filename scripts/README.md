@@ -18,7 +18,7 @@ after cloning, before your first commit:
 ## enable_ci.sh
 
 Present only if CI was declined at project init. Installs the staged CI /
-release automation (`.github/workflows/`, fastlane files, `pages/`,
+release automation (`.github/workflows/`, fastlane files, `legal/`,
 release-please config) and then removes itself:
 
 ```bash

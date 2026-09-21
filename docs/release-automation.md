@@ -125,7 +125,7 @@ Worth knowing before you do this the second time: every secret below is a proper
 
 One Apple distribution certificate signs every app on the team. One App Store Connect API key covers the team. One Play service account covers the developer account, once you grant it access to each app. One upload keystore can sign all of them: with Play App Signing the upload key only proves *you* sent the build, and Google holds the key users actually verify.
 
-So do not treat a new app as thirteen console visits. Keep the shared material in one private folder outside any repo, alongside a script that runs `gh secret set` for a named repo, and a new app costs one four-line file. GitHub does not offer account-level secrets for personal repos; a free organization does, with per-repository visibility, if you would rather have the platform hold them. Moving repos into an org rewrites their GitHub Pages URL, so do that before you file a privacy policy URL with either store, not after.
+So do not treat a new app as thirteen console visits. Keep the shared material in one private folder outside any repo, alongside a script that runs `gh secret set` for a named repo, and a new app costs one four-line file. GitHub does not offer account-level secrets for personal repos; a free organization does, with per-repository visibility, if you would rather have the platform hold them. Moving repos into an org rewrites their GitHub Pages URL. That no longer touches the privacy policy URL, which is on the studio domain, but it is still worth doing before you file anything derived from a repo URL.
 
 The one that is genuinely dangerous to lose is the Android upload keystore. Everything else on the list can be reissued from a console in five minutes, including the Apple `.p8` that only downloads once. The keystore cannot: once an app has shipped a build signed with it, losing it means asking Google to reset the upload key before you can publish an update.
 
@@ -213,9 +213,24 @@ The pipeline ships only the binary + release notes (`skip_metadata: true`, `skip
 - [ ] Content rating, target audience, data safety, category, contact
 - [ ] **Ship the first production release manually from Play Console.** `r0adkll/upload-google-play` can't push to production until there's an approved prod release to update. Use `track: internal` in [release.yml](../.github/workflows/release.yml) for the first few releases if you prefer automation all the way down.
 
-### One-time GitHub Pages source
+### One-time legal-sync setup
 
-Marketing/landing pages (`index.html`, `privacy.html`, `terms.html`, `style.css`) live in [pages/](../pages/) so that `docs/` can stay developer-focused. Set **Settings → Pages → Source** to `main` / `/pages` so the site serves at `https://<user>.github.io/<repo>/` without any path change. The URLs referenced from the app (`/privacy.html`, `/terms.html`) stay the same.
+The privacy policy and terms of service live in [legal/](../legal/) as Markdown and are published to
+`https://nightjarlabs.llc/<app-slug>/privacy` and `/terms` by
+[legal-sync.yml](../.github/workflows/legal-sync.yml), which opens a pull request against the studio
+site's repository whenever either file changes on `main`.
+
+Run [`scripts/setup_legal_sync.sh`](../scripts/setup_legal_sync.sh) once to create the two secrets it
+needs. Until then the workflow fails on every push that touches `legal/`.
+
+**Why the text lives next to the code.** A privacy policy is a claim about what a specific binary
+does. Keeping it in a marketing folder guarantees the day someone adds an SDK, ships it, and nobody
+remembers that a sentence elsewhere just became false. Drop2048 hit that twice in one month, which
+is what a process problem looks like rather than two mistakes. Next to the code, the diff that
+changes what the app collects and the diff that corrects the claim land in the same review.
+
+A pull request rather than a push, so the rendered page can be read before it is published. The cost
+is that an unmerged PR means the published policy is stale.
 
 ## Runbook: something broke
 

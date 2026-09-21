@@ -128,7 +128,8 @@ val TEXT_FILE_EXTENSIONS = setOf(
     // extensionless and server config is project-agnostic, so they don't
     // carry the project name.)
     "toml", "sql",
-    // Staged GitHub Pages content ({{APP_NAME}} etc. live in the HTML).
+    // Staged web content, if a project ever adds any. The legal Markdown that
+    // carries {{APP_NAME}} and {{APP_SLUG}} is covered by "md" above.
     "html", "css",
     // R8 keep rules are written against the package prefix. Left un-renamed,
     // every `-keep class com.kmptemplate.**` matches nothing in the generated
@@ -431,6 +432,7 @@ fun ensureExecutableBits(projectDir: File) {
     val execPaths = listOf(
         "scripts/install_hooks.sh",
         "scripts/enable_ci.sh",
+        "scripts/setup_legal_sync.sh",
         "scripts/cleanup.sh",
         "scripts/create_module.main.kts",
         "scripts/setup.main.kts",
@@ -478,12 +480,13 @@ fun maybeEnableCi(templateDir: File, projectDir: File, cliCiEnabled: Boolean?): 
         printCyan("""
             🚢 Enable CI / release automation?
 
-            This copies release-please, fastlane, GitHub Pages, and the Sentry
-            triage prompt into your project:
+            This copies release-please, fastlane, the legal documents, and the
+            Sentry triage prompt into your project:
 
               • .github/workflows/*.yml  (ci, release-please, release, etc.)
               • apps/ios/Gemfile + apps/ios/fastlane/*
-              • pages/*.html, style.css, icons
+              • legal/privacy.md, legal/terms.md + the workflow that publishes
+                them to the studio site
               • release-please-config.json, .release-please-manifest.json
 
             You'll still need to set GitHub secrets and create store listings
@@ -555,10 +558,10 @@ fun wantsBackend(cliBackendEnabled: Boolean?): Boolean {
 }
 
 /**
- * Substitute the {{APP_NAME}} / {{CONTACT_EMAIL}} / {{LAST_UPDATED}} /
- * {{APP_TAGLINE}} / {{APP_DESCRIPTION}} placeholders that live inside the
- * CI staging files. Runs after replaceFileContents so it applies to the
- * already-copied, already-renamed content.
+ * Substitute the {{APP_NAME}} / {{APP_SLUG}} / {{CONTACT_EMAIL}} /
+ * {{LAST_UPDATED}} / {{APP_TAGLINE}} / {{APP_DESCRIPTION}} placeholders that
+ * live inside the CI staging files. Runs after replaceFileContents so it
+ * applies to the already-copied, already-renamed content.
  */
 fun substitutePlaceholders(projectDir: File, projectName: ProjectName, contactEmail: String) {
     val today = java.time.LocalDate.now().toString()
@@ -566,6 +569,11 @@ fun substitutePlaceholders(projectDir: File, projectName: ProjectName, contactEm
     val description = "${projectName.displayName} is a cross-platform app built with Kotlin Multiplatform and Compose."
     val pairs = listOf(
         "{{APP_NAME}}" to projectName.displayName,
+        // The first path segment of the published legal URLs, e.g.
+        // nightjarlabs.llc/my-awesome-app/privacy. Kebab-case because it is a
+        // URL. Once a store listing is live this is not a cosmetic string:
+        // changing it means re-filing on both stores.
+        "{{APP_SLUG}}" to projectName.kebabCase,
         "{{CONTACT_EMAIL}}" to contactEmail,
         "{{LAST_UPDATED}}" to today,
         "{{APP_TAGLINE}}" to tagline,
@@ -1594,8 +1602,9 @@ fun getContactEmail(): String? {
     printCyan("""
         ✉️ Contact email
 
-        Shown in the privacy/terms pages and used as the default support
-        address. You can change it later by editing pages/*.html.
+        Shown on the published privacy policy and terms, and used as the
+        default support address. You can change it later by editing the
+        frontmatter of legal/*.md.
 
         Press Enter to use a placeholder (you@example.com).
     """.trimIndent())

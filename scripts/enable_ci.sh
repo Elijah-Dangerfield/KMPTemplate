@@ -17,7 +17,8 @@ rm -rf template
 rm -- scripts/enable_ci.sh
 
 echo "CI installed:"
-echo "  - .github/workflows/ (ci, release-please, release, ...)"
-echo "  - apps/ios fastlane files, pages/, release-please config"
+echo "  - .github/workflows/ (ci, release-please, release, legal-sync, ...)"
+echo "  - apps/ios fastlane files, legal/, release-please config"
 echo
 echo "Next: set the GitHub secrets listed in SETUP.md before the pipeline can ship."
+echo "For the legal pages specifically, run ./scripts/setup_legal_sync.sh."
