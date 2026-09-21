@@ -9,15 +9,46 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<!--
-	  Without this key the generated plist defaults CFBundleName to
-	  $(PRODUCT_NAME), and App Store delivery rejects names that are
-	  already taken by another app (ITMS-90129). Keep it set to the
-	  app's display name; it must be unique on the App Store.
+	  The app's name is NOT here, and putting it back here does not work.
+
+	  GENERATE_INFOPLIST_FILE is YES, and a key Xcode synthesizes silently
+	  overrides the same key in this file. A CFBundleName set here loses to the
+	  generated $(PRODUCT_NAME). This file used to carry one with a comment
+	  saying it was load-bearing; it never reached a single build, and a
+	  downstream app shipped under its old name because of it.
+	  INFOPLIST_KEY_CFBundleName does not rescue it either: Xcode accepts the
+	  setting and then ignores it, verified against the built plist.
+
+	  So PRODUCT_NAME in Configuration/Config.xcconfig is the only lever, and it
+	  is the name App Store delivery checks for uniqueness (ITMS-90129). Rename
+	  the app there. CFBundleDisplayName, the home-screen name, is separate and
+	  is INFOPLIST_KEY_CFBundleDisplayName in the target's build settings.
 	-->
-	<key>CFBundleName</key>
-	<string>KMP Template</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>We'd like to send you notifications.</string>
+	<!--
+	  REQUIRED, even though nothing in the generated app calls the camera.
+
+	  :libraries:ui ships a CameraPreview across all three source sets and
+	  IOSNativeViewFactory.swift imports AVFoundation to serve it. App Store
+	  delivery scans the binary for *API references*, not for call sites, so the
+	  upload is rejected with ITMS-90683 whether or not a screen ever shows a
+	  preview. A downstream app hit exactly this on its first submission.
+
+	  Two correct answers, and the one you pick should match what the app does:
+
+	  * **Using the camera.** Keep this key and rewrite the string to say what
+	    you use it for. A vague purpose string is its own rejection.
+	  * **Not using the camera**, which is most apps. Delete the bridge rather
+	    than declaring a sensor you never touch: a purpose string here
+	    contradicts the App Privacy answers and the privacy manifest. Remove
+	    this key, `libraries/ui/.../CameraPreview*.kt`, the camera members of
+	    `nativeviews/NativeViewFactory.kt`, and the camera half of
+	    `apps/ios/iosApp/Platform/IOSNativeViewFactory.swift`. Confirm with
+	    `otool -L` on the built .app that AVFoundation is gone.
+	-->
+	<key>NSCameraUsageDescription</key>
+	<string>Used to take photos inside the app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>processing</string>

@@ -265,7 +265,12 @@ the environment the prod deploy runs unguarded.
 Before `release.yml` can ship:
 
 1. **Play Console** → Create app → fill out store listing, data-safety form, content rating, pricing/distribution. Create at least one internal track tester.
-2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details. Note: Apple checks the binary's bundle name / display name for uniqueness at *delivery* time (ITMS-90129), not here. If your app name is a common word, the first upload may bounce; pick a more distinctive `CFBundleName`/`CFBundleDisplayName` in `apps/ios` and re-upload.
+2. **App Store Connect** → My Apps → New App → pick the bundle ID that matches `apps/ios/fastlane/Appfile`. Fill out app info, pricing, privacy details.
+
+   Two things reject a first upload *after* it has already succeeded, so both are worth doing before you submit:
+
+   - **ITMS-90129, name already taken.** Apple checks the binary's name for uniqueness at *delivery* time, not when you reserve it. The lever is `PRODUCT_NAME` in `apps/ios/Configuration/Config.xcconfig`, **not** `CFBundleName` in `Info.plist`, which `GENERATE_INFOPLIST_FILE` silently overrides. Setting it in the plist looks like it worked and reaches no build.
+   - **ITMS-90683, missing purpose string.** The template ships a `CameraPreview` and an AVFoundation bridge in `IOSNativeViewFactory.swift`. Apple scans for API references, not call sites, so this is rejected even if no screen ever opens a camera. Either keep `NSCameraUsageDescription` in `Info.plist` and write a real purpose string, or delete the camera bridge. `Info.plist` names the exact files.
 3. **TestFlight** external group: create a group named `External Testers` (or change `TESTFLIGHT_EXTERNAL_GROUP` in `release.yml`).
 4. Privacy policy + terms of service URLs: written in [legal/](legal/) and published to `https://nightjarlabs.llc/<app-slug>/privacy` and `/terms`. Run `./scripts/setup_legal_sync.sh` once, merge the pull request it opens on the website repo, then paste those URLs into both store listings.
 
