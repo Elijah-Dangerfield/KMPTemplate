@@ -283,6 +283,37 @@ object Keys {
         consequence = "setup_supabase.main.kts will ask which organization to create in.",
     )
 
+    // One Grafana stack serves every project you generate, so these three are
+    // account-wide like the Sentry org token. Apps are separated inside it by
+    // the `service_name` label, which the rename pass makes per-project. See
+    // decisions.md, 2026-09-21.
+    val GRAFANA_OTLP_BASE_URL = SetupKey(
+        storeKey = "grafana.otlpBaseUrl",
+        env = "GRAFANA_OTLP_BASE_URL",
+        label = "Grafana OTLP base URL",
+        secret = false,
+        where = "Grafana Cloud > OpenTelemetry > OTLP endpoint base URL",
+        consequence = "App events and Warn+ logs never leave the device, so Loki has nothing " +
+            "to correlate against a Sentry crash.",
+    )
+    val GRAFANA_OTLP_INSTANCE_ID = SetupKey(
+        storeKey = "grafana.otlpInstanceId",
+        env = "GRAFANA_OTLP_INSTANCE_ID",
+        label = "Grafana OTLP instance ID",
+        secret = false,
+        where = "same page as the OTLP endpoint, the numeric user",
+        consequence = "The OTLP exporter cannot authenticate, so client telemetry is dropped.",
+    )
+    val GRAFANA_LOGS_WRITE_TOKEN = SetupKey(
+        storeKey = "grafana.logsWriteToken",
+        env = "GRAFANA_LOGS_WRITE_TOKEN",
+        label = "Grafana logs:write token (glc_...)",
+        secret = true,
+        where = "Grafana Cloud access policy with logs:write. Never commit one; " +
+            "Grafana auto-revokes glc_ tokens it finds in public repos.",
+        consequence = "The OTLP exporter cannot authenticate, so client telemetry is dropped.",
+    )
+
     val FLY_ORG = SetupKey(
         storeKey = "fly.org",
         env = "FLY_ORG",
@@ -355,6 +386,7 @@ object Keys {
         FLY_TOKEN_DEV, FLY_TOKEN_PROD,
         APPLE_TEAM_ID, ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH, APPLE_DIST_CERT_PASSWORD,
         SUPABASE_ACCESS_TOKEN, SUPABASE_ORG,
+        GRAFANA_OTLP_BASE_URL, GRAFANA_OTLP_INSTANCE_ID, GRAFANA_LOGS_WRITE_TOKEN,
         FLY_ORG,
         SIGNING_DIR, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD,
     )

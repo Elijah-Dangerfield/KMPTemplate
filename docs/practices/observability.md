@@ -33,6 +33,35 @@ string works everywhere. The same rule applies to any context you add: if a key 
 spans and client Sentry tags, spell it identically (`Telemetry.setContext(key, value)` client-side,
 `SpanAttrs` server-side).
 
+## One stack, many apps
+
+Every project generated from this template sends to the **same** Grafana Cloud
+stack. Nothing separates them at the account level; they are told apart by
+`service_name`, which is `<project>-client` and `<project>-server` and is
+per-project because the rename pass rewrites it. `deployment_environment` then
+splits dev from prod inside that.
+
+So a query without a `service_name` matcher spans every app you have ever
+shipped. That is occasionally what you want and usually not, and it is the
+first thing to check when a Loki result looks too broad.
+
+The practical consequences:
+
+- The three `GRAFANA_*` credentials are account-wide, like the Sentry org
+  token. They live in the machine-local credential store and
+  `setup_github_secrets.main.kts` pushes them, so a new project needs none of
+  them typed.
+- Quota is shared. One chatty app can eat the allowance and blind the others,
+  which is what `telemetry.appEventsSampleRate` and the
+  `telemetry.appEventsEnabled` kill switch are for. Both are remote config and
+  per app, so throttling one needs no release.
+- Retention is per stack, so you cannot keep one app's data longer than
+  another's.
+
+Splitting an app onto its own stack later is three secrets and a rebuild, not a
+migration, because the separation already lives in the labels. See
+decisions.md, 2026-09-21.
+
 ## Loki label conventions
 
 Stream labels are only `service_name` + `deployment_environment`. Everything else, `event_name`,

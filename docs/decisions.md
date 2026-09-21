@@ -6,6 +6,40 @@ the decision, alternatives considered, and *why*. Newest first.
 
 ---
 
+## 2026-09-21: One Grafana stack for every project, separated by service_name
+
+**Decision:** every app generated from this template sends to the same Grafana
+Cloud stack. They are told apart by the `service_name` label, which
+`GrafanaLogTree.SERVICE_NAME` and the server's `OTEL_SERVICE_NAME` both derive
+from the project name, so the rename pass makes it per-project for free.
+`deployment_environment` splits dev from prod inside that. The three
+`GRAFANA_*` credentials are therefore account-wide and live in the machine
+store alongside the Sentry org token.
+
+**Why:** the separation already exists in the labels, so a stack per project
+buys nothing you do not already have and costs a second thing to administer.
+One stack means cross-project queries, one alerting setup, and one set of
+credentials that `setup_github_secrets.main.kts` pushes without anyone typing
+them. It is the same shape as Sentry: one org, per-app separation inside it.
+
+**What it costs, and this is the real argument for the other choice:** quota is
+shared, so a chatty app can eat the log allowance and blind the others.
+Retention is per-stack, so you cannot keep one app's data longer. And one
+`glc_` token sits in every repo's CI, so a revocation takes out all of them at
+once. Grafana auto-revokes tokens it finds in public repos, which makes that
+less hypothetical than it sounds.
+
+**Why the quota risk is survivable:** the levers are already per-app and
+remote. `telemetry.appEventsSampleRate` is stable-hashed per session, so a
+sample rate is all-or-nothing per session rather than a partial trace, and
+`telemetry.appEventsEnabled` is an instant kill switch. Either can be turned
+down for one noisy app without touching the others or shipping a build.
+
+**When to split:** one app turns genuinely high-volume, or a project needs
+different retention or access (a client's app, say). Moving is three secrets
+and a rebuild rather than a migration, precisely because the separation lives
+in the labels rather than in the stack.
+
 ## 2026-09-20: Provisioning is scripted per service, orchestrated by one entry point
 
 **Decision:** each external service gets its own idempotent script

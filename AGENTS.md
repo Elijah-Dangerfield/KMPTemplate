@@ -122,6 +122,25 @@ A Ktor + Postgres backend with Supabase JWT auth. It reuses the client's convent
 
 The full reference, how to add a route, repository, migration, or config value, plus the auth, persistence, and testing patterns, lives in [`apps/server/README.md`](apps/server/README.md). Read it before touching the server.
 
+## Telemetry goes to a shared Grafana stack
+
+Every project generated from this template exports to the **same** Grafana
+Cloud stack. Apps are separated by the `service_name` label
+(`<project>-client` / `<project>-server`, per-project because the rename pass
+rewrites it), never by having a stack of their own, with
+`deployment_environment` splitting dev from prod inside that.
+
+Two things follow that will bite an agent debugging from logs. **A Loki query
+with no `service_name` matcher spans every app ever shipped from this
+template**, so a result that looks broad probably is. And quota and retention
+are shared, so the levers for a noisy app are `telemetry.appEventsSampleRate`
+and the `telemetry.appEventsEnabled` kill switch, both remote config and both
+per app, rather than anything stack-level.
+
+Full detail and the case for splitting later in
+[`docs/practices/observability.md`](docs/practices/observability.md); the
+decision and what it costs in `docs/decisions.md`, 2026-09-21.
+
 ## Testing
 
 Conventions (hand-rolled fakes only, dispatcher choice, which layer catches which bug) live in [`docs/practices/testing.md`](docs/practices/testing.md). Read it before adding tests. The end-to-end tier is `:apps:integration`: an Android-library module whose tests run on the host JVM (`./gradlew :apps:integration:testDebugUnitTest`, needs Docker) and drive the real client stack (real `HomeViewModel`, real repositories, real HTTP client) over real TCP against a real in-process Ktor server on a Testcontainers Postgres. `HarnessSmokeTest` is the worked example; `commonMain` stays empty so iOS never links the JVM-only server.

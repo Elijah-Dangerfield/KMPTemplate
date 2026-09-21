@@ -205,6 +205,16 @@ Used by `beta.yml` and `release.yml` to bake client app-event credentials into
 store builds. Leave unset and the telemetry pipe stays dormant. The app builds
 and runs fine.
 
+`./scripts/setup_github_secrets.main.kts` pushes all three from your
+[credential store](#credential-store-do-this-on-your-second-project), so this
+is a fill-in-once set rather than a per-project one.
+
+**These are account-wide because every project shares one Grafana stack.** Apps
+are separated by the `service_name` label, not by having their own stack, so a
+Loki query with no `service_name` matcher spans all of them. Quota and
+retention are shared too. See `docs/practices/observability.md` for what that
+costs and how to throttle one noisy app without touching the rest.
+
 | Secret | Notes |
 | --- | --- |
 | `GRAFANA_OTLP_BASE_URL` | Grafana Cloud → OpenTelemetry → OTLP endpoint base URL |

@@ -126,6 +126,7 @@ values.plan(
         Keys.SIGNING_DIR,
         Keys.ANDROID_KEYSTORE_PASSWORD, Keys.ANDROID_KEY_ALIAS, Keys.ANDROID_KEY_PASSWORD,
         Keys.APPLE_TEAM_ID, Keys.ASC_KEY_ID, Keys.ASC_ISSUER_ID, Keys.APPLE_DIST_CERT_PASSWORD,
+        Keys.GRAFANA_OTLP_BASE_URL, Keys.GRAFANA_OTLP_INSTANCE_ID, Keys.GRAFANA_LOGS_WRITE_TOKEN,
     )
 )
 
@@ -224,6 +225,27 @@ push(
     Secret(
         "APPLE_DIST_CERT_PASSWORD", values.optional(Keys.APPLE_DIST_CERT_PASSWORD),
         "not in the store. The .p12 cannot be imported in CI.",
+    )
+)
+
+// Optional by design: with these unset the OTLP pipe stays dormant and the app
+// builds and runs fine, so a missing one is reported rather than fatal.
+push(
+    Secret(
+        "GRAFANA_OTLP_BASE_URL", values.optional(Keys.GRAFANA_OTLP_BASE_URL),
+        "not in the store. Client telemetry stays on the device.",
+    )
+)
+push(
+    Secret(
+        "GRAFANA_OTLP_INSTANCE_ID", values.optional(Keys.GRAFANA_OTLP_INSTANCE_ID),
+        "not in the store. Client telemetry stays on the device.",
+    )
+)
+push(
+    Secret(
+        "GRAFANA_LOGS_WRITE_TOKEN", values.optional(Keys.GRAFANA_LOGS_WRITE_TOKEN),
+        "not in the store. Client telemetry stays on the device.",
     )
 )
 

@@ -188,6 +188,10 @@ Pushes every release secret from one folder plus the credential store:
 ./scripts/setup_github_secrets.main.kts --dry-run
 ```
 
+Eleven signing values plus the three `GRAFANA_*` credentials, which are
+account-wide because every project shares one Grafana stack (see
+`docs/practices/observability.md`).
+
 The binary material (upload keystore, Apple `.p12`, ASC `.p8`, Play
 service-account JSON) lives in one folder outside every repo; the store
 remembers *where* it is, never what is in it. The passwords beside them are
