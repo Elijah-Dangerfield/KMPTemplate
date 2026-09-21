@@ -35,17 +35,20 @@
 	  upload is rejected with ITMS-90683 whether or not a screen ever shows a
 	  preview. A downstream app hit exactly this on its first submission.
 
-	  Two correct answers, and the one you pick should match what the app does:
+	  **This key is a stopgap and should not survive.** It is here so a fresh
+	  project uploads at all; it is the wrong answer for almost every app,
+	  because it declares access to a sensor the app never touches and so
+	  contradicts the App Privacy answers and PrivacyInfo.xcprivacy. The camera
+	  is coming out of the template wholesale, Android permission included:
+	  docs/PORT-CANDIDATES.md, "Remove the camera entirely", lists every file.
+
+	  Until that lands:
 
 	  * **Using the camera.** Keep this key and rewrite the string to say what
 	    you use it for. A vague purpose string is its own rejection.
-	  * **Not using the camera**, which is most apps. Delete the bridge rather
-	    than declaring a sensor you never touch: a purpose string here
-	    contradicts the App Privacy answers and the privacy manifest. Remove
-	    this key, `libraries/ui/.../CameraPreview*.kt`, the camera members of
-	    `nativeviews/NativeViewFactory.kt`, and the camera half of
-	    `apps/ios/iosApp/Platform/IOSNativeViewFactory.swift`. Confirm with
-	    `otool -L` on the built .app that AVFoundation is gone.
+	  * **Not using the camera**, which is most apps. Do the deletion in that
+	    entry now rather than shipping this key. Confirm with `otool -L` on the
+	    built .app that AVFoundation is gone.
 	-->
 	<key>NSCameraUsageDescription</key>
 	<string>Used to take photos inside the app.</string>

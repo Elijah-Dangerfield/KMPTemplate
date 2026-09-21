@@ -20,4 +20,69 @@ One `##` section per candidate. The next person meets a symptom, not a cause, so
 
 ---
 
-*(no open candidates)*
+## Remove the camera entirely
+
+**What it is.** The template ships a camera nothing uses, and it costs every
+generated app something on both stores. Delete the whole surface rather than
+declaring permissions for it:
+
+- `libraries/ui/src/commonMain/.../CameraPreview.kt` and the `androidMain` /
+  `iosMain` actuals
+- `libraries/ui/src/commonMain/.../PermissionLauncher.kt` and both actuals.
+  Its entire public surface is `rememberCameraPermissionLauncher`, so it goes
+  with the camera rather than surviving as a general permission helper
+- the six camera members and `CameraGuidanceState` on
+  `libraries/ui/src/iosMain/.../nativeviews/NativeViewFactory.kt`
+- the camera half of `apps/ios/iosApp/Platform/IOSNativeViewFactory.swift`
+  (544 lines, `import AVFoundation`)
+- `NSCameraUsageDescription` from `apps/ios/iosApp/Info.plist`
+- `android.permission.CAMERA` and the `android.hardware.camera` `uses-feature`
+  from `apps/compose/src/androidMain/AndroidManifest.xml`
+- whatever falls out of `config/detekt/baseline.xml`
+
+The Apple Sign In button factory is the other half of `NativeViewFactory` and
+is a separate question: it is live while the template ships Supabase auth. If
+both halves go, the interface, `LocalNativeViewFactory`, the `nativeViewFactory`
+parameter on `IosAppComponent` and its plumbing through `iOSApp.swift` and
+`MainViewController.kt` all go with them.
+
+**How it looks from the outside.** Two symptoms, and neither names a camera at
+the moment you meet it.
+
+On iOS the first upload is accepted and then rejected by email twenty minutes
+later: `ITMS-90683: Missing purpose string in Info.plist`, asking for
+`NSCameraUsageDescription` on an app with no camera screen. On Android nobody
+emails at all. The Play listing simply shows a **Camera** permission, which a
+reviewer reads as an app asking for a sensor it never uses, and which a player
+reads as worse than that.
+
+**Why it is hard to spot.** Every instinct points at the wrong fix.
+
+Apple's own error text tells you to add the purpose string, and adding it works:
+the build goes through. That is the trap. A purpose string declares access to a
+sensor the app never touches, which contradicts the App Privacy answers and
+`PrivacyInfo.xcprivacy`, and leaves the reviewer a question you cannot answer
+well. The template did exactly this on 2026-09-21 before this entry was written.
+
+It also looks like dead code that cannot matter, because it is unreachable:
+nothing in the generated app calls `CameraPreview`. App Store delivery scans the
+binary for **API references**, not call sites, so unreachable is not the same as
+absent. `grep` for a call site finds nothing and tells you the wrong thing.
+
+**Where it hooks in.** Nothing consumes any of it. `CameraPreview` has no call
+site outside its own actuals, and `rememberCameraPermissionLauncher` has none at
+all, so this is a deletion rather than a refactor. Prove it on the built
+artifact rather than the diff: `otool -L` on the `.app` should report no
+AVFoundation linkage and `nm -u` no `AVCapture` symbols, and
+`./gradlew :apps:compose:assembleRelease` plus `aapt dump permissions` should
+show no camera permission. `scripts/verify_template.sh --fast` is the gate for
+the generator still working afterwards.
+
+**Provenance.** Drop2048, 2026-09-21. It inherited the iOS half, deleted the
+Kotlin side in an earlier chunk, and left the Swift bridge behind; the first
+TestFlight upload was rejected with ITMS-90683 and the fix was to delete the
+bridge, verified with `otool`. Its release checklist separately carried the
+Android half as a blocker: "The Play listing shows a Camera permission for a
+falling-block puzzle." Both claims verified in this repo: the files above exist
+here, `Info.plist` had no purpose string until 2026-09-21, and
+`AndroidManifest.xml` still declares `android.permission.CAMERA`.
