@@ -487,7 +487,9 @@ jobs:
       - name: Set up Ruby / Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2"
+          # fastlane resolves excon, which needs >= 3.3. A runner on 3.2 dies
+          # in bundler before fastlane starts.
+          ruby-version: "3.4"
           bundler-cache: true
           working-directory: apps/ios
 
@@ -547,7 +549,20 @@ jobs:
           PY
           )
           rm -f "$KEY_PATH"
-          RESP=$(curl -fsS -H "Authorization: Bearer $TOKEN" "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$BUNDLE_ID&limit=1" || echo '{"data":[]}')
+          # -g is load-bearing. curl treats [ and ] in a URL as glob syntax, so
+          # without it this request never leaves the machine: it aborts with
+          # "bad range in URL", the fallback below substitutes an empty result
+          # set, and an app that plainly exists reads as "no app record, first
+          # release". The job then skips the App Store submission and reports
+          # success. Moving Eyes shipped four releases that way before anyone
+          # noticed the submission was never happening.
+          if ! RESP=$(curl -g -fsS -H "Authorization: Bearer $TOKEN" "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$BUNDLE_ID&limit=1"); then
+            echo "::error::Could not ask App Store Connect whether $BUNDLE_ID exists."
+            echo "A failed query is not evidence of a first release. Refusing to"
+            echo "guess, because guessing wrong silently downgrades a production"
+            echo "release to a TestFlight upload."
+            exit 1
+          fi
           APP_COUNT=$(echo "$RESP" | python3 -c 'import json,sys;print(len(json.load(sys.stdin).get("data",[])))' 2>/dev/null || echo "0")
           if [ "$APP_COUNT" = "0" ]; then
             echo "::warning::No app record found on App Store Connect for $BUNDLE_ID — first release. TestFlight internal only; skipping App Store submission."
