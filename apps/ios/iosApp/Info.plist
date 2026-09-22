@@ -50,8 +50,6 @@
 	    entry now rather than shipping this key. Confirm with `otool -L` on the
 	    built .app that AVFoundation is gone.
 	-->
-	<key>NSCameraUsageDescription</key>
-	<string>Used to take photos inside the app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>processing</string>
