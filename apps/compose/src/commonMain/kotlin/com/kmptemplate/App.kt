@@ -146,7 +146,14 @@ fun App(appComponent: AppComponent) {
         LocalDialogHostState provides dialogHostState
     ) {
         AppThemeProvider {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    // Detection only, at the root so it sees every press. See
+                    // NavigationQueueWatchdog for why a touch is the one signal
+                    // that a host below STARTED is lying about its visibility.
+                    .navigationQueueWatchdog(onWedgeDetected = router::drainQueuedNavigation)
+            ) {
                 // Stage 1: null until the async AppData read resolves — the
                 // platform splash (keyed on appViewModel.isReady) covers the
                 // gap. Stage 2: the Compose boot gate holds a loading screen

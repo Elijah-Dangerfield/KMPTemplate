@@ -21,6 +21,7 @@ import com.kmptemplate.libraries.navigation.BlockingErrorRoute
 import com.kmptemplate.libraries.navigation.NavigationOptions
 import com.kmptemplate.libraries.navigation.NavigationTracker
 import com.kmptemplate.libraries.navigation.Route
+import com.kmptemplate.libraries.navigation.NavigationRecovery
 import com.kmptemplate.libraries.navigation.Router
 import com.kmptemplate.libraries.navigation.WebLinkLauncher
 import com.kmptemplate.libraries.navigation.NavigableWhileBlocked
@@ -43,12 +44,13 @@ import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = Router::class)
+@ContributesBinding(AppScope::class, boundType = NavigationRecovery::class)
 @Inject
 class DelegatingRouter(
     private val appScope: AppCoroutineScope,
     private val webLinkLauncher: WebLinkLauncher,
     private val navigationTracker: NavigationTracker,
-) : Router {
+) : Router, NavigationRecovery {
 
     private val logger = KLog.withTag("DelegatingRouter")
     private val navigationRequests = Channel<NavHostController.() -> Unit>(Channel.UNLIMITED)
@@ -124,6 +126,33 @@ class DelegatingRouter(
     override fun popBackTo(route: Route, inclusive: Boolean) {
         enqueueNavigation("popBackTo ${route.nameForLogs()}") {
             popBackStack(route, inclusive)
+        }
+    }
+
+    /**
+     * Releases the queue past the lifecycle gate. See [NavigationRecovery] for
+     * why this exists and why nothing but the watchdog may call it.
+     *
+     * Dispatched to the main thread rather than run inline: the commands touch
+     * `NavHostController`, and the watchdog fires from a pointer callback whose
+     * thread is not guaranteed. `immediate` so an already-main call keeps the
+     * ordering the queue promised.
+     */
+    override fun drainQueuedNavigation() {
+        val controller = navController ?: run {
+            logger.w { "Navigation recovery asked for, but no controller is attached" }
+            return
+        }
+        appScope.launch(Dispatchers.Main.immediate) {
+            val drained = navigationRequests.drainInto { command ->
+                Catching { command(controller) }
+                    .logOnFailure("Navigation failure while recovering the queue")
+            }
+            if (drained > 0) {
+                logger.w { "Navigation queue was wedged; released $drained queued command(s)" }
+            } else {
+                logger.i { "Navigation recovery ran with an empty queue; the host was not the problem" }
+            }
         }
     }
 
