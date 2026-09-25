@@ -27,6 +27,23 @@
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>We'd like to send you notifications.</string>
 	<!--
+	  The export compliance answer, stated once here instead of by hand on every
+	  upload. Without it a build finishes processing and then sits in TestFlight
+	  as "Missing Compliance", installable by nobody, until someone opens App
+	  Store Connect and answers the encryption question. Nothing warns you: the
+	  upload succeeds, the build goes VALID, and the testers just never get it.
+	  Two downstream apps were sitting in that state at once on 2026-09-25.
+
+	  False is correct for an app whose only encryption is HTTPS through the
+	  system's own TLS, which Apple exempts (Category 5 Part 2). That covers
+	  crash reporting, telemetry and ad networks. An app that implements or
+	  bundles a cipher, or that ships its own TLS, has to change this key and
+	  file the paperwork behind it. Check before assuming you inherited the
+	  right answer.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!--
 	  REQUIRED, even though nothing in the generated app calls the camera.
 
 	  :libraries:ui ships a CameraPreview across all three source sets and
