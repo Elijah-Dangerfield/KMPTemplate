@@ -20,6 +20,59 @@ One `##` section per candidate. The next person meets a symptom, not a cause, so
 
 ---
 
+## A build that cannot sell anything says nothing
+
+**What it is.** Whatever a downstream app uses to fetch its catalog should
+report at error level, not debug, when the store answers and the product is not
+in the answer. Moving Eyes added roughly fifteen lines to `EntitlementsImpl`:
+an error log plus a `purchase_unavailable` event when the product query comes
+back without the product, the same for an outright query failure, and a
+`purchase_failed` event when someone taps buy and does not get the thing.
+This template has no billing module, so there is nothing to fix here. The
+pattern is what travels, and it applies to any remote fetch whose empty result
+is indistinguishable from its failure.
+
+**How it looks from the outside.** It does not look like anything. That is the
+entry. A paywall with no price renders a buy button that errors on tap, the app
+does not crash, no log passes the release-build severity filter, and the first
+anyone hears is a store rejection weeks later. Moving Eyes was rejected by App
+Review on 2026-09-08 for exactly this and spent two weeks unable to reproduce
+it, because the failure was in the reviewer's environment and produced no
+signal anywhere.
+
+Once the telemetry existed it took one read of Sentry. Five events tagged
+`store returned no matching product`, from a device reporting model
+`iPhone99,7` with a `VMAPPLE` kernel in San Jose, running the exact build under
+review. Apple's review infrastructure, caught in the act, with timestamps
+straddling the submission.
+
+**Why it is hard to spot.** Empty is a legitimate answer. A store with no
+matching product returns success and an empty list, so every `when` branch is
+handled, nothing throws, and the code reads as correct. The natural severity
+for "we got a response we did not like" is debug, and debug is exactly the
+level a release build drops. The bug is not in the branch, it is in the
+severity of the branch, which no review catches and no test asserts.
+
+The fix that looks obvious and is worse: log it at debug and move on, or put it
+behind the existing "store unreachable" message. Unreachable and
+answered-but-empty need different words, because one sends someone to check
+their wifi and the other is a configuration fault on your side.
+
+**Where it hooks in.** `SentryLogTree` already raises an event at error and
+above, so the whole change is choosing the level deliberately and adding an
+analytics event beside it. Report once per process: the query runs on every
+foreground and a store that is unhappy stays unhappy, so reporting each time
+turns one broken build into thousands of identical events.
+
+Generic version, for any fetch that gates something the user paid for: if the
+response parsed, succeeded, and still cannot produce the thing the screen
+exists to offer, that is an error, not a debug line.
+
+**Provenance.** Moving Eyes, 2026-09-25. Verified: the telemetry was added on
+2026-09-11 and the App Review events it captured were read out of Sentry on
+2026-09-25. The claims about this repo were checked by reading it; there is no
+billing module here.
+
 ## A build-time release channel does not survive promotion to the App Store
 
 **What it is.** `beta.yml` stamps `RELEASE_CHANNEL_OVERRIDE: beta` and
