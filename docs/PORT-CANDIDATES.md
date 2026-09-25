@@ -20,4 +20,55 @@ One `##` section per candidate. The next person meets a symptom, not a cause, so
 
 ---
 
-*(no open candidates)*
+## A build-time release channel does not survive promotion to the App Store
+
+**What it is.** `beta.yml` stamps `RELEASE_CHANNEL_OVERRIDE: beta` and
+`release.yml` stamps `store`, and `Versioning.kt` bakes that into
+`BuildInfo.releaseChannel`. The value is correct when the binary is built and
+wrong forever after, because promoting a TestFlight build to the App Store is
+an ordinary action in App Store Connect that rewrites nothing. The binary that
+goes on sale is the one that was built for TestFlight, still saying `beta`.
+
+**How it looks from the outside.** Sentry cannot tell App Store customers from
+TestFlight testers: every event from the live build arrives tagged
+`beta-ios-release`. Moving Eyes shipped that way on 2026-09-22 and found it by
+reading production events from real devices whose `build_type` was
+`"app store"` while `release_channel` said `"beta"`.
+
+Anything conditioned on the channel then behaves in production the way it was
+meant to behave for testers. Moving Eyes had invented an `isQaBuild` that was
+true for debug plus `beta`, and used it to gate a QA config menu reachable by
+deep link. The result was a live App Store build one link and one toggle away
+from granting its paid unlock for free.
+
+**Why it is hard to spot.** The channel is right at every moment you would
+think to check it. CI sets it correctly, the build reports it correctly, and
+TestFlight shows exactly what you expect. Nothing is wrong until a human
+promotes the build weeks later, and promotion produces no artefact, no log line
+and no new binary. The tag only becomes a lie in retrospect.
+
+The fix that looks obvious and is worse: tighten the channel gate, or add a
+`store` check next to the `beta` one. That keeps a security decision resting on
+a value the App Store is free to invalidate. **Do not gate anything that
+protects money or data on the release channel.** Gate it on `BuildInfo.isDebug`,
+which cannot survive a release build at all, and let the channel do what it is
+good for, which is labelling telemetry.
+
+**Where it hooks in.** `RELEASE_CHANNEL_OVERRIDE` in
+`template/ci/.github/workflows/{beta,release}.yml` and the resolve chain in
+`build-logic/.../Versioning.kt`. This template ships the channel but does not
+yet gate behaviour on it, so there is nothing to fix here today. The entry
+exists so the next app that invents channel-based gating, as Moving Eyes did,
+does not have to learn this from a production incident.
+
+Two things worth carrying with it. A local build script that stamps `beta` for
+TestFlight will eventually produce a binary someone promotes, so the safer
+default is `store` with `beta` as the explicit opt-in. And a debug-only
+affordance reached by deep link needs its route registration gated, not just
+whatever UI normally opens it: Moving Eyes gated the shake gesture and left the
+deep link open, with a comment asserting the opposite.
+
+**Provenance.** Moving Eyes, 2026-09-25. Verified against production Sentry
+events and by installing a signed `store` channel APK to confirm the gate. The
+claims about this repo's files were checked by reading them.
+
