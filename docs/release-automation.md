@@ -229,8 +229,14 @@ remembers that a sentence elsewhere just became false. Drop2048 hit that twice i
 is what a process problem looks like rather than two mistakes. Next to the code, the diff that
 changes what the app collects and the diff that corrects the claim land in the same review.
 
-A pull request rather than a push, so the rendered page can be read before it is published. The cost
-is that an unmerged PR means the published policy is stale.
+A pull request rather than a push, but nobody merges it: the site repo's `auto-merge-legal.yml`
+merges any `legal-sync/*` branch once its Preview build passes, then dispatches the deploy. Editing
+the Markdown here is the whole job.
+
+That drops a review step on purpose. A PR nobody remembers to merge means the published policy
+drifts behind the app, and that policy is the URL filed with Apple and Google, so stale is the worse
+of the two failures. The build gate stays, which is what stops a malformed file from replacing a
+good page.
 
 ## Runbook: something broke
 
