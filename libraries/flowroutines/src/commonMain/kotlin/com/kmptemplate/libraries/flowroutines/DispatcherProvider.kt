@@ -54,34 +54,35 @@ class DefaultDispatcherProvider @Inject constructor() : DispatcherProvider {
 }
 
 /**
- * The scope background work outlives a screen in.
+ * The scope for work that has to outlive the screen that started it: config
+ * refreshes, queued navigation, anything fired and forgotten at app level.
  *
  * ## Why it catches
  *
  * A [SupervisorJob] keeps one failed child from cancelling its siblings, which
- * is what people usually reach for it for. It does nothing about an exception
- * nobody catches: that goes to the platform's default handler, which on Android
- * kills the process. Without the handler below, every `appScope.launch` in a
- * generated app is one uncaught throw away from ending the session, wherever
- * the player happens to be. A downstream app shipped exactly that on
- * 2026-09-25: a lifecycle registration on the wrong thread turned a background
- * sign-in into a crash at launch.
+ * is what people reach for it for — and it is also what makes them stop
+ * looking, because it does nothing about an exception nobody catches. That one
+ * goes to the platform's default handler, which on Android ends the process.
+ * With no handler here, every `appScope.launch` in the app is one uncaught
+ * throw away from killing the app wherever the user happens to be. A
+ * downstream app shipped exactly that and died at launch on a release build,
+ * when a background sign-in coroutine hit a lifecycle registration made off
+ * the main thread.
  *
- * So failures are logged rather than fatal, and the logging is the point.
- * `KLog.e` carries the throwable to Sentry through the log tree, so the report
- * that makes a bug like that findable still arrives; what changes is that the
- * player keeps what they were doing. In a debug build it rethrows, because
- * locally the loud version is the useful one. That is the same shape as
- * `Catching {}.logOnFailure().throwIfDebug()`, which is how the rest of this
- * template treats a failure it cannot act on.
+ * So a failure is logged rather than fatal, and the logging is the point:
+ * `KLog.e` carries the throwable to Sentry through `SentryLogTree`, so the
+ * report that makes a bug like that findable still arrives. A debug build
+ * rethrows, because locally the loud version is the useful one. That is the
+ * same shape as `Catching {}.logOnFailure().throwIfDebug()`, which is how the
+ * rest of the app treats a failure it cannot act on.
  *
- * What this is not is a licence to skip handling errors where they happen. A
- * handler this far out knows nothing except that something failed, so it cannot
- * retry, fall back, or tell anyone. Anything that can do better should still do
- * it at the call site.
+ * None of which is a licence to skip handling errors where they happen. A
+ * handler this far out knows only that something failed, so it cannot retry,
+ * fall back, or tell anyone. Anything that can do better should still do it at
+ * the call site.
  *
- * Cancellation never reaches here. The machinery treats it as normal completion
- * rather than as a failure, so there is nothing to filter out.
+ * Cancellation never reaches here — the machinery treats it as normal
+ * completion rather than as a failure, so there is nothing to filter out.
  */
 @SingleIn(AppScope::class)
 class AppCoroutineScope @Inject constructor(
