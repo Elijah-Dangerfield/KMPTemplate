@@ -18,7 +18,7 @@ One `##` section per candidate. The next person meets a symptom, not a cause, so
 - **Where it hooks in.** The existing pattern to extend, with file and line. Ports arrive shaped like the app they came from; say what the generic version looks like.
 - **Provenance.** Which app, what date, and whether you verified the claims in this repo or are reporting them.
 
-Entries are in priority order. Everything queued right now is something a downstream app built that a brand-new app would want, rather than a defect: no entry below is a bug a generated app is currently shipping. Each is larger than a fix, and none is urgent.
+One entry left, and it is a capability rather than a defect: nothing queued is a bug a generated app is currently shipping.
 
 ---
 
@@ -35,36 +35,3 @@ reputation for flaking. Runs under the `testDebugUnitTest` sweep CI already
 executes, with no workflow change.
 
 **Provenance.** Sodogku, commits `83eff68` and `854b727`.
-
-## Grafana dashboards in the repo, held to the code by a test
-
-**What it is.** Dashboards committed as JSON under `ops/grafana/`, plus a test
-that parses every committed query and every `logEvent(...)` in the source tree
-and fails when a dashboard names an event or attribute nothing emits.
-
-The argument is the port-worthy part: a panel that filters on `strikes_used`
-against an app that emits `strikes` is not an error anywhere. Loki accepts the
-query, the panel renders, and it renders empty, which is exactly what a healthy
-panel looks like before launch. The LogQL reader deliberately throws on
-constructs it does not understand rather than shrugging, because a looser regex
-reader is how a check like this passes while proving nothing.
-
-This repo has a documented shared Grafana stack and no committed dashboards.
-
-**Provenance.** Sodogku, `docs/decisions.md`.
-
-## A config registry drift guard, and the Gradle wiring that makes it real
-
-**What it is.** `apps/admin/config-manifest-registry.json` is a hand-written
-transcription of the `ConfiguredValue` classes and nothing checks it. The test
-belongs in `:apps:integration` rather than `:libraries:config`, because only an
-`:apps:*` module can see both halves of the declared key set.
-
-The non-obvious half is the Gradle wiring, and it generalises to any repo with a
-test that reads a file: **a file read at test runtime is invisible to the
-up-to-date check.** Editing the registry alone left the test task `UP-TO-DATE`
-and the drift shipped. Observed rather than theorised, on a run that reported
-BUILD SUCCESSFUL against a registry with a key deleted and three values wrong.
-`inputs.file(registry)` on the `Test` tasks is what makes it real.
-
-**Provenance.** Sodogku, `docs/decisions.md`.
