@@ -162,56 +162,6 @@ the app launches fine.
 independently on the same afternoon from opposite ends of the schema, which
 suggests it is discoverable and also easy to ship past. Verified here by reading.
 
-## A mistyped boolean in remote config turns the feature off, everywhere, silently
-
-**What it is.** `getValueRecursive` resolves booleans with
-`rawValue.toString().toBoolean()`, and `"banana".toBoolean()` is `false`. So a
-string typed into a boolean key in the admin console does not fall back to the
-shipped default and does not log. It turns that feature off on every device that
-fetches the config. Resolve booleans only from `"true"`/`"false"`
-case-insensitively, with anything else null so the declared default wins.
-
-**How it looks from the outside.** A feature is off for everyone and the config
-that turned it off looks fine in the console, because it is the value someone
-meant to type with a typo in it.
-
-**Why it is hard to spot.** Every numeric branch on the same `when` is already
-safe, because `toDoubleOrNull` returns null and falls back. Booleans are the sole
-outlier, sitting in a list of lines that all look alike. And the fail-open test
-reads against an *empty* map, where every key falls back correctly: the hole is
-in resolving a value that is present and malformed, which no test covers. This is
-the one path that can make a kill switch or a monetization key fail closed.
-
-**Where it hooks in.**
-`libraries/config/src/commonMain/.../MapExt.kt:32`. The generic rule it is worth
-carrying with the fix: a parse that invents an answer is worse than no answer.
-
-**Provenance.** Sodogku, `docs/decisions.md`, 2026-09-07. Verified here by
-reading the line.
-
-## The first frame waits ten seconds for a config server that is not deployed
-
-**What it is.** `EnsureAppConfigLoaded` awaits `configStream().first()`, and that
-stream is built with `mapNotNull` over the cached snapshot. With no cached config
-(a fresh install, or a corrupt cache) it emits nothing, so `first()` sits through
-the entire retry chain against the unconfigured base URL until the boot timeout.
-Measured downstream at 10s cold, 3.3s after the fix. `configStream` should start
-from the bundled fallback and re-emit when a cached or fetched snapshot
-supersedes it.
-
-**How it looks from the outside.** A brand-new generated app takes ten seconds to
-show its first frame, once, on the very first launch after install. This is what
-someone evaluating the template sees first.
-
-**Why it is hard to spot.** It is true from the second launch onwards, and on a
-dev machine you launch the app twice. The second one is fine, so the first gets
-written off as cold-start noise.
-
-**Where it hooks in.**
-`libraries/config/impl/src/commonMain/.../OfflineFirstAppConfigRepository.kt:90`.
-
-**Provenance.** Sodogku, `docs/decisions.md`. Verified here by reading the line.
-
 ## `FloatingWindowHost` pins an entry for the life of the process
 
 **What it is.** `FloatingWindowHost` is a copy of AndroidX's `DialogHost` that
@@ -235,23 +185,6 @@ does not appear in manual testing.
 
 **Provenance.** Sodogku, commit `83eff68`. Verified here by reading: the bare
 `onDispose` is unchanged.
-
-## Three desktop source sets that nothing compiles
-
-**What it is.** `libraries/ui/src/jvmMain` and
-`libraries/navigation/impl/src/jvmMain` hold a `JvmWebLinkLauncher`, a desktop
-`FontFamily` and a `NativeButton` actual. No module in the repo declares a
-`jvm()` target, so none of it has ever been compiled. Delete them, or add the
-target deliberately.
-
-**How it looks from the outside.** It reads as live platform support, which is
-worse than absent. Someone fixing a link-opening bug on desktop edits a file that
-does not run, and the build agrees with them by staying green.
-
-**Where it hooks in.** Both directories. Verified here: `grep "jvm()"` across
-every build file in the repo returns nothing.
-
-**Provenance.** Sodogku, `docs/decisions.md`.
 
 ## A source directory named for a project this template is not
 
