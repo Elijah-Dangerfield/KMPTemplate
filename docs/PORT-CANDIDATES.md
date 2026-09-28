@@ -18,149 +18,9 @@ One `##` section per candidate. The next person meets a symptom, not a cause, so
 - **Where it hooks in.** The existing pattern to extend, with file and line. Ports arrive shaped like the app they came from; say what the generic version looks like.
 - **Provenance.** Which app, what date, and whether you verified the claims in this repo or are reporting them.
 
-Entries are in priority order. The first four are live defects every generated app ships today.
+Entries are in priority order.
 
 ---
-
-## A launch crash every generated app ships: lifecycle registration off the main thread, with nothing to catch it
-
-**What it is.** Two inherited defects that are only fatal together, so port them together.
-
-`AndroidAppLifecycle.addObserver` calls `lifecycle.addObserver(this)` on whatever
-thread the caller arrived on. `LifecycleRegistry` throws rather than synchronize,
-so off the main thread that is an `IllegalStateException`. Nothing in the code
-chooses the thread: callers reach it through the object graph, so registration
-runs on whichever thread first touched a dependency that constructs an
-`AppEventDispatcher`. Fix: post to main rather than running inline, keeping add
-and remove in call order.
-
-`AppCoroutineScope` is `SupervisorJob() + dispatcherProvider.default` with no
-`CoroutineExceptionHandler`. A supervisor stops one failed child cancelling its
-siblings and does nothing about an exception nobody catches; that goes to the
-thread's default handler, which on Android kills the process. So every
-`appScope.launch` anywhere in the app is one uncaught throw from a crash. Fix:
-add a handler that does `KLog.e(throwable)`, which reaches Sentry through
-`SentryLogTree`, and rethrows a `DebugException` only in debug builds, mirroring
-the existing `Catching {}.logOnFailure().throwIfDebug()` shape.
-
-**How it looks from the outside.** The app dies on launch, before any frame, on
-some installs and not others. Downstream it was a fatal on a real release build
-when a Play Games sign-in coroutine won the race on `Dispatchers.Default`.
-Whether it crashes depends on which dependency the object graph happens to touch
-first, so it reproduces on a device and not on the next one.
-
-**Why it is hard to spot.** Each half looks fine alone. Thread-unsafe
-registration usually produces a caught exception somewhere; a missing exception
-handler usually produces a logged warning. The scope's `SupervisorJob` reads as
-the error-handling decision, and it is the thing that makes people stop looking.
-The fix that looks obvious and is worse: wrap the `addObserver` call site in a
-`Catching {}`. That fixes the one caller you found and leaves every other
-`appScope.launch` in the app one throw from the same crash.
-
-**Where it hooks in.**
-`libraries/kmptemplate/src/androidMain/.../AndroidAppLifecycle.kt:32` and
-`libraries/flowroutines/src/commonMain/.../DispatcherProvider.kt:52-60`.
-
-**Provenance.** Sodogku, commit `d4c446f`, 2026-09-28, found as a fatal launch
-crash on a shipped release build. Both claims verified by reading this repo:
-the `addObserver` call is unguarded and `AppCoroutineScope` has no handler.
-
-## `Cache.update` is a read-then-write, and several writers share one record
-
-**What it is.** `Cache.update`'s interface default is `set(transform(get()))`.
-Two callers that overlap each transform a snapshot the other has already
-replaced, so the second write silently reverts the first. Neither implementation
-overrides it, even though `DataStore.updateData` already serialises the read and
-the write and `MutableStateFlow.updateAndGet` does the same in memory. Override
-in both, and put the reason on the interface default so the next implementation
-does not quietly inherit it.
-
-Use `updateAndGet` rather than update-then-read in the in-memory case: a second
-read can see a later writer's value, so the caller would be handed a result its
-own transform never produced.
-
-**How it looks from the outside.** Flip a setting on a fresh install, send a
-piece of feedback, relaunch, and the toggle is off again with the counters at
-zero. Three unrelated features losing a write at once, which reads like the file
-never saved rather than like a race.
-
-**Why it is hard to spot.** Every unit test for a toggle uses a single-writer
-in-memory fake, where the interleaving cannot occur. The tests are correct and
-stay green straight through the bug. Downstream it stayed latent until the app
-navigated to its first `TrackableRoute`, which made the navigation tracker's
-write fire against a live screen for the first time.
-
-**Where it hooks in.** `libraries/storage/src/commonMain/.../Cache.kt:12` is the
-default. In this repo four writers share `AppData`
-(`CachedInstallIdProvider.kt:58`, `AppNavigationTracker.kt:27`,
-`UserScopedAppDataReset.kt:27`, `SessionExpiredViewModel.kt:62`) and two share
-`ConfigCacheSnapshot` (`OfflineFirstAppConfigRepository.kt:171` and
-`ConfigOverrideRepositoryImpl.kt:52`). That second pair writes *different fields
-of the same record* and one of them runs on every boot, which makes it the more
-likely of the two to bite here.
-
-**Provenance.** Sodogku, `docs/decisions.md`, 2026-09-07. Its author wrote "this
-is a template bug, not a Sodogku one" and filed it locally, where it sat until
-2026-09-28. Verified here by reading: the default is unchanged and neither
-implementation overrides it.
-
-## `Cache.clear()` deletes the wrong path, and would not work if it deleted the right one
-
-**What it is.** `DataStoreCache.clear()` calls `deleteFile(name)` while the file
-is created as `"$name.json"`, so it removes nothing. Correcting the name is not
-enough: `DataStore` holds the value in memory and serves readers from there, so
-even a correctly-named delete leaves every reader on the old value until the
-process dies. `updateData` is the only write path `DataStore` observes, which
-makes it the only one `clear` can use. Write the serializer's default back
-through it.
-
-**How it looks from the outside.** Data that is supposed to be gone is still
-there. In this repo `clear()` is the user-isolation mechanism:
-`UserScopedProfileCacheCleaner` calls `profileCache.clear()` on a user change,
-and `ProfileCache` is a `cacheFactory.persistent(...)`, so **the previous
-account's profile record survives sign-out and account switch on a shared
-device.**
-
-**Why it is hard to spot.** It is silent twice over. `deleteRecursively()` on a
-path that does not exist returns false without throwing, so the
-`Catching {}.logOnFailure` wrapper around the call never fires. And the reader
-keeps serving the in-memory value, so the data looks present for the ordinary
-reason that data looks present.
-
-**Where it hooks in.**
-`libraries/storage/impl/src/commonMain/.../CacheFactoryImpl.kt:117` is the
-`clear`, and `:63` is the `"$name.json"` that it disagrees with. Sodogku's fix
-changes the `DataStoreCache` constructor from `deleteFile: () -> Unit` to
-`defaultValue: suspend () -> T`.
-
-**Provenance.** Sodogku, `docs/decisions.md`, found while fixing `update` above.
-It went unnoticed there because the account-switch clearer it was written for had
-been deleted. This repo still has accounts, so the method has live callers.
-Verified here by reading both lines.
-
-## The database ships `fallbackToDestructiveMigration(dropAllTables = true)`
-
-**What it is.** `RealAppDatabaseProvider` builds the database with destructive
-fallback across all versions. Harmless while the only table is the template's
-example; a silent unrecoverable wipe the moment a real table lands and a release
-adds a column. Replace with `autoMigrations`, and narrow the destructive fallback
-to the version range that is template history no install has ever run.
-
-**How it looks from the outside.** Nothing, until it is unrecoverable. The next
-release after a schema change launches normally, having deleted everything the
-user had. With no account, a player's records exist in exactly one place.
-
-**Why it is hard to spot.** The line is correct for the state the template is in
-and stops being correct on the day someone adds a column, which is a different
-day from the one where anyone reads this file. Nothing fails, nothing logs, and
-the app launches fine.
-
-**Where it hooks in.**
-`libraries/storage/impl/src/commonMain/.../db/RealAppDatabaseProvider.kt:22`.
-
-**Provenance.** Sodogku, `docs/decisions.md`. Two of its agents flagged it
-independently on the same afternoon from opposite ends of the schema, which
-suggests it is discoverable and also easy to ship past. Verified here by reading.
 
 ## `FloatingWindowHost` pins an entry for the life of the process
 
@@ -185,6 +45,31 @@ does not appear in manual testing.
 
 **Provenance.** Sodogku, commit `83eff68`. Verified here by reading: the bare
 `onDispose` is unchanged.
+
+## Exported schemas from a project this template is not
+
+**What it is.**
+`libraries/storage/impl/schemas/com.dangerfield.goodtimes.libraries.storage.impl.db.AppDatabase/`
+holds `2.json` and `3.json` beside the real `com.kmptemplate.…AppDatabase/`
+directory. Room keys the schema directory on the fully-qualified database class,
+so these are exports from a class that no longer exists, under a package this
+repo does not use. Delete them.
+
+**How it looks from the outside.** Two schema directories where there should be
+one, and the dead one disagrees with the live one at the same version numbers:
+its `3.json` carries `tasks`, `task_progress` and `task_results`, which the live
+`3.json` does not have. Anyone reading schema history to work out what a
+migration has to do can read the wrong file and get a confident wrong answer.
+
+**Where it hooks in.** Delete the directory, then confirm
+`./gradlew :libraries:storage:impl:kspDebugKotlinAndroid` still exports only into
+the `com.kmptemplate` directory.
+
+**Provenance.** Found in this repo on 2026-09-28 while fixing the destructive
+migration above, which needed the schema history to pick a safe drop range. Not
+reported by any downstream app. Same class as the entry below: a name from an
+earlier lineage that the rename pass does not touch, so every generated app
+inherits it.
 
 ## A source directory named for a project this template is not
 
