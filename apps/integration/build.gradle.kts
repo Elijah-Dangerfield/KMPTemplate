@@ -74,9 +74,10 @@ kotlin {
 
 // ── Files these tests read at runtime, declared so Gradle can see them ────────
 //
-// ConfigManifestRegistryDriftTest reads a committed JSON file and an Android
-// unit test's working directory is not worth guessing at, so the paths are
-// handed in as system properties — a wrong guess reads nothing and passes.
+// ConfigManifestRegistryDriftTest reads a committed JSON file, and
+// DashboardQueryContractTest reads a directory of them plus the Kotlin tree. An
+// Android unit test's working directory is not worth guessing at, so the paths
+// are handed in as system properties — a wrong guess reads nothing and passes.
 //
 // The `inputs.file`/`inputs.files` declarations are the load-bearing half, and
 // the non-obvious one. **A file read at test *runtime* is invisible to Gradle's
@@ -93,8 +94,13 @@ tasks.withType<Test>().configureEach {
     inputs.file(registry).withPropertyName("configManifestRegistry")
     systemProperty("configManifestRegistry", registry.absolutePath)
 
-    // The same hole one level along: the test also greps the Kotlin tree for
-    // `ConfiguredValue` declarations, which Gradle cannot see either. A
+    val dashboards = rootProject.file("ops/grafana")
+    inputs.dir(dashboards).withPropertyName("grafanaDashboards")
+    systemProperty("grafanaDashboards", dashboards.absolutePath)
+
+    // The same hole one level along: the tests also grep the Kotlin tree, for
+    // `ConfiguredValue` declarations and for `logEvent(...)` call sites, and
+    // Gradle cannot see either read. A
     // filtered tree rather than `inputs.dir` — declaring the directories
     // wholesale sweeps in `*/build/**`, which is another task's output, and
     // Gradle rejects the undeclared dependency. `.claude/` holds agent

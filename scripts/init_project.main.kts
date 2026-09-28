@@ -1081,6 +1081,7 @@ fun removeBackend(projectDir: File, projectName: ProjectName) {
         serviceName = "${projectName.lowercase}-server",
     )
     cutSection(File(projectDir, "libraries/config/README.md"), "## Server side")
+    stripGuardFromDashboardDoc(File(projectDir, "ops/grafana/README.md"))
     printGreen("   ✓ Removed the backend from the docs")
 
     stripServerFromSourceComments(projectDir)
@@ -1230,6 +1231,41 @@ fun stripServerFromObservabilityDoc(file: File, serviceName: String) {
         " The server's OTel pipeline is gated by a\n" +
             "single env var: `OTEL_EXPORTER_OTLP_ENDPOINT` unset → stdout exporters, set → OTLP/HTTP." to "",
     ))
+}
+
+/**
+ * The dashboards survive a client-only generation; the test holding them to the
+ * code does not, because it lives in the integration harness (the only module that
+ * can see both a dashboard and every emit site) and that module goes with the
+ * server.
+ *
+ * So the section describing the guard is replaced with the honest version rather
+ * than trimmed. Left as written it would send the reader looking for a test that
+ * is not in their checkout, and — worse — tell them a rename is caught when
+ * nothing is checking. The argument for the strict reader is kept, because it is
+ * the argument for restoring the guard.
+ */
+fun stripGuardFromDashboardDoc(file: File) {
+    cutSection(file, "## How they are kept honest")
+    file.appendText(
+        "\n" + """
+        ## Nothing is holding these to the code
+
+        Upstream, `DashboardQueryContractTest` parsed every query here and every `logEvent(...)` call in
+        the source tree and failed when a dashboard named an event or attribute nothing emits. It lived in
+        the end-to-end test harness, the only module able to see both a dashboard and every emit site, and
+        this project was generated without that harness.
+
+        So the failure it existed to catch is live here. A panel filtering on `strikes_used` against an app
+        emitting `strikes` is not an error anywhere: Loki accepts the query, the panel renders, and it
+        renders **empty** — exactly what a healthy panel looks like before launch. Rename an event at the
+        emit site and these files go quietly wrong.
+
+        Until something checks them, rename in both places in the same commit, and treat an empty panel as
+        unexplained rather than as "no data yet".
+
+        """.trimIndent() + "\n",
+    )
 }
 
 fun stripServerFromSetupDoc(file: File) {

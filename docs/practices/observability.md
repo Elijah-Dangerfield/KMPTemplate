@@ -86,6 +86,16 @@ Client records also carry resource attributes: `service.version`, `platform` (an
 `build_number`, `commit_sha`, `release_channel`, and `deployment.environment` (dev for debug
 builds, prod for release).
 
+## Dashboards live in the repo
+
+Three boards over the client events are committed as JSON under
+[`ops/grafana/`](../../ops/grafana/README.md) and imported by hand, rather than created in Grafana
+and left there. The reason is what a broken panel looks like: one that filters on an attribute the
+app does not emit renders **empty**, which is indistinguishable from a healthy panel before launch.
+A dashboard that lives only in Grafana has no way to be wrong in a build, so
+`DashboardQueryContractTest` parses every committed query and every `logEvent(...)` call in the
+source tree and fails when a dashboard names an event or attribute nothing emits.
+
 ## How to find a session
 
 Start from wherever the report landed and pivot on the id:

@@ -6,7 +6,10 @@ the normal KLog tree system: it lands in logcat/os_log, as a Sentry breadcrumb, 
 `GrafanaLogTree` in `:libraries:telemetry:impl`, as an OTLP log record in Grafana Cloud Loki.
 Query conventions are in [`observability.md`](observability.md).
 
-Dashboard queries treat this page as the source of truth for names and attributes. Names are
+Dashboard queries treat this page as the source of truth for names and attributes, and the
+dashboards themselves are committed under [`ops/grafana/`](../../ops/grafana/README.md) so a query
+naming an event or attribute nothing emits fails a build rather than rendering an empty panel
+forever. Rename an event here and the panels that read it go red, which is the point. Names are
 dot-namespaced snake_case; every record automatically carries `session_id` + `install_id` +
 `is_offline` (per-record) plus resource attributes (`service.name="kmptemplate-client"`,
 deployment environment, version, platform). `is_offline` is `AppState.isOffline` captured **at
