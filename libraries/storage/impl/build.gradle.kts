@@ -19,6 +19,11 @@ kotlin {
             implementation(projects.libraries.kmptemplate.storage)
             implementation(libs.kotlinx.serialization.json)
         }
+        commonTest.dependencies {
+            implementation(projects.libraries.storage)
+            implementation(projects.libraries.flowroutines)
+            implementation(projects.libraries.flowroutines.testing)
+        }
     }
 }
 

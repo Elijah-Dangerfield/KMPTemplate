@@ -114,5 +114,17 @@ private class DataStoreCache<T : Any>(
         dataStore.updateData { value }
     }
 
+    /**
+     * Overridden because the interface default is `set(transform(get()))`, and
+     * a read-then-write is not atomic. Two writers that overlap each hold a
+     * snapshot taken before the other's write, so whichever lands second
+     * silently reverts the first. `AppData` has several writers live at once
+     * on a cold start.
+     *
+     * `DataStore.updateData` serialises the read and the write, so the
+     * transform always sees the latest value.
+     */
+    override suspend fun update(transform: (T) -> T): T = dataStore.updateData(transform)
+
     override suspend fun clear() { deleteFile() }
 }
