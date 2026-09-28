@@ -18,6 +18,11 @@ class FloatingWindowNavigator : Navigator<FloatingWindowNavigator.Destination>()
      */
     internal val backStack get() = state.backStack
 
+    /**
+     * Get the entries still waiting on a transition to complete from the [state].
+     */
+    internal val transitionsInProgress get() = state.transitionsInProgress
+
     override fun navigate(
         entries: List<NavBackStackEntry>,
         navOptions: NavOptions?,

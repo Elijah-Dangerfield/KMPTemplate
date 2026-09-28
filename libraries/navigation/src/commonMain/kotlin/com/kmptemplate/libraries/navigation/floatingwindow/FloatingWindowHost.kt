@@ -2,6 +2,7 @@ package com.kmptemplate.libraries.navigation.floatingwindow
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -21,7 +22,7 @@ import androidx.navigation.compose.LocalOwnersProvider
  *
  * Shows each [Destination] on the [FloatingWindowNavigator]'s back stack.
  *
- * Note that [PodawanApp] should be the only caller of this function.
+ * Note that the app's Compose root should be the only caller of this function.
  */
 @Composable
 fun FloatingWindowHost(floatingWindowNavigator: FloatingWindowNavigator) {
@@ -30,18 +31,39 @@ fun FloatingWindowHost(floatingWindowNavigator: FloatingWindowNavigator) {
     val visibleBackStack = rememberVisibleList(backstackState)
     visibleBackStack.PopulateVisibleList(backstackState)
 
+    val transitionsInProgress by floatingWindowNavigator.transitionsInProgress.collectAsState()
+    val windowsToDispose = remember { mutableStateListOf<NavBackStackEntry>() }
+
     visibleBackStack.forEach { backStackEntry ->
 
         val destination = backStackEntry.destination as FloatingWindowNavigator.Destination
 
         DisposableEffect(backStackEntry) {
+            windowsToDispose.add(backStackEntry)
             onDispose {
                 floatingWindowNavigator.onTransitionComplete(backStackEntry)
+                windowsToDispose.remove(backStackEntry)
             }
         }
 
         backStackEntry.LocalOwnersProvider(saveableStateHolder) {
             destination.content(backStackEntry)
+        }
+    }
+
+    // A window can be popped before it ever composes, and what never composes never disposes, so
+    // the dispose above cannot be the only place a transition completes: NavController holds an
+    // entry it believes is transitioning below CREATED and never clears its ViewModelStore, which
+    // pins that entry and everything it references for the life of the process. Complete those
+    // here, while leaving alone any entry that did compose and has simply not been disposed of yet.
+    LaunchedEffect(transitionsInProgress, windowsToDispose) {
+        transitionsInProgress.forEach { entry ->
+            if (
+                !floatingWindowNavigator.backStack.value.contains(entry) &&
+                !windowsToDispose.contains(entry)
+            ) {
+                floatingWindowNavigator.onTransitionComplete(entry)
+            }
         }
     }
 }
