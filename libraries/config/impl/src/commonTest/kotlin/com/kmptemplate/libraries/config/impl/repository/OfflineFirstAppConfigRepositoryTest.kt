@@ -16,14 +16,17 @@ import com.kmptemplate.libraries.core.Catching
 import com.kmptemplate.libraries.flowroutines.AppCoroutineScope
 import com.kmptemplate.libraries.flowroutines.testing.CoroutineTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
@@ -208,6 +211,62 @@ class OfflineFirstAppConfigRepositoryTest : CoroutineTest() {
         assertEquals("overridden", repo.configStream().first().map["foo"])
     }
 
+    @Test
+    fun freshInstall_configStreamEmitsWithoutTheNetworkAnsweringAtAll() = runUnitTest {
+        // The boot gate (`EnsureAppConfigLoaded`) awaits `configStream().first()`.
+        // This used to emit nothing on a device with no cached snapshot, so the
+        // first frame waited out the whole retry chain against a base URL that
+        // a brand-new project has not deployed yet — measured downstream at 10s
+        // cold, 3.3s after the fix. True only on the very first launch after
+        // install, which is why it survived: on a dev machine you launch twice
+        // and the second one is fine.
+        //
+        // The data source is never allowed to answer, so a pass here can only
+        // come from the bundled fallback.
+        val cache = FakeConfigCache()
+        val source = FakeRemoteDataSource(neverAnswers = true)
+        val fallback = TestFallbackConfigMap(map = mapOf("bundled" to "default"))
+        val repo = newRepo(source = source, cache = cache, fallback = fallback)
+        runCurrent()
+
+        val emitted = withTimeoutOrNull(1_000) { repo.configStream().first() }
+
+        assertNotNull(emitted, "nothing emitted, so the first frame is still blocked on the network")
+        assertEquals("default", emitted.map["bundled"], "and what it emitted has to be the bundled fallback")
+        assertEquals(0, cache.writes, "reading config must not require having written any")
+    }
+
+    @Test
+    fun aCorruptCachedSnapshotIsAsGoodAReasonToUseTheFallbackAsAnAbsentOne() = runUnitTest {
+        // Same symptom, different cause: `decodeConfig` returns null on
+        // unreadable JSON, which used to be filtered out and emit nothing.
+        val cache = FakeConfigCache().apply { seed(configJson = "{ this is not json") }
+        val fallback = TestFallbackConfigMap(map = mapOf("bundled" to "default"))
+        val repo = newRepo(
+            source = FakeRemoteDataSource(neverAnswers = true),
+            cache = cache,
+            fallback = fallback,
+        )
+        runCurrent()
+
+        val emitted = withTimeoutOrNull(1_000) { repo.configStream().first() }
+
+        assertNotNull(emitted, "a corrupt snapshot must not wedge the boot gate")
+        assertEquals("default", emitted.map["bundled"])
+    }
+
+    @Test
+    fun aRealSnapshotStillWinsOverTheFallback() = runUnitTest {
+        // The companion that stops "always return the fallback" passing the two
+        // tests above. Starting from the fallback is only correct if a genuine
+        // snapshot supersedes it.
+        val cache = FakeConfigCache().apply { seed(configJson = """{"foo":"cached"}""") }
+        val repo = newRepo(source = FakeRemoteDataSource(neverAnswers = true), cache = cache)
+        runCurrent()
+
+        assertEquals("cached", repo.configStream().first().map["foo"])
+    }
+
     // ---------- Test scaffolding ----------
 
     private fun newRepo(
@@ -255,6 +314,8 @@ class OfflineFirstAppConfigRepositoryTest : CoroutineTest() {
 
     private class FakeRemoteDataSource(
         var response: AppConfigMap = MapAppConfig(emptyMap<String, Any?>()),
+        /** Suspends forever, standing in for a server that is simply not there. */
+        private val neverAnswers: Boolean = false,
     ) : RemoteConfigDataSource {
         var failNext: Throwable? = null
         var callCount: Int = 0
@@ -262,6 +323,7 @@ class OfflineFirstAppConfigRepositoryTest : CoroutineTest() {
 
         override suspend fun getConfig(): Catching<AppConfigMap> {
             callCount++
+            if (neverAnswers) awaitCancellation()
             failNext?.let { failNext = null; return Catching.failure(it) }
             return Catching.success(response)
         }
@@ -269,10 +331,19 @@ class OfflineFirstAppConfigRepositoryTest : CoroutineTest() {
 
     private class FakeConfigCache : ConfigCache {
         private val state = MutableStateFlow(ConfigCacheSnapshot())
+
+        /** Counts persists, so a test can prove reading needed no write. */
+        var writes: Int = 0
+            private set
+
         override val updates: Flow<ConfigCacheSnapshot> = state
         override suspend fun get(): ConfigCacheSnapshot = state.value
-        override suspend fun set(value: ConfigCacheSnapshot) { state.value = value }
+        override suspend fun set(value: ConfigCacheSnapshot) {
+            writes++
+            state.value = value
+        }
         override suspend fun clear() { state.value = ConfigCacheSnapshot() }
+        /** Puts a snapshot in place without counting as a persist. */
         fun seed(configJson: String? = null, overridesJson: String? = null) {
             state.value = ConfigCacheSnapshot(configJson = configJson, overridesJson = overridesJson)
         }

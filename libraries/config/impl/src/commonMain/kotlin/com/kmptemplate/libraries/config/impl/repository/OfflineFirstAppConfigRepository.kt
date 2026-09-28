@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -58,13 +58,15 @@ private val ConfigRefreshTimeout = 5.seconds
  *
  * Note this is a *transition* trigger: a user who keeps the app foregrounded
  * uninterrupted never re-fetches mid-session — that would need polling, which we
- * deliberately don't do. The cached snapshot survives launches so the first frame
- * never blocks on the network.
+ * deliberately don't do. The first frame never blocks on the network: the cached
+ * snapshot survives launches, and [cachedConfigFlow] starts from the bundled
+ * fallback when there isn't one.
  *
  * Failure path: if the network fetch fails AND there's no prior cached snapshot,
- * the bundled fallback config is persisted so future `configStream` subscribers
- * get a usable map. With a prior snapshot, the failure is logged and the prior
- * snapshot stays in place — the next foreground past the throttle tries again.
+ * the bundled fallback config is persisted so a later process starts from disk
+ * rather than re-deciding. With a prior snapshot, the failure is logged and the
+ * prior snapshot stays in place — the next foreground past the throttle tries
+ * again.
  */
 @ContributesBinding(AppScope::class, boundType = AppConfigRepository::class)
 @ContributesBinding(AppScope::class, boundType = AutoInit::class, multibinding = true)
@@ -86,8 +88,29 @@ class OfflineFirstAppConfigRepository @Inject constructor(
     private val refreshJobMutex = Mutex()
     private var lastFetchAtMs: Long? = null
 
+    /**
+     * The current config, starting from the bundled fallback rather than from
+     * nothing.
+     *
+     * This used to be `mapNotNull`, which meant a device with no cached snapshot
+     * emitted **nothing at all** until a fetch either succeeded or failed hard
+     * enough to persist the fallback. [com.kmptemplate.libraries.config.EnsureAppConfigLoaded]
+     * awaits `configStream().first()`, so on a fresh install the first frame
+     * waited out the entire retry chain against a config server a brand-new
+     * project has not deployed yet — measured downstream at 10 seconds cold,
+     * 3.3 after this change.
+     *
+     * This file's own KDoc already promised the first frame never blocks on the
+     * network. It was true from the second launch onwards, which is why it
+     * survived: on a dev machine you launch the app twice and the second one is
+     * fine.
+     *
+     * A corrupt snapshot takes the same path: [decodeConfig] returns null, and
+     * an unreadable file is exactly as good a reason to start from the fallback
+     * as an absent one.
+     */
     private val cachedConfigFlow = configCache.updates
-        .mapNotNull { snapshot -> snapshot.configJson?.let(::decodeConfig) }
+        .map { snapshot -> snapshot.configJson?.let(::decodeConfig) ?: fallbackConfig }
 
     private val configStream: SharedFlow<AppConfigMap> = combine(
         configOverrideRepository.getOverridesFlow(),
@@ -187,7 +210,7 @@ class OfflineFirstAppConfigRepository @Inject constructor(
         // Synchronous + non-blocking by design. A `ConfiguredValue` read can land
         // on the main thread (e.g. `progressionConfig.levelCurve()` during
         // composition), so this must never block: on a cold/fresh start the
-        // stream hasn't emitted yet (it waits for the first cached config), and
+        // stream has not emitted yet (it is one dispatch away, not zero), and
         // `runBlocking { configStream.first() }` here deadlocks the app — the
         // main thread parks while the K/N worker pool is full of the same
         // blocking read, so nothing can produce the config (scene-create
