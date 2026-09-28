@@ -29,7 +29,25 @@ fun <T : Any> Map<String, *>.getValueRecursive(path: List<String>, clazz: KClass
         return Catching {
             when (clazz) {
                 String::class -> rawValue.toString() as? T
-                Boolean::class -> rawValue.toString().toBoolean() as? T
+                // Not `toBoolean()`. That maps *everything* that is not "true"
+                // to `false`, so a string typed into a boolean key in the admin
+                // console would turn that feature off on every device that
+                // fetched the config — silently, and without falling back to
+                // the declared default. A kill switch or a monetization flag is
+                // meant to fail open, and this is the one path that could
+                // quietly make one fail closed. The general rule: a parse that
+                // invents an answer is worse than no answer. The default was
+                // chosen deliberately; the invented value is whatever the
+                // coercion happened to produce.
+                //
+                // Case stays forgiving, because the console lets an operator
+                // type a raw value and "True" is not a mistake worth punishing.
+                // Anything else resolves to null and the caller's default wins.
+                Boolean::class -> when (rawValue.toString().lowercase()) {
+                    "true" -> true as T
+                    "false" -> false as T
+                    else -> null
+                }
                 Int::class -> rawValue.toString().toDoubleOrNull()?.toInt() as? T
                 Number::class -> rawValue.toString().toDoubleOrNull() as? T
                 Double::class -> rawValue.toString().toDoubleOrNull() as? T
