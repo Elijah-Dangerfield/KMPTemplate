@@ -40,32 +40,39 @@
 	  bundles a cipher, or that ships its own TLS, has to change this key and
 	  file the paperwork behind it. Check before assuming you inherited the
 	  right answer.
+
+	  It does not reach back. The key only affects builds made after it, so any
+	  build already sitting in "Missing Compliance" still needs answering by
+	  hand in App Store Connect, or a PATCH of usesNonExemptEncryption onto that
+	  build through the API.
+
+	  If you ever do have to answer the dialog by hand, the honest-looking
+	  option is the wrong one. "Standard encryption algorithms instead of, or in
+	  addition to, using or accessing the encryption within Apple's operating
+	  system" reads like a description of any app that makes HTTPS calls, but
+	  HTTPS through NSURLSession *is* the encryption within Apple's operating
+	  system, which that option exists to exclude. Picking it commits you to a
+	  CCATS filing and an annual self-classification report. "None of the
+	  algorithms mentioned above" is the answer that matches this key.
 	-->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!--
-	  REQUIRED, even though nothing in the generated app calls the camera.
+	  There is deliberately no NSCameraUsageDescription here, and adding one
+	  back needs a reason.
 
-	  :libraries:ui ships a CameraPreview across all three source sets and
-	  IOSNativeViewFactory.swift imports AVFoundation to serve it. App Store
-	  delivery scans the binary for *API references*, not for call sites, so the
-	  upload is rejected with ITMS-90683 whether or not a screen ever shows a
-	  preview. A downstream app hit exactly this on its first submission.
+	  The template used to ship a CameraPreview across all three source sets
+	  with AVFoundation imported to serve it, which forced this key: App Store
+	  delivery scans the binary for *API references*, not call sites, so the
+	  upload was rejected with ITMS-90683 whether or not any screen showed a
+	  preview. The camera came out wholesale, so the key went with it. Declaring
+	  access to a sensor the app never touches contradicts the App Privacy
+	  answers and PrivacyInfo.xcprivacy.
 
-	  **This key is a stopgap and should not survive.** It is here so a fresh
-	  project uploads at all; it is the wrong answer for almost every app,
-	  because it declares access to a sensor the app never touches and so
-	  contradicts the App Privacy answers and PrivacyInfo.xcprivacy. The camera
-	  is coming out of the template wholesale, Android permission included:
-	  docs/PORT-CANDIDATES.md, "Remove the camera entirely", lists every file.
-
-	  Until that lands:
-
-	  * **Using the camera.** Keep this key and rewrite the string to say what
-	    you use it for. A vague purpose string is its own rejection.
-	  * **Not using the camera**, which is most apps. Do the deletion in that
-	    entry now rather than shipping this key. Confirm with `otool -L` on the
-	    built .app that AVFoundation is gone.
+	  If you add camera code, add this key with a purpose string that says what
+	  you use it for; a vague one is its own rejection. If you are not using the
+	  camera and an upload is still rejected for it, something reintroduced an
+	  AVFoundation reference. `otool -L` on the built .app will tell you.
 	-->
 	<key>UIBackgroundModes</key>
 	<array>
