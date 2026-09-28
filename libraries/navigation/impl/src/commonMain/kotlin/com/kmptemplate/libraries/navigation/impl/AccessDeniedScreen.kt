@@ -21,6 +21,16 @@ import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
 import com.kmptemplate.system.VerticalSpacerD1600
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.access_denied_appeal
+import kmptemplate.libraries.resources.generated.resources.access_denied_banned_message
+import kmptemplate.libraries.resources.generated.resources.access_denied_banned_title
+import kmptemplate.libraries.resources.generated.resources.access_denied_message
+import kmptemplate.libraries.resources.generated.resources.access_denied_suspended_message
+import kmptemplate.libraries.resources.generated.resources.access_denied_suspended_title
+import kmptemplate.libraries.resources.generated.resources.access_denied_title
+import kmptemplate.libraries.resources.generated.resources.access_denied_until
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -39,12 +49,12 @@ internal fun AccessDeniedScreen(
 ) {
     BackHandler { doNothing() }
     val (title, message) = when (reason) {
-        "banned" -> "Account banned" to
-            "This account has been permanently banned for violating our terms."
-        "suspended" -> "Account suspended" to
-            "This account has been temporarily suspended."
-        else -> "Access denied" to
-            "This account can't access the app right now."
+        "banned" -> stringResource(Res.string.access_denied_banned_title) to
+            stringResource(Res.string.access_denied_banned_message)
+        "suspended" -> stringResource(Res.string.access_denied_suspended_title) to
+            stringResource(Res.string.access_denied_suspended_message)
+        else -> stringResource(Res.string.access_denied_title) to
+            stringResource(Res.string.access_denied_message)
     }
     Screen { paddingValues ->
         Column(
@@ -70,7 +80,7 @@ internal fun AccessDeniedScreen(
             if (until != null) {
                 Spacer(modifier = Modifier.height(Dimension.D400))
                 Text(
-                    text = "Access is restored on $until.",
+                    text = stringResource(Res.string.access_denied_until, until),
                     typography = AppTheme.typography.Body.B500,
                     color = AppTheme.colors.textSecondary,
                     textAlign = TextAlign.Center,
@@ -83,7 +93,7 @@ internal fun AccessDeniedScreen(
                     onClick = { onAppeal(appealUrl) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(text = "Appeal this decision")
+                    Text(text = stringResource(Res.string.access_denied_appeal))
                 }
                 VerticalSpacerD1600()
             }

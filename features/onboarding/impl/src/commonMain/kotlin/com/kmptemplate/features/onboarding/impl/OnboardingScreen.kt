@@ -29,6 +29,29 @@ import com.kmptemplate.libraries.ui.components.text.OutlinedTextField
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.auth_continue_with_google
+import kmptemplate.libraries.resources.generated.resources.auth_error_network
+import kmptemplate.libraries.resources.generated.resources.auth_error_provider_not_enabled
+import kmptemplate.libraries.resources.generated.resources.auth_sign_in_with_apple
+import kmptemplate.libraries.resources.generated.resources.common_back
+import kmptemplate.libraries.resources.generated.resources.onboarding_continue
+import kmptemplate.libraries.resources.generated.resources.onboarding_continue_as_guest
+import kmptemplate.libraries.resources.generated.resources.onboarding_create_an_account
+import kmptemplate.libraries.resources.generated.resources.onboarding_display_name_invalid
+import kmptemplate.libraries.resources.generated.resources.onboarding_display_name_label
+import kmptemplate.libraries.resources.generated.resources.onboarding_display_name_taken
+import kmptemplate.libraries.resources.generated.resources.onboarding_finishing
+import kmptemplate.libraries.resources.generated.resources.onboarding_oauth_failed
+import kmptemplate.libraries.resources.generated.resources.onboarding_opening_browser
+import kmptemplate.libraries.resources.generated.resources.onboarding_pick_display_name_subtitle
+import kmptemplate.libraries.resources.generated.resources.onboarding_pick_display_name_title
+import kmptemplate.libraries.resources.generated.resources.onboarding_sign_in_with_email
+import kmptemplate.libraries.resources.generated.resources.onboarding_suggest_another
+import kmptemplate.libraries.resources.generated.resources.onboarding_waiting_for_apple
+import kmptemplate.libraries.resources.generated.resources.onboarding_welcome_subtitle
+import kmptemplate.libraries.resources.generated.resources.onboarding_welcome_title
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -75,14 +98,14 @@ private fun WelcomeStep(
 
     Spacer(modifier = Modifier.height(Dimension.D1200))
     Text(
-        text = "Welcome",
+        text = stringResource(Res.string.onboarding_welcome_title),
         typography = AppTheme.typography.Heading.H800,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(Dimension.D400))
     Text(
-        text = "Jump right in as a guest, or sign in to pick up where you left off.",
+        text = stringResource(Res.string.onboarding_welcome_subtitle),
         typography = AppTheme.typography.Body.B500,
         color = AppTheme.colors.textSecondary,
         textAlign = TextAlign.Center,
@@ -96,7 +119,7 @@ private fun WelcomeStep(
         enabled = !busy,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Continue as guest")
+        Text(stringResource(Res.string.onboarding_continue_as_guest))
     }
 
     Spacer(modifier = Modifier.height(Dimension.D500))
@@ -107,8 +130,11 @@ private fun WelcomeStep(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            if (state.oauthInFlight == OAuthProvider.Google) "Opening browser…"
-            else "Continue with Google",
+            if (state.oauthInFlight == OAuthProvider.Google) {
+                stringResource(Res.string.onboarding_opening_browser)
+            } else {
+                stringResource(Res.string.auth_continue_with_google)
+            },
         )
     }
 
@@ -120,8 +146,11 @@ private fun WelcomeStep(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                if (state.oauthInFlight == OAuthProvider.Apple) "Waiting for Apple…"
-                else "Sign in with Apple",
+                if (state.oauthInFlight == OAuthProvider.Apple) {
+                    stringResource(Res.string.onboarding_waiting_for_apple)
+                } else {
+                    stringResource(Res.string.auth_sign_in_with_apple)
+                },
             )
         }
     }
@@ -129,14 +158,14 @@ private fun WelcomeStep(
     state.authError?.let {
         Spacer(modifier = Modifier.height(Dimension.D400))
         Text(
-            text = when (it) {
-                OnboardingAuthError.OAuthProviderNotEnabled ->
-                    "That sign-in method isn't available right now."
-                OnboardingAuthError.OAuthNetworkError ->
-                    "Couldn't reach the server. Check your connection and try again."
-                OnboardingAuthError.OAuthFailed ->
-                    "Sign-in didn't go through. Please try again."
-            },
+            text = stringResource(
+                when (it) {
+                    OnboardingAuthError.OAuthProviderNotEnabled ->
+                        Res.string.auth_error_provider_not_enabled
+                    OnboardingAuthError.OAuthNetworkError -> Res.string.auth_error_network
+                    OnboardingAuthError.OAuthFailed -> Res.string.onboarding_oauth_failed
+                },
+            ),
             typography = AppTheme.typography.Body.B500,
             color = AppTheme.colors.danger,
             textAlign = TextAlign.Center,
@@ -151,14 +180,14 @@ private fun WelcomeStep(
         enabled = !busy,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Sign in with email")
+        Text(stringResource(Res.string.onboarding_sign_in_with_email))
     }
     ButtonGhost(
         onClick = { onAction(OnboardingAction.SignUp) },
         enabled = !busy,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Create an account")
+        Text(stringResource(Res.string.onboarding_create_an_account))
     }
     Spacer(modifier = Modifier.height(Dimension.D800))
 }
@@ -176,18 +205,18 @@ private fun PickIdentityStep(
             onClick = { onAction(OnboardingAction.Back) },
             icon = Icons.ChevronLeft(null),
         ) {
-            Text("Back")
+            Text(stringResource(Res.string.common_back))
         }
     }
     Spacer(modifier = Modifier.height(Dimension.D700))
 
     Text(
-        text = "Pick a display name",
+        text = stringResource(Res.string.onboarding_pick_display_name_title),
         typography = AppTheme.typography.Heading.H700,
     )
     Spacer(modifier = Modifier.height(Dimension.D300))
     Text(
-        text = "This is how you'll show up in the app. You can change it later.",
+        text = stringResource(Res.string.onboarding_pick_display_name_subtitle),
         typography = AppTheme.typography.Body.B500,
         color = AppTheme.colors.textSecondary,
     )
@@ -204,14 +233,18 @@ private fun PickIdentityStep(
         keyboardActions = KeyboardActions(
             onGo = { onAction(OnboardingAction.ContinueFromPickIdentity) },
         ),
-        label = { Text("Display name") },
+        label = { Text(stringResource(Res.string.onboarding_display_name_label)) },
         supportingText = state.saveError?.let {
             {
                 Text(
-                    text = when (it) {
-                        OnboardingSaveError.DisplayNameTaken -> "That name is taken — try another."
-                        OnboardingSaveError.InvalidDisplayName -> "That name won't work — try another."
-                    },
+                    text = stringResource(
+                        when (it) {
+                            OnboardingSaveError.DisplayNameTaken ->
+                                Res.string.onboarding_display_name_taken
+                            OnboardingSaveError.InvalidDisplayName ->
+                                Res.string.onboarding_display_name_invalid
+                        },
+                    ),
                     typography = AppTheme.typography.Body.B400,
                     color = AppTheme.colors.danger,
                 )
@@ -226,7 +259,7 @@ private fun PickIdentityStep(
         onClick = { onAction(OnboardingAction.RegenerateDisplayName) },
         enabled = !state.isFinishing,
     ) {
-        Text("Suggest another")
+        Text(stringResource(Res.string.onboarding_suggest_another))
     }
 
     Spacer(modifier = Modifier.height(Dimension.D800))
@@ -236,7 +269,13 @@ private fun PickIdentityStep(
         enabled = !state.isFinishing,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(if (state.isFinishing) "Setting things up…" else "Continue")
+        Text(
+            if (state.isFinishing) {
+                stringResource(Res.string.onboarding_finishing)
+            } else {
+                stringResource(Res.string.onboarding_continue)
+            },
+        )
     }
     Spacer(modifier = Modifier.height(Dimension.D800))
 }

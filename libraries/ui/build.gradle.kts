@@ -19,6 +19,9 @@ kotlin {
             implementation(projects.libraries.core)
             // TODO honestly the kmptemplate library should expose the component that require kmptemplate domain
             implementation(projects.libraries.kmptemplate)
+            // User-facing copy in the few DS components that carry their own
+            // (ShakeDialog), so `VerifyStrings` has a resource to point at.
+            implementation(projects.libraries.resources)
 
             api(compose.ui)
             api(compose.uiUtil)

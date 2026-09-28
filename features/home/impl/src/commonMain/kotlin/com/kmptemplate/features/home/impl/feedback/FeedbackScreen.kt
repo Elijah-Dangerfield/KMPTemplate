@@ -28,6 +28,14 @@ import com.kmptemplate.libraries.ui.components.header.TopBar
 import com.kmptemplate.libraries.ui.components.text.OutlinedTextField
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.libraries.ui.screenContentPadding
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.common_message_label
+import kmptemplate.libraries.resources.generated.resources.common_message_placeholder
+import kmptemplate.libraries.resources.generated.resources.common_send
+import kmptemplate.libraries.resources.generated.resources.common_sending
+import kmptemplate.libraries.resources.generated.resources.feedback_prompt
+import kmptemplate.libraries.resources.generated.resources.feedback_title
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val FEEDBACK_CHAR_LIMIT = 200
@@ -45,7 +53,7 @@ fun FeedbackScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBar(
-                 title = "Share Your Feedback",
+                title = stringResource(Res.string.feedback_title),
                 onNavigateBack = { onAction(FeedbackAction.Back) }
             )
         }
@@ -63,7 +71,7 @@ fun FeedbackScreen(
             VerticalSpacerD1000()
 
             Text(
-                text = "We'd love to hear from you",
+                text = stringResource(Res.string.feedback_prompt),
                 typography = AppTheme.typography.Body.B700,
                 color = AppTheme.colors.textSecondary
             )
@@ -79,8 +87,8 @@ fun FeedbackScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimension.D1900),
-                label = { Text("Message") },
-                placeholder = { Text("Describe what happened…") },
+                label = { Text(stringResource(Res.string.common_message_label)) },
+                placeholder = { Text(stringResource(Res.string.common_message_placeholder)) },
                 singleLine = false,
                 minLines = 6,
                 maxLines = 10,
@@ -138,7 +146,13 @@ fun FeedbackScreen(
                     }
                 }
             ) {
-                Text(if (state.isSubmitting) "Sending…" else "Send")
+                Text(
+                    if (state.isSubmitting) {
+                        stringResource(Res.string.common_sending)
+                    } else {
+                        stringResource(Res.string.common_send)
+                    },
+                )
             }
 
             VerticalSpacerD500()

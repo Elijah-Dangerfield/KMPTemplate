@@ -25,6 +25,11 @@ import com.kmptemplate.system.VerticalSpacerD1000
 import com.kmptemplate.system.VerticalSpacerD1200
 import com.kmptemplate.system.VerticalSpacerD1600
 import com.kmptemplate.system.VerticalSpacerD500
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.common_error_code
+import kmptemplate.libraries.resources.generated.resources.common_report_to_developers
+import kmptemplate.libraries.resources.generated.resources.common_report_to_developers_aside
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -61,7 +66,7 @@ internal fun BlockingErrorScreen(
             errorCode?.let {
                 Spacer(modifier = Modifier.height(Dimension.D400))
                 Text(
-                    text = "Error code: $it",
+                    text = stringResource(Res.string.common_error_code, it),
                     typography = AppTheme.typography.Body.B500,
                     color = AppTheme.colors.textSecondary,
                     textAlign = TextAlign.Center,
@@ -75,12 +80,12 @@ internal fun BlockingErrorScreen(
                     onClick = onReportToDevelopers,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Report to developers")
+                    Text(text = stringResource(Res.string.common_report_to_developers))
                 }
 
                 VerticalSpacerD500()
 
-                Text("(which is me cause I wrote myself)")
+                Text(stringResource(Res.string.common_report_to_developers_aside))
 
                 VerticalSpacerD1600()
             }

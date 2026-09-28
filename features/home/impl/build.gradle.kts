@@ -15,6 +15,7 @@ kotlin {
             implementation(projects.libraries.core)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.ui)
+            implementation(projects.libraries.resources)
             implementation(projects.libraries.kmptemplate)
             implementation(projects.libraries.identity)
 

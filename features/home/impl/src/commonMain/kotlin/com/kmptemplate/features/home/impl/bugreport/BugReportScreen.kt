@@ -30,6 +30,17 @@ import com.kmptemplate.libraries.ui.components.header.TopBar
 import com.kmptemplate.libraries.ui.components.text.OutlinedTextField
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.libraries.ui.screenContentPadding
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.bug_report_captured_details
+import kmptemplate.libraries.resources.generated.resources.bug_report_error_code_label
+import kmptemplate.libraries.resources.generated.resources.bug_report_id_label
+import kmptemplate.libraries.resources.generated.resources.bug_report_prompt
+import kmptemplate.libraries.resources.generated.resources.bug_report_title
+import kmptemplate.libraries.resources.generated.resources.common_message_label
+import kmptemplate.libraries.resources.generated.resources.common_message_placeholder
+import kmptemplate.libraries.resources.generated.resources.common_send
+import kmptemplate.libraries.resources.generated.resources.common_sending
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val BUG_REPORT_CHAR_LIMIT = 180
@@ -47,7 +58,7 @@ fun BugReportScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBar(
-                title = "Report a Bug",
+                title = stringResource(Res.string.bug_report_title),
                 onNavigateBack = { onAction(BugReportAction.Back) }
             )
         }
@@ -65,7 +76,7 @@ fun BugReportScreen(
             VerticalSpacerD1000()
 
             if (state.hasContext) {
-                SectionCard(title = "Captured details") {
+                SectionCard(title = stringResource(Res.string.bug_report_captured_details)) {
                     state.contextMessage?.let {
                         Text(
                             text = it,
@@ -76,14 +87,14 @@ fun BugReportScreen(
 
                     state.errorCode?.let {
                         SummaryRow(
-                            label = "Error code",
+                            label = stringResource(Res.string.bug_report_error_code_label),
                             value = "$it"
                         )
                     }
 
                     state.logId?.let {
                         SummaryRow(
-                            label = "Report id",
+                            label = stringResource(Res.string.bug_report_id_label),
                             value = it
                         )
                     }
@@ -93,7 +104,7 @@ fun BugReportScreen(
             }
 
             Text(
-                text = "Help us understand what went wrong. We would love to fix it!",
+                text = stringResource(Res.string.bug_report_prompt),
                 typography = AppTheme.typography.Body.B700,
                 color = AppTheme.colors.textSecondary
             )
@@ -109,8 +120,8 @@ fun BugReportScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimension.D1900),
-                label = { Text("Message") },
-                placeholder = { Text("Describe what happened…") },
+                label = { Text(stringResource(Res.string.common_message_label)) },
+                placeholder = { Text(stringResource(Res.string.common_message_placeholder)) },
                 singleLine = false,
                 minLines = 6,
                 maxLines = 10,
@@ -168,7 +179,13 @@ fun BugReportScreen(
                     }
                 }
             ) {
-                Text(if (state.isSubmitting) "Sending…" else "Send")
+                Text(
+                    if (state.isSubmitting) {
+                        stringResource(Res.string.common_sending)
+                    } else {
+                        stringResource(Res.string.common_send)
+                    },
+                )
             }
 
             VerticalSpacerD500()

@@ -20,6 +20,16 @@ import com.kmptemplate.libraries.ui.components.button.ButtonPrimary
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.session_expired_message
+import kmptemplate.libraries.resources.generated.resources.session_expired_title
+import kmptemplate.libraries.resources.generated.resources.session_lost_message
+import kmptemplate.libraries.resources.generated.resources.session_lost_title
+import kmptemplate.libraries.resources.generated.resources.session_sign_in_again
+import kmptemplate.libraries.resources.generated.resources.session_start_fresh
+import kmptemplate.libraries.resources.generated.resources.session_start_fresh_failed
+import kmptemplate.libraries.resources.generated.resources.session_working
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -51,7 +61,11 @@ internal fun SessionExpiredScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = if (wasAnonymous) "Session lost" else "Session expired",
+                text = if (wasAnonymous) {
+                    stringResource(Res.string.session_lost_title)
+                } else {
+                    stringResource(Res.string.session_expired_title)
+                },
                 typography = AppTheme.typography.Display.D1000,
                 textAlign = TextAlign.Center,
             )
@@ -60,9 +74,9 @@ internal fun SessionExpiredScreen(
 
             Text(
                 text = if (wasAnonymous) {
-                    "Your guest session can't be recovered. Start fresh to keep using the app."
+                    stringResource(Res.string.session_lost_message)
                 } else {
-                    "For your security you've been signed out. Sign in again to pick up where you left off."
+                    stringResource(Res.string.session_expired_message)
                 },
                 typography = AppTheme.typography.Body.B400,
                 textAlign = TextAlign.Center,
@@ -71,7 +85,7 @@ internal fun SessionExpiredScreen(
             if (startFreshFailed) {
                 Spacer(modifier = Modifier.height(Dimension.D400))
                 Text(
-                    text = "Couldn't start a new session. Check your connection and try again.",
+                    text = stringResource(Res.string.session_start_fresh_failed),
                     typography = AppTheme.typography.Body.B500,
                     color = AppTheme.colors.status.warning,
                     textAlign = TextAlign.Center,
@@ -86,11 +100,13 @@ internal fun SessionExpiredScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = when {
-                        working -> "Working…"
-                        wasAnonymous -> "Start fresh"
-                        else -> "Sign in again"
-                    },
+                    text = stringResource(
+                        when {
+                            working -> Res.string.session_working
+                            wasAnonymous -> Res.string.session_start_fresh
+                            else -> Res.string.session_sign_in_again
+                        },
+                    ),
                 )
             }
 

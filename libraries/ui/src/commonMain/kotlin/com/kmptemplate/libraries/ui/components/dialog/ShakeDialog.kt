@@ -16,6 +16,10 @@ import com.kmptemplate.libraries.ui.components.button.ButtonSize
 import com.kmptemplate.libraries.ui.components.button.ButtonStyle
 import com.kmptemplate.libraries.ui.components.button.ButtonType
 import com.kmptemplate.libraries.ui.components.text.Text
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.shake_dismiss
+import kmptemplate.libraries.resources.generated.resources.shake_report_a_bug
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Debug-only CTA label — dev-facing, so a constant rather than a string
@@ -73,7 +77,7 @@ fun ShakeDialog(
                     size = ButtonSize.Medium,
                     type = ButtonType.Danger,
                 ) {
-                    Text("Report a bug")
+                    Text(stringResource(Res.string.shake_report_a_bug))
                 }
 
                 if (onOpenNetworkInspector != null) {
@@ -99,7 +103,7 @@ fun ShakeDialog(
                     size = ButtonSize.Medium,
                     style = ButtonStyle.Text
                 ) {
-                    Text("Dismiss")
+                    Text(stringResource(Res.string.shake_dismiss))
                 }
             }
         }

@@ -13,6 +13,7 @@ kotlin {
             implementation(projects.libraries.core)
             implementation(projects.libraries.navigation)
             implementation(projects.libraries.ui)
+            implementation(projects.libraries.resources)
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.kmptemplate)
             // Session-expired recovery reads AuthState + mints guest sessions.

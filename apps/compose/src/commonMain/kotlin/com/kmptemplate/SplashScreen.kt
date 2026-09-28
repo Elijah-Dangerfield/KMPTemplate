@@ -22,7 +22,10 @@ import com.kmptemplate.libraries.core.Platform
 import com.kmptemplate.libraries.ui.PreviewContent
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.splash_title
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private const val FadeInMillis = 450
@@ -70,7 +73,7 @@ private fun SplashContent(alpha: () -> Float) {
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "KMP Template",
+            text = stringResource(Res.string.splash_title),
             typography = AppTheme.typography.Brand.B1300,
             textAlign = TextAlign.Center,
         )

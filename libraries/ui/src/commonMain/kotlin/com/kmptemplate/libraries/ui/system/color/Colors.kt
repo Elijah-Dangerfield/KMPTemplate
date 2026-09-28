@@ -125,6 +125,12 @@ private fun SectionTitle(text: String, colors: Colors) {
     )
 }
 
+// Sample copy for the palette gallery, which only ever renders from the
+// @Preview below and from ColorResource.kt's. None of it reaches a user, so a
+// string resource for it would be a resource nothing translates. `VerifyStrings`
+// exempts a literal written *inside* an @Preview function; these live one call
+// deeper, in the helpers the preview composes.
+@Suppress("VerifyStrings")
 @Composable
 private fun HeroPanel(colors: Colors) {
     Column(
@@ -337,6 +343,9 @@ private fun SurfaceStack(colors: Colors) {
     }
 }
 
+// Same as HeroPanel: "Card content" is filler that shows what text looks like
+// on each surface, not copy.
+@Suppress("VerifyStrings")
 @Composable
 private fun RowScope.SurfaceCard(
     title: String,

@@ -17,6 +17,13 @@ import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.VerticalSpacerD500
 import com.kmptemplate.system.VerticalSpacerD800
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.home_greeting
+import kmptemplate.libraries.resources.generated.resources.home_report_bug
+import kmptemplate.libraries.resources.generated.resources.home_send_feedback
+import kmptemplate.libraries.resources.generated.resources.home_subtitle
+import kmptemplate.libraries.resources.generated.resources.home_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HomeScreen(
@@ -37,7 +44,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "Welcome to KMP Template",
+                text = stringResource(Res.string.home_title),
                 typography = AppTheme.typography.Heading.H700,
                 color = AppTheme.colors.text,
                 textAlign = TextAlign.Center,
@@ -47,7 +54,7 @@ fun HomeScreen(
 
             if (state.userName != null) {
                 Text(
-                    text = "Hello, ${state.userName}!",
+                    text = stringResource(Res.string.home_greeting, state.userName.orEmpty()),
                     typography = AppTheme.typography.Body.B600,
                     color = AppTheme.colors.textSecondary,
                 )
@@ -55,7 +62,7 @@ fun HomeScreen(
             }
 
             Text(
-                text = "This is your starting point.\nBuild something amazing!",
+                text = stringResource(Res.string.home_subtitle),
                 typography = AppTheme.typography.Body.B500,
                 color = AppTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
@@ -64,13 +71,13 @@ fun HomeScreen(
             VerticalSpacerD800()
 
             Button(onClick = onNavigateToFeedback) {
-                Text("Send Feedback")
+                Text(stringResource(Res.string.home_send_feedback))
             }
 
             VerticalSpacerD500()
 
             Button(onClick = onNavigateToBugReport) {
-                Text("Report a Bug")
+                Text(stringResource(Res.string.home_report_bug))
             }
         }
     }

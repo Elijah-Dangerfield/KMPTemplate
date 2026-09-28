@@ -19,6 +19,11 @@ import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
 import com.kmptemplate.system.VerticalSpacerD1000
 import com.kmptemplate.system.VerticalSpacerD500
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.common_error_code
+import kmptemplate.libraries.resources.generated.resources.common_report_to_developers
+import kmptemplate.libraries.resources.generated.resources.common_report_to_developers_aside
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -31,7 +36,7 @@ internal fun ErrorDialog(
     onDismissRequest: () -> Unit,
     onAction: () -> Unit,
     onReportToDeveloper: (() -> Unit)? = null,
-    reportActionTitle: String = "Report to developers",
+    reportActionTitle: String = stringResource(Res.string.common_report_to_developers),
 ) {
     val showReportButton = onReportToDeveloper != null
 
@@ -50,7 +55,7 @@ internal fun ErrorDialog(
                 errorCode?.let {
                     VerticalSpacerD1000()
                     Text(
-                        text = "Error code: $it",
+                        text = stringResource(Res.string.common_error_code, it),
                         typography = AppTheme.typography.Body.B500.Bold,
                         color = AppTheme.colors.textSecondary,
                     )
@@ -80,7 +85,7 @@ internal fun ErrorDialog(
 
                     VerticalSpacerD500()
 
-                    Text("(which is me cause I wrote myself)")
+                    Text(stringResource(Res.string.common_report_to_developers_aside))
                 }
             }
         }

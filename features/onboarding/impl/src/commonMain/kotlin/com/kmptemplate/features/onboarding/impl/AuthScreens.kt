@@ -33,6 +33,53 @@ import com.kmptemplate.libraries.ui.components.text.OutlinedTextField
 import com.kmptemplate.libraries.ui.components.text.Text
 import com.kmptemplate.system.AppTheme
 import com.kmptemplate.system.Dimension
+import kmptemplate.libraries.resources.generated.resources.Res
+import kmptemplate.libraries.resources.generated.resources.auth_back_to_sign_in
+import kmptemplate.libraries.resources.generated.resources.auth_checking
+import kmptemplate.libraries.resources.generated.resources.auth_confirm_password_label
+import kmptemplate.libraries.resources.generated.resources.auth_continue_with_google
+import kmptemplate.libraries.resources.generated.resources.auth_create_account
+import kmptemplate.libraries.resources.generated.resources.auth_creating_account
+import kmptemplate.libraries.resources.generated.resources.auth_email_label
+import kmptemplate.libraries.resources.generated.resources.auth_error_email_already_registered
+import kmptemplate.libraries.resources.generated.resources.auth_error_generic
+import kmptemplate.libraries.resources.generated.resources.auth_error_invalid_credentials
+import kmptemplate.libraries.resources.generated.resources.auth_error_invalid_email
+import kmptemplate.libraries.resources.generated.resources.auth_error_network
+import kmptemplate.libraries.resources.generated.resources.auth_error_provider_not_enabled
+import kmptemplate.libraries.resources.generated.resources.auth_error_rate_limited
+import kmptemplate.libraries.resources.generated.resources.auth_error_timeout
+import kmptemplate.libraries.resources.generated.resources.auth_error_weak_password
+import kmptemplate.libraries.resources.generated.resources.auth_forgot_password
+import kmptemplate.libraries.resources.generated.resources.auth_forgot_password_body
+import kmptemplate.libraries.resources.generated.resources.auth_forgot_password_sent_body
+import kmptemplate.libraries.resources.generated.resources.auth_forgot_password_sent_title
+import kmptemplate.libraries.resources.generated.resources.auth_forgot_password_title
+import kmptemplate.libraries.resources.generated.resources.auth_have_account_sign_in
+import kmptemplate.libraries.resources.generated.resources.auth_i_clicked_the_link
+import kmptemplate.libraries.resources.generated.resources.auth_no_account_create_one
+import kmptemplate.libraries.resources.generated.resources.auth_or_use_email
+import kmptemplate.libraries.resources.generated.resources.auth_password_label
+import kmptemplate.libraries.resources.generated.resources.auth_password_min_length_helper
+import kmptemplate.libraries.resources.generated.resources.auth_passwords_do_not_match
+import kmptemplate.libraries.resources.generated.resources.auth_resend_email
+import kmptemplate.libraries.resources.generated.resources.auth_resending
+import kmptemplate.libraries.resources.generated.resources.auth_send_reset_link
+import kmptemplate.libraries.resources.generated.resources.auth_sign_in
+import kmptemplate.libraries.resources.generated.resources.auth_sign_in_subtitle
+import kmptemplate.libraries.resources.generated.resources.auth_sign_in_title
+import kmptemplate.libraries.resources.generated.resources.auth_sign_in_with_apple
+import kmptemplate.libraries.resources.generated.resources.auth_sign_up_subtitle
+import kmptemplate.libraries.resources.generated.resources.auth_sign_up_title
+import kmptemplate.libraries.resources.generated.resources.auth_signing_in
+import kmptemplate.libraries.resources.generated.resources.auth_verify_email_body
+import kmptemplate.libraries.resources.generated.resources.auth_verify_email_body_no_address
+import kmptemplate.libraries.resources.generated.resources.auth_verify_email_title
+import kmptemplate.libraries.resources.generated.resources.auth_verify_resent
+import kmptemplate.libraries.resources.generated.resources.auth_verify_still_pending
+import kmptemplate.libraries.resources.generated.resources.common_back
+import kmptemplate.libraries.resources.generated.resources.common_sending
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -71,7 +118,7 @@ private fun AuthShell(
                     onClick = onBack,
                     icon = Icons.ChevronLeft(null),
                 ) {
-                    Text("Back")
+                    Text(stringResource(Res.string.common_back))
                 }
                 Spacer(modifier = Modifier.height(Dimension.D700))
                 content()
@@ -96,12 +143,12 @@ fun SignInScreen(
     }
     AuthShell(onBack = onBack) {
         Text(
-            text = "Welcome back",
+            text = stringResource(Res.string.auth_sign_in_title),
             typography = AppTheme.typography.Heading.H700,
         )
         Spacer(modifier = Modifier.height(Dimension.D300))
         Text(
-            text = "Sign in to pick up where you left off.",
+            text = stringResource(Res.string.auth_sign_in_subtitle),
             typography = AppTheme.typography.Body.B500,
             color = AppTheme.colors.textSecondary,
         )
@@ -112,7 +159,7 @@ fun SignInScreen(
             enabled = !state.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Continue with Google")
+            Text(stringResource(Res.string.auth_continue_with_google))
         }
         if (state.appleEnabled) {
             Spacer(modifier = Modifier.height(Dimension.D400))
@@ -123,12 +170,12 @@ fun SignInScreen(
                 enabled = !state.isSubmitting,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Sign in with Apple")
+                Text(stringResource(Res.string.auth_sign_in_with_apple))
             }
         }
         Spacer(modifier = Modifier.height(Dimension.D700))
         Text(
-            text = "or use your email",
+            text = stringResource(Res.string.auth_or_use_email),
             typography = AppTheme.typography.Body.B400,
             color = AppTheme.colors.textSecondary,
             textAlign = TextAlign.Center,
@@ -146,7 +193,7 @@ fun SignInScreen(
         PasswordField(
             value = state.password,
             onValueChange = { onAction(SignInAction.PasswordChanged(it)) },
-            label = "Password",
+            label = stringResource(Res.string.auth_password_label),
             enabled = !state.isSubmitting,
             imeAction = ImeAction.Go,
             onImeAction = { submit() },
@@ -164,7 +211,7 @@ fun SignInScreen(
             enabled = !state.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Forgot password?")
+            Text(stringResource(Res.string.auth_forgot_password))
         }
 
         Spacer(modifier = Modifier.height(Dimension.D500))
@@ -174,7 +221,13 @@ fun SignInScreen(
             enabled = state.canSubmit,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (state.isSubmitting) "Signing in…" else "Sign in")
+            Text(
+                if (state.isSubmitting) {
+                    stringResource(Res.string.auth_signing_in)
+                } else {
+                    stringResource(Res.string.auth_sign_in)
+                },
+            )
         }
 
         Spacer(modifier = Modifier.height(Dimension.D400))
@@ -184,7 +237,7 @@ fun SignInScreen(
             enabled = !state.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Don't have an account? Create one")
+            Text(stringResource(Res.string.auth_no_account_create_one))
         }
     }
 }
@@ -203,15 +256,19 @@ fun ForgotPasswordScreen(
     }
     AuthShell(onBack = onBack) {
         Text(
-            text = if (state.sent) "Check your inbox" else "Forgot your password?",
+            text = if (state.sent) {
+                stringResource(Res.string.auth_forgot_password_sent_title)
+            } else {
+                stringResource(Res.string.auth_forgot_password_title)
+            },
             typography = AppTheme.typography.Heading.H700,
         )
         Spacer(modifier = Modifier.height(Dimension.D300))
         Text(
             text = if (state.sent) {
-                "We sent a password reset link to ${state.email.trim()}."
+                stringResource(Res.string.auth_forgot_password_sent_body, state.email.trim())
             } else {
-                "Enter your email and we'll send you a reset link."
+                stringResource(Res.string.auth_forgot_password_body)
             },
             typography = AppTheme.typography.Body.B500,
             color = AppTheme.colors.textSecondary,
@@ -231,14 +288,13 @@ fun ForgotPasswordScreen(
         state.banner?.let { banner ->
             Spacer(modifier = Modifier.height(Dimension.D500))
             ErrorText(
-                when (banner) {
-                    ForgotPasswordState.Banner.RateLimited ->
-                        "Too many requests — give it a minute and try again."
-                    ForgotPasswordState.Banner.NetworkError ->
-                        "Couldn't reach the server. Check your connection and try again."
-                    ForgotPasswordState.Banner.GenericError ->
-                        "Something went wrong. Please try again."
-                },
+                stringResource(
+                    when (banner) {
+                        ForgotPasswordState.Banner.RateLimited -> Res.string.auth_error_rate_limited
+                        ForgotPasswordState.Banner.NetworkError -> Res.string.auth_error_network
+                        ForgotPasswordState.Banner.GenericError -> Res.string.auth_error_generic
+                    },
+                ),
             )
         }
 
@@ -249,7 +305,7 @@ fun ForgotPasswordScreen(
                 onClick = onBackToSignIn,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Back to sign in")
+                Text(stringResource(Res.string.auth_back_to_sign_in))
             }
         } else {
             ButtonPrimary(
@@ -257,7 +313,13 @@ fun ForgotPasswordScreen(
                 enabled = state.canSubmit,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(if (state.isSubmitting) "Sending…" else "Send reset link")
+                Text(
+                    if (state.isSubmitting) {
+                        stringResource(Res.string.common_sending)
+                    } else {
+                        stringResource(Res.string.auth_send_reset_link)
+                    },
+                )
             }
         }
     }
@@ -277,12 +339,12 @@ fun SignUpScreen(
     }
     AuthShell(onBack = onBack) {
         Text(
-            text = "Create your account",
+            text = stringResource(Res.string.auth_sign_up_title),
             typography = AppTheme.typography.Heading.H700,
         )
         Spacer(modifier = Modifier.height(Dimension.D300))
         Text(
-            text = "Save your progress and sign in from any device.",
+            text = stringResource(Res.string.auth_sign_up_subtitle),
             typography = AppTheme.typography.Body.B500,
             color = AppTheme.colors.textSecondary,
         )
@@ -298,20 +360,27 @@ fun SignUpScreen(
         PasswordField(
             value = state.password,
             onValueChange = { onAction(SignUpAction.PasswordChanged(it)) },
-            label = "Password",
+            label = stringResource(Res.string.auth_password_label),
             enabled = !state.isSubmitting,
             imeAction = ImeAction.Next,
-            helper = "At least ${SignUpState.MIN_PASSWORD_LENGTH} characters",
+            helper = stringResource(
+                Res.string.auth_password_min_length_helper,
+                SignUpState.MIN_PASSWORD_LENGTH,
+            ),
         )
         Spacer(modifier = Modifier.height(Dimension.D500))
         PasswordField(
             value = state.confirmPassword,
             onValueChange = { onAction(SignUpAction.ConfirmPasswordChanged(it)) },
-            label = "Confirm password",
+            label = stringResource(Res.string.auth_confirm_password_label),
             enabled = !state.isSubmitting,
             imeAction = ImeAction.Go,
             onImeAction = { submit() },
-            helper = if (state.passwordMismatch) "Passwords don't match" else null,
+            helper = if (state.passwordMismatch) {
+                stringResource(Res.string.auth_passwords_do_not_match)
+            } else {
+                null
+            },
             isError = state.passwordMismatch,
         )
 
@@ -327,7 +396,13 @@ fun SignUpScreen(
             enabled = state.canSubmit,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (state.isSubmitting) "Creating account…" else "Create account")
+            Text(
+                if (state.isSubmitting) {
+                    stringResource(Res.string.auth_creating_account)
+                } else {
+                    stringResource(Res.string.auth_create_account)
+                },
+            )
         }
 
         Spacer(modifier = Modifier.height(Dimension.D400))
@@ -337,7 +412,7 @@ fun SignUpScreen(
             enabled = !state.isSubmitting,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Already have an account? Sign in")
+            Text(stringResource(Res.string.auth_have_account_sign_in))
         }
     }
 }
@@ -354,7 +429,7 @@ fun VerifyEmailScreen(
     }
     AuthShell(onBack = onBack) {
         Text(
-            text = "Verify your email",
+            text = stringResource(Res.string.auth_verify_email_title),
             typography = AppTheme.typography.Heading.H700,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
@@ -363,9 +438,9 @@ fun VerifyEmailScreen(
 
         Text(
             text = if (state.email.isEmpty()) {
-                "We sent you a verification link. Tap it, then come back here."
+                stringResource(Res.string.auth_verify_email_body_no_address)
             } else {
-                "We sent a verification link to ${state.email}. Tap it, then come back here."
+                stringResource(Res.string.auth_verify_email_body, state.email)
             },
             typography = AppTheme.typography.Body.B500,
             color = AppTheme.colors.textSecondary,
@@ -385,7 +460,13 @@ fun VerifyEmailScreen(
             enabled = !state.isRefreshing,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (state.isRefreshing) "Checking…" else "I clicked the link")
+            Text(
+                if (state.isRefreshing) {
+                    stringResource(Res.string.auth_checking)
+                } else {
+                    stringResource(Res.string.auth_i_clicked_the_link)
+                },
+            )
         }
 
         Spacer(modifier = Modifier.height(Dimension.D400))
@@ -395,7 +476,13 @@ fun VerifyEmailScreen(
             enabled = !state.isResending && !state.isRefreshing && state.email.isNotEmpty(),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (state.isResending) "Resending…" else "Resend email")
+            Text(
+                if (state.isResending) {
+                    stringResource(Res.string.auth_resending)
+                } else {
+                    stringResource(Res.string.auth_resend_email)
+                },
+            )
         }
     }
 }
@@ -423,7 +510,7 @@ private fun EmailField(
             onGo = { onSubmitImeAction?.invoke() },
             onNext = { onSubmitImeAction?.invoke() },
         ),
-        label = { Text("Email") },
+        label = { Text(stringResource(Res.string.auth_email_label)) },
         modifier = Modifier.fillMaxWidth(),
     )
 }
@@ -479,20 +566,20 @@ private fun ErrorText(text: String) {
 
 @Composable
 private fun VerifyEmailBanner(banner: VerifyEmailState.Banner) {
-    val (text, color) = when (banner) {
+    val (copy, color) = when (banner) {
         VerifyEmailState.Banner.StillPending ->
-            "Not confirmed yet — check your inbox and tap the link." to AppTheme.colors.textSecondary
+            Res.string.auth_verify_still_pending to AppTheme.colors.textSecondary
         VerifyEmailState.Banner.ResendSent ->
-            "Verification email sent." to AppTheme.colors.textSecondary
+            Res.string.auth_verify_resent to AppTheme.colors.textSecondary
         VerifyEmailState.Banner.ResendRateLimited ->
-            "Too many requests — give it a minute and try again." to AppTheme.colors.danger
+            Res.string.auth_error_rate_limited to AppTheme.colors.danger
         VerifyEmailState.Banner.NetworkError ->
-            "Couldn't reach the server. Check your connection and try again." to AppTheme.colors.danger
+            Res.string.auth_error_network to AppTheme.colors.danger
         VerifyEmailState.Banner.GenericError ->
-            "Something went wrong. Please try again." to AppTheme.colors.danger
+            Res.string.auth_error_generic to AppTheme.colors.danger
     }
     Text(
-        text = text,
+        text = stringResource(copy),
         typography = AppTheme.typography.Body.B500,
         color = color,
         textAlign = TextAlign.Center,
@@ -500,20 +587,23 @@ private fun VerifyEmailBanner(banner: VerifyEmailState.Banner) {
     )
 }
 
+@Composable
 private fun SignInError.message(): String = when (this) {
-    SignInError.InvalidCredentials -> "That email and password don't match. Try again."
-    SignInError.NetworkError -> "Couldn't reach the server. Check your connection and try again."
-    SignInError.ProviderNotEnabled -> "That sign-in method isn't available right now."
-    SignInError.Unknown -> "Something went wrong. Please try again."
+    SignInError.InvalidCredentials -> stringResource(Res.string.auth_error_invalid_credentials)
+    SignInError.NetworkError -> stringResource(Res.string.auth_error_network)
+    SignInError.ProviderNotEnabled -> stringResource(Res.string.auth_error_provider_not_enabled)
+    SignInError.Unknown -> stringResource(Res.string.auth_error_generic)
 }
 
+@Composable
 private fun SignUpError.message(): String = when (this) {
-    SignUpError.EmailAlreadyRegistered -> "That email is already registered. Try signing in instead."
-    is SignUpError.WeakPassword -> "Password must be at least $minLength characters."
-    SignUpError.InvalidEmail -> "That doesn't look like a valid email address."
-    SignUpError.NetworkError -> "Couldn't reach the server. Check your connection and try again."
-    SignUpError.Timeout -> "That's taking longer than usual. Please try again."
-    SignUpError.Unknown -> "Something went wrong. Please try again."
+    SignUpError.EmailAlreadyRegistered ->
+        stringResource(Res.string.auth_error_email_already_registered)
+    is SignUpError.WeakPassword -> stringResource(Res.string.auth_error_weak_password, minLength)
+    SignUpError.InvalidEmail -> stringResource(Res.string.auth_error_invalid_email)
+    SignUpError.NetworkError -> stringResource(Res.string.auth_error_network)
+    SignUpError.Timeout -> stringResource(Res.string.auth_error_timeout)
+    SignUpError.Unknown -> stringResource(Res.string.auth_error_generic)
 }
 
 @Preview
