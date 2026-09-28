@@ -137,7 +137,7 @@ if grep -rIn --exclude-dir=.git 'This template' docs SETUP.md >/tmp/verify_templ
 fi
 
 # 4. Executable bits survived the copy.
-for f in gradlew scripts/install_hooks.sh .githooks/commit-msg .githooks/post-commit; do
+for f in gradlew scripts/install_hooks.sh scripts/dev/drive.py .githooks/commit-msg .githooks/post-commit; do
   [ -x "$f" ] || fail "$f is not executable"
 done
 if [ -f .githooks/pre-push ] && [ ! -x .githooks/pre-push ]; then

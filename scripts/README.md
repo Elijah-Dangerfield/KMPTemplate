@@ -44,6 +44,31 @@ Creates new KMP modules with proper structure and configuration.
 ./scripts/create_module.main.kts library user:preferences  # sub-module
 ```
 
+## dev/drive.py
+
+Drives the app on a connected Android device or emulator, so UI work can be
+verified without a human at the screen. Python 3 standard library plus `adb`:
+
+```bash
+./scripts/dev/drive.py launch [--fresh]   # start the app, wait for its first frame
+./scripts/dev/drive.py text               # every label on screen
+./scripts/dev/drive.py tap "Continue"     # tap the node whose label matches
+./scripts/dev/drive.py shot /tmp/home.png # save a screenshot
+./scripts/dev/drive.py --dry-run launch   # print the adb commands, run nothing
+```
+
+Nothing takes coordinates. It dumps the accessibility tree and taps by `text`
+or `content-desc`, which survives a layout shift and a slow boot; a pixel
+guess does not. The package comes from `applicationId` in
+`versions.properties` (plus the debug suffix), and the launcher activity is
+resolved on the device, so neither is written down anywhere to go stale.
+
+`launch` uses `am start`, **not** `monkey -p <pkg> -c LAUNCHER 1`. Monkey's
+trailing count is the number of random input events it fires after the app
+starts, so the obvious incantation taps the first frame on every launch. The
+script's docstring has the measured cost and is the reason not to "simplify"
+it back.
+
 ## setup.main.kts
 
 The one entry point. Walks every setup step in the order its dependencies

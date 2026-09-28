@@ -436,6 +436,7 @@ fun ensureExecutableBits(projectDir: File) {
         "scripts/setup_sentry_ci.sh",
         "scripts/cleanup.sh",
         "scripts/create_module.main.kts",
+        "scripts/dev/drive.py",
         "scripts/setup.main.kts",
         "scripts/setup_sentry.main.kts",
         "scripts/setup_supabase.main.kts",
