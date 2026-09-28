@@ -283,27 +283,46 @@ def shot(adb: Adb, path: str) -> int:
 
 
 def main() -> int:
+    # Shared options live on the subcommands, not on the top-level parser, so
+    # the spelling that works is `drive.py launch --dry-run`. That is the one
+    # people reach for; `drive.py --dry-run launch` is rejected outright with
+    # "unrecognized arguments".
+    #
+    # Rejected outright is the requirement, and putting them in *both* places is
+    # the trap. A subparser writes into the same namespace after the top-level
+    # parser has, so an ordinary `False` default on the subcommand's copy
+    # silently overwrites a `--dry-run` passed before the subcommand, and the
+    # run touches the device for real while the caller believes it is a
+    # rehearsal. `default=argparse.SUPPRESS` does not save it either: with
+    # subparsers the top-level value is still lost. Declared once, a
+    # misplacement is a parse error, which is the only failure mode worth
+    # having on a flag whose whole job is "do not act on the device".
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--device", help="adb serial, when more than one is attached")
+    common.add_argument("--package", help="override the resolved package name")
+    common.add_argument("--dry-run", action="store_true",
+                        help="print the adb commands instead of running them")
+
     parser = argparse.ArgumentParser(
         prog="drive.py",
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--device", help="adb serial, when more than one is attached")
-    parser.add_argument("--package", help="override the resolved package name")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="print the adb commands instead of running them")
     commands = parser.add_subparsers(dest="command", required=True)
 
-    launch_command = commands.add_parser("launch", help="start the app and wait for its first frame")
+    launch_command = commands.add_parser(
+        "launch", parents=[common], help="start the app and wait for its first frame")
     launch_command.add_argument("--fresh", action="store_true",
                                 help="pm clear first, for a clean-install run")
-    tap_command = commands.add_parser("tap", help="tap the node whose label contains TEXT")
+    tap_command = commands.add_parser(
+        "tap", parents=[common], help="tap the node whose label contains TEXT")
     tap_command.add_argument("text")
     tap_command.add_argument("--timeout", type=float, default=30.0,
                              help="seconds to wait for the node to appear (default: 30)")
-    shot_command = commands.add_parser("shot", help="save a PNG screenshot")
+    shot_command = commands.add_parser(
+        "shot", parents=[common], help="save a PNG screenshot")
     shot_command.add_argument("path")
-    commands.add_parser("text", help="print every label on screen")
+    commands.add_parser("text", parents=[common], help="print every label on screen")
 
     args = parser.parse_args()
     # A dry run must work with nothing attached, so it takes --device as given.
