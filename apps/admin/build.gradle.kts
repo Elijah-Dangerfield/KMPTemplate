@@ -30,10 +30,11 @@ plugins {
 // The client DI graph that owns the live `Set<ConfiguredValue<*>>` is Android/
 // iOS-only, so it can't be enumerated from this JS module. The registry is a
 // maintained list of the scalar (targetable) flags — keep it in sync with the
-// real ConfiguredValue classes when you add one (a drift test against the DI
-// graph's Set<ConfiguredValue<*>> is the pattern once an integration-test
-// module exists). Composite (JsonConfigValue) flags are intentionally omitted —
-// they aren't targeted per version/locale and their defaults are large.
+// real ConfiguredValue classes when you add one. The validation below is
+// structural only; ConfigManifestRegistryDriftTest in :apps:integration is what
+// holds the contents against the classes. Composite (JsonConfigValue) flags are
+// intentionally omitted — they aren't targeted per version/locale and their
+// defaults are large.
 val exportConfigManifest = tasks.register("exportConfigManifest") {
     description = "Validate config-manifest-registry.json and write the upload payload for CI."
     val versionsFile = rootProject.file("versions.properties")

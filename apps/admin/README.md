@@ -164,13 +164,22 @@ module nor a JVM build task can read it directly). Two guards keep it from drift
 - `exportConfigManifest` **structurally validates** it (valid types, unique paths,
   each default matches its declared type, enum defaults ∈ allowed values) and fails
   the build on any inconsistency.
-- A drift test that instantiates the **real** scalar `ConfiguredValue` classes and
-  compares them to the registry is the second guard once an integration-test
-  module exists, until then the review discipline is manual.
+- `ConfigManifestRegistryDriftTest` in `:apps:integration` instantiates the **real**
+  scalar `ConfiguredValue` classes and compares path, type, default and allowed
+  values against the registry. It runs under the ordinary `testDebugUnitTest`
+  sweep and prints the JSON line to paste when it fails.
 
 So: when you add, remove, or change a scalar `ConfiguredValue`, update
 `config-manifest-registry.json` in the same change.
 Composite (`JsonConfigValue`) flags are intentionally omitted.
+
+The `upgrade.*` kill switches are the one set of rows with no `ConfiguredValue`
+behind them: they are seeded by the V4 migration and driven from the panel above,
+and no client code reads them yet. Their rows stay because `ConfigSchema` waves
+through any path the manifest does not mention, so deleting them is what would let
+`maintenanceMode = "banana"` through the admin API. The drift test names them
+explicitly and fails if one ever gains a `ConfiguredValue` without leaving that
+list.
 
 ## Why this exists / scope
 

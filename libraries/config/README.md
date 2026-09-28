@@ -81,4 +81,6 @@ The tree comes from the server's `app_config_values` + `app_config_rules`
 tables (see `apps/server`), managed through the admin console in `apps/admin`.
 When you add a scalar flag, also add it to
 `apps/admin/config-manifest-registry.json` so the admin tool knows the in-code
-default it is overriding.
+default it is overriding. `ConfigManifestRegistryDriftTest` in `:apps:integration`
+instantiates the real value classes and fails when the two disagree, and prints
+the JSON line to paste.

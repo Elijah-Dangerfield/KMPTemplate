@@ -36,6 +36,17 @@ kotlin {
             implementation(projects.libraries.flowroutines)
             implementation(projects.libraries.core)
 
+            // ConfigManifestRegistryDriftTest instantiates the real
+            // `ConfiguredValue` classes. They are spread across two impl
+            // modules that cannot see each other — `:libraries:config:impl`
+            // owns `config.refreshThrottleMs`, `:libraries:telemetry:impl` owns
+            // the `telemetry.*` three — so an `:apps:*` module is the only
+            // place a test can hold the whole declared key set at once.
+            implementation(projects.libraries.config)
+            implementation(projects.libraries.config.impl)
+            implementation(projects.libraries.telemetry.impl)
+            implementation(libs.kotlinx.serialization.json)
+
             // Boot a real server on an ephemeral port + verify HS256 test JWTs.
             // Declared here because :apps:server's dependencies are
             // `implementation`-scoped and don't leak to consumers' compile
@@ -59,4 +70,40 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
     }
+}
+
+// ── Files these tests read at runtime, declared so Gradle can see them ────────
+//
+// ConfigManifestRegistryDriftTest reads a committed JSON file and an Android
+// unit test's working directory is not worth guessing at, so the paths are
+// handed in as system properties — a wrong guess reads nothing and passes.
+//
+// The `inputs.file`/`inputs.files` declarations are the load-bearing half, and
+// the non-obvious one. **A file read at test *runtime* is invisible to Gradle's
+// up-to-date check.** Without these declarations,
+// editing the registry alone leaves `testDebugUnitTest` UP-TO-DATE and the
+// drift ships: downstream, the first mutation run reported BUILD SUCCESSFUL
+// against a registry with a key deleted and three values wrong. The rule
+// generalises to any test whose subject is a file rather than a class.
+tasks.withType<Test>().configureEach {
+    val repoRoot = rootProject.layout.projectDirectory
+    systemProperty("repoRoot", repoRoot.asFile.absolutePath)
+
+    val registry = rootProject.file("apps/admin/config-manifest-registry.json")
+    inputs.file(registry).withPropertyName("configManifestRegistry")
+    systemProperty("configManifestRegistry", registry.absolutePath)
+
+    // The same hole one level along: the test also greps the Kotlin tree for
+    // `ConfiguredValue` declarations, which Gradle cannot see either. A
+    // filtered tree rather than `inputs.dir` — declaring the directories
+    // wholesale sweeps in `*/build/**`, which is another task's output, and
+    // Gradle rejects the undeclared dependency. `.claude/` holds agent
+    // worktrees, which are full checkouts of this repo, so without excluding it
+    // the inputs change every time an agent edits anything.
+    inputs.files(
+        rootProject.fileTree(repoRoot) {
+            include("libraries/**/*.kt", "features/**/*.kt", "apps/**/*.kt")
+            exclude("**/build/**", ".claude/**")
+        },
+    ).withPropertyName("sourceTreeScan")
 }
