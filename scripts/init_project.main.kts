@@ -1152,6 +1152,17 @@ fun stripServerFromSourceComments(projectDir: File) {
     applyEdits(File(projectDir, "gradle/libs.versions.toml"), listOf(
         "# JWKS (see :apps:server). Only the GoTrue/auth module is needed client-side." to
             "# Only the GoTrue/auth module is needed client-side.",
+        "# The composition test tier: a real composition driven on the host JVM under\n" +
+            "# Robolectric, the same host-JVM-Android path :apps:integration already uses.\n" to
+            "# The composition test tier: a real composition driven on the host JVM under\n" +
+                "# Robolectric, an Android unit test like any other.\n",
+    ))
+
+    applyEdits(File(projectDir, "libraries/navigation/build.gradle.kts"), listOf(
+        "for the reason\n" +
+            "        // `:apps:integration` already gives: the Android variants already run on " +
+            "the host JVM." to
+            "because the Android\n        // variants already run on the host JVM.",
     ))
 
     applyEdits(File(projectDir, "config/detekt/detekt.yml"), listOf(
@@ -1183,6 +1194,11 @@ fun stripServerFromTestingDoc(file: File) {
         " Integration tests use a **real** Main\n" +
             "  dispatcher (`Dispatchers.setMain(Dispatchers.Default)`) because real sockets\n" +
             "  run on real threads." to "",
+        "That is a lot of\nshipped surface invented to serve tests, and it contradicts the " +
+            "stance\n`:apps:integration` already took: reuse the Android variants on the host " +
+            "JVM." to
+            "That is a lot of\nshipped surface invented to serve tests, and this repo already " +
+                "runs its\nAndroid variants on the host JVM everywhere else.",
     ))
 }
 

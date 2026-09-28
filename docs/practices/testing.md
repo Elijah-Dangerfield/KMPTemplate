@@ -16,6 +16,10 @@ layer, the cheapest layer that can fail when it breaks.
   `assertState {}` DSL next to them so tests read as user scenarios.
   `HomeScenario` / `HomeScenarioTest` demonstrate the shape. It's a pattern,
   not a framework, copy and adapt, don't generalize.
+- **Composition tests** (`androidUnitTest` in a Compose module): a real
+  composition, driven and asserted on the host JVM. Only for claims that are
+  about composition itself: effects running and disposing, recomposition, what
+  is on screen. See below.
 - **Server unit + route tests** (`:apps:server` `src/test`): plugins and
   routes through Ktor's `testApplication`, repositories over Testcontainers
   Postgres (`DatabaseTest` base class).
@@ -25,6 +29,56 @@ layer, the cheapest layer that can fail when it breaks.
   + auth + repository + route integrate; the client side is Ktor's test client.
 - **End-to-end integration** (`:apps:integration`): the real *client* stack
   against the real server. See below.
+
+## Composition tests
+
+`FloatingWindowHostTest` (`:libraries:navigation`) is the worked example and the
+first thing in this repo that ever asserted against a composition. It drives a
+real `NavController` and the real `FloatingWindowHost` through push and pop, and
+asserts that the popped entry was released and that the window's state was
+scoped to its own back stack entry. Those are claims about effects running,
+disposing, and the owners a composable sees, which no view-model test can reach.
+
+The recipe, to copy:
+
+```kotlin
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35])
+class MyThingTest {
+    @get:Rule val compose = createComposeRule()
+    …
+}
+```
+
+Where it lives and why: **`androidUnitTest`, not `commonTest`, and not a `jvm()`
+target.** `commonTest` also compiles for iOS, where none of the harness
+resolves. A `jvm()` target would be the Compose Multiplatform-idiomatic answer
+(`runComposeUiTest` on desktop) but it cascades through every library that
+already carries an `actual` (core, ui, networking, storage, telemetry), each
+needing a third implementation written for nobody, plus a third value on the
+two-case `Platform` enum that several exhaustive `when`s read. That is a lot of
+shipped surface invented to serve tests, and it contradicts the stance
+`:apps:integration` already took: reuse the Android variants on the host JVM.
+
+Setup lives in `libraries/navigation/build.gradle.kts`. Two parts are
+load-bearing and worth copying wholesale into the next module that wants this:
+`testOptions.unitTests.isIncludeAndroidResources = true`, and the
+`stageRobolectricJars` task. The second resolves Robolectric's Android framework
+jar through Gradle and runs Robolectric offline against the staged copy, instead
+of letting it fetch ~200MB from Maven into `~/.m2` at test time. Nothing caches
+`~/.m2` on CI, and a network call inside a test is how a tier earns a reputation
+for flaking.
+
+It runs under `./gradlew testDebugUnitTest`, so CI's existing unit-test job
+already covers it.
+
+**What this layer is not for.** It is slow (a Robolectric sandbox per class) and
+it is the easiest place in the codebase to write something that passes for the
+wrong reason. Anything a view-model test or a pure-function test can answer
+belongs there instead. Mutate the thing you think you are covering and watch the
+test go red before you believe it: several branches in `FloatingWindowHost` turn
+out to be unreachable from outside the host, and the test file names them rather
+than implying coverage it does not have.
 
 ## The integration harness (`:apps:integration`)
 
@@ -78,6 +132,7 @@ and the higher one doesn't get written.
 | Route status codes, error envelopes, auth challenge shapes | `:apps:server` route tests | not integration |
 | SQL, migrations, repository contracts | `:apps:server` Testcontainers tests | not route tests |
 | DI graph constructs against a live DB | `FullStackMeTest` | not per-repository tests |
+| Effects running/disposing, recomposition, what is on screen | composition tests | not VM tests, which cannot see a composition |
 | Client↔server contract drift (serialization, headers, auth handshake, real HTTP semantics) | `:apps:integration` | not unit tests with canned JSON |
 
 Integration tests aren't a substitute for unit tests, they're slower and
