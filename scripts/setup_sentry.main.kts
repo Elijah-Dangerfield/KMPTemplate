@@ -250,6 +250,56 @@ fun printManualCiCommands(org: String, project: String) {
     )
 }
 
+/**
+ * Whether [token] can actually upload debug files to [org], checked before the
+ * secret is set rather than discovered from a failed release build.
+ *
+ * A token that authenticates but cannot upload is indistinguishable from a
+ * working one until something needs it, and the failure hides well: on iOS
+ * fastlane logs sentry-cli's error and carries on, so the run stays green. An
+ * app generated from this template carried a rejected token for nine days
+ * before an Android release job surfaced it as "Invalid org token (401)".
+ *
+ * `/organizations/<org>/chunk-upload/` is the endpoint sentry-cli uploads
+ * through, so a 200 means the thing CI does will work. The friendlier-looking
+ * endpoints are actively wrong here: an `org:ci` token answers 403 to
+ * `/organizations/<org>/` and `/projects/<org>/<project>/` while being
+ * perfectly good for uploads, so validating against those would reject working
+ * tokens.
+ *
+ * A network failure is not a verdict on the token, so it warns and proceeds.
+ * Only an answer from Sentry refuses.
+ */
+fun ciTokenCanUpload(token: String, org: String): Boolean {
+    val response = try {
+        request("GET", "https://sentry.io/api/0/organizations/$org/chunk-upload/", token = token)
+    } catch (e: Exception) {
+        yellow("Could not reach sentry.io to check the token (${e.message}). Setting it unchecked.")
+        return true
+    }
+    if (response.isSuccess) {
+        green("✓ Token can upload to $org")
+        return true
+    }
+    val reason = when (response.code) {
+        401 -> "rejected outright, so it is revoked, expired, or was mistyped"
+        403 -> "authenticates but lacks the org:ci scope uploads need"
+        404 -> "no such organization, so check the org slug rather than the token"
+        else -> "unexpected response"
+    }
+    red("That token cannot upload: HTTP ${response.code}, $reason")
+    yellow("Nothing was set, deliberately: a token that fails here fails in CI, where")
+    yellow("iOS logs the error and stays green.")
+    // Named only when it is actually present. It ships with CI, and this script
+    // runs whether or not CI was enabled.
+    if (File("scripts/setup_sentry_ci.sh").exists()) {
+        yellow("Fix the token, then ./scripts/setup_sentry_ci.sh sets just this secret.")
+    } else {
+        yellow("Fix the token, then re-run this script.")
+    }
+    return false
+}
+
 fun configureCi(org: String, project: String, values: SetupValues, interactive: Boolean) {
     bold("\nCI configuration")
     when (githubCliState()) {
@@ -290,6 +340,7 @@ fun configureCi(org: String, project: String, values: SetupValues, interactive: 
     if (!ciToken.startsWith("sntrys_")) {
         yellow("That does not look like an organization token. Setting it anyway, CI needs org:ci.")
     }
+    if (!ciTokenCanUpload(ciToken, org)) return
     if (runGh("secret", "set", "SENTRY_AUTH_TOKEN", stdin = ciToken)) {
         green("✓ Set repo secret SENTRY_AUTH_TOKEN")
     } else {

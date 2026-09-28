@@ -433,6 +433,7 @@ fun ensureExecutableBits(projectDir: File) {
         "scripts/install_hooks.sh",
         "scripts/enable_ci.sh",
         "scripts/setup_legal_sync.sh",
+        "scripts/setup_sentry_ci.sh",
         "scripts/cleanup.sh",
         "scripts/create_module.main.kts",
         "scripts/setup.main.kts",

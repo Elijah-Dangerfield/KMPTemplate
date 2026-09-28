@@ -13,6 +13,13 @@ if [ ! -d template/ci ]; then
 fi
 
 cp -R template/ci/. .
+
+# The staging copy lost its executable bits: init_project.main.kts copies with
+# File.copyTo, which drops the mode, and `cp -R` above faithfully preserves what
+# it finds. Restoring them here rather than in the copy above keeps the one
+# place that knows which staged files are scripts.
+chmod +x scripts/setup_legal_sync.sh scripts/setup_sentry_ci.sh
+
 rm -rf template
 rm -- scripts/enable_ci.sh
 

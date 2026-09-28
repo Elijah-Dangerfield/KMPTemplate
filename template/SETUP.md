@@ -107,6 +107,15 @@ identical to a working one.
 
 Re-run it any time; every step is an upsert.
 
+**Rotating or fixing just the CI token.** `./scripts/setup_sentry_ci.sh` sets
+`SENTRY_AUTH_TOKEN` and nothing else, and it proves the token can upload before
+it sets it. That check is the reason the script exists: a token that
+authenticates but cannot upload looks exactly like a working one, and on iOS
+fastlane logs sentry-cli's rejection and carries on, so the run stays green. One
+app generated from this template carried a rejected token for nine days that
+way. The full script above validates too, so reach for this one when you only
+want to swap the token.
+
 **Get the right token.** Sentry has two kinds and they are not interchangeable:
 
 **The prefix is how you tell them apart.** `sntryu_` is personal, `sntrys_` is organization.
