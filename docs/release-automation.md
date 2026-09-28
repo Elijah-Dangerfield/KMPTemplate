@@ -215,6 +215,30 @@ The pipeline ships only the binary + release notes (`skip_metadata: true`, `skip
 - [ ] Content rating, target audience, data safety, category, contact
 - [ ] **Ship the first production release manually from Play Console.** `r0adkll/upload-google-play` can't push to production until there's an approved prod release to update. Use `track: internal` in [release.yml](../.github/workflows/release.yml) for the first few releases if you prefer automation all the way down.
 
+### Beta builds belong on your machine
+
+`beta.yml` exists for the times CI itself is what you are testing: the runner image, the
+secrets, the workflow file. For everything else run the same lane locally:
+
+```bash
+./scripts/beta_ios.sh
+```
+
+A hosted macOS runner starts from nothing every time. A beta run on 2026-09-28 spent over ten
+minutes on the Kotlin/Native release link before it reached the archive, and forty-three
+minutes in total; your machine has those caches already.
+
+The script does not reimplement the lane. It finds the values the workflow passes as secrets
+and variables, from the credential store the setup scripts write, encodes the App Store
+Connect `.p8` the way a CI secret carries it, reads the Sentry org and project from the repo's
+own variables, and hands off to fastlane. Anything already exported wins.
+
+Two things it sets that are easy to get wrong by hand. `RELEASE_CHANNEL_OVERRIDE` is `beta`,
+as the workflow sets it, so the build asks for test ad units rather than live ones. `CI` is
+deliberately left unset, because that sends the Fastfile down the runner path and fails on a
+`.p12` your machine does not have; with it unset the build signs from your own keychain, which
+is what the Fastfile intends for a local run.
+
 ### One-time legal-sync setup
 
 The privacy policy and terms of service live in [legal/](../legal/) as Markdown and are published to
