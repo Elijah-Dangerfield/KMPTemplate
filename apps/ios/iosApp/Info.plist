@@ -24,8 +24,23 @@
 	  the app there. CFBundleDisplayName, the home-screen name, is separate and
 	  is INFOPLIST_KEY_CFBundleDisplayName in the target's build settings.
 	-->
-	<key>NSUserNotificationsUsageDescription</key>
-	<string>We'd like to send you notifications.</string>
+	<!--
+	  There is deliberately no NSUserNotificationsUsageDescription here, and
+	  adding one back needs a reason.
+
+	  The template used to ship it with the string "We'd like to send you
+	  notifications." in an app that posts none. It cost nothing while unused
+	  and was invisible while wrong, because iOS does not display it: the
+	  notification prompt is system-written, and the permission comes from
+	  UNUserNotificationCenter.requestAuthorization at runtime, not from a
+	  purpose string. So the first reader of that sentence is a reviewer
+	  comparing declared intent against the App Privacy answers, by which point
+	  it is a question to answer rather than a line to edit.
+
+	  If you add notifications, ask for authorization in code and say what you
+	  send in the App Store Connect listing. Reach for this key only if you have
+	  something specific to declare; a placeholder is worse than its absence.
+	-->
 	<!--
 	  The export compliance answer, stated once here instead of by hand on every
 	  upload. Without it a build finishes processing and then sits in TestFlight

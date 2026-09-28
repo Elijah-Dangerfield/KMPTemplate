@@ -312,7 +312,7 @@ The release-please PR shows a `!!! FIRST RELEASE !!!` banner the first time arou
 Drop your icons into:
 
 - **iOS** → `apps/ios/iosApp/Assets.xcassets/AppIcon.appiconset/` (replace the placeholder set).
-- **Android** → `apps/compose/src/androidMain/res/mipmap-*/` (replace `ic_launcher*.webp`).
+- **Android** → `apps/compose/src/androidMain/res/mipmap-*/` (replace `ic_launcher*.webp`). Three more pieces live outside those folders and are easy to leave as the placeholder: the background colour in `res/values/ic_launcher_background.xml`, the themed-icon layer in `res/drawable/ic_launcher_monochrome.xml`, and the adaptive icon itself in `res/mipmap-anydpi-v26/`. The monochrome layer is one flat colour by design — the launcher tints it, so a copy of your colour artwork comes out as a filled rectangle.
 - **Shared** (used by Compose splash, about screens, etc.) → `libraries/resources/src/commonMain/composeResources/drawable/`.
 - **Website** → `public/apps/<app-slug>.png` in the studio site repo, which is where the app's page and legal documents live.
 
