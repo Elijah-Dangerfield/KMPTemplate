@@ -125,3 +125,60 @@ deep link open, with a comment asserting the opposite.
 events and by installing a signed `store` channel APK to confirm the gate. The
 claims about this repo's files were checked by reading them.
 
+
+---
+
+## App Store Connect blocks every build on an encryption question nobody answered
+
+**What it is.** One key in `apps/ios/iosApp/Info.plist`:
+
+```xml
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
+```
+
+It answers the "App Encryption Documentation" prompt App Store Connect raises
+against every uploaded build. Without it, a person has to open the build in the
+browser and click through a four-option radio dialog before that build can go
+anywhere, including to internal TestFlight testers.
+
+Deliberately not fixed in the template. The key is a declaration on an export
+form, not a build setting, and baking it in would have every generated app
+inherit a claim about its own cryptography that nobody in that app ever made.
+An app that later encrypts its cache would keep shipping `false` and nothing
+would say otherwise. The fifteen minutes this entry costs the next person are
+the point.
+
+**How it looks from the outside.** A build reaches TestFlight, processes
+successfully, and then sits there. TestFlight shows "Missing Compliance" next to
+it. Nothing failed, no email arrives, and the release workflow is green, because
+from CI's point of view the upload worked. The first symptom is usually a tester
+saying they never got the build.
+
+**Why it is hard to spot.** The dialog's four options are written for firmware
+exporters, and the honest-looking answer is the wrong one. Most apps make HTTPS
+calls, so "Standard encryption algorithms instead of, or in addition to, using
+or accessing the encryption within Apple's operating system" reads like a
+description of what the app does. It is not. HTTPS through `NSURLSession` *is*
+the encryption within Apple's operating system, which that option exists to
+exclude. Choosing it commits you to a CCATS filing and an annual
+self-classification report that a puzzle game has no business filing.
+
+The answer is "None of the algorithms mentioned above" for any app that calls
+Apple's networking and implements no cryptography itself. Establish that rather
+than assuming it: grep for `CryptoKit`, `CommonCrypto` and any local encrypt or
+decrypt implementation, and check whether the SPM dependencies carry their own
+TLS. Most do not; anything Firebase or gRPC-based bundles BoringSSL and does.
+
+**Where it hooks in.** `apps/ios/iosApp/Info.plist`. `GENERATE_INFOPLIST_FILE`
+is `YES`, but Xcode does not generate this key, so a value in the file survives
+(unlike `CFBundleName`, which it does generate and does clobber). Drop2048 pairs
+the key with `docs/store/export-compliance.md`, recording what was checked and
+what would make the declaration false later; that doc is the half worth copying,
+because the key without it is just an unexamined `false`.
+
+**Provenance.** Drop2048, 2026-09-28, hit on the first v0.2.0 TestFlight build.
+Verified in this repo: `apps/ios/iosApp/Info.plist` does not carry the key, and
+`GENERATE_INFOPLIST_FILE = YES` with `INFOPLIST_FILE` set is what the project
+does today. The claim that Xcode leaves this key alone is reported from
+Drop2048, not re-verified here.
