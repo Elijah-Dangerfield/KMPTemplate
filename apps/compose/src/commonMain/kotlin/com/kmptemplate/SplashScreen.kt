@@ -51,16 +51,21 @@ fun SplashOverlay(
         }
     }
 
-    SplashContent(alpha = alpha.value)
+    SplashContent(alpha = { alpha.value })
 }
 
+/**
+ * Takes the fade as a lambda, not a `Float`, so the read happens in the draw
+ * phase inside `graphicsLayer`. Passing `alpha.value` would subscribe the
+ * caller to a value that moves every frame for the whole splash.
+ */
 @Composable
-private fun SplashContent(alpha: Float) {
+private fun SplashContent(alpha: () -> Float) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(AppTheme.colors.background.color)
-            .graphicsLayer { this.alpha = alpha },
+            .graphicsLayer { this.alpha = alpha() },
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -76,6 +81,6 @@ private fun SplashContent(alpha: Float) {
 @Composable
 private fun PreviewSplashOverlay() {
     PreviewContent {
-        SplashContent(alpha = 1f)
+        SplashContent(alpha = { 1f })
     }
 }
