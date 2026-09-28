@@ -19,7 +19,16 @@ class RealAppDatabaseProvider @Inject constructor(
             .create()
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(dispatcherProvider.io)
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            // Only the pre-app template schemas may be dropped. Everything from
+            // AppDatabase.FIRST_APP_DATA_VERSION up has to migrate: this file on
+            // the device may be the only copy of what the user has. See
+            // AppDatabase for what belongs in the autoMigrations list.
+            .fallbackToDestructiveMigrationFrom(
+                dropAllTables = true,
+                *DROPPABLE_TEMPLATE_SCHEMA_VERSIONS,
+            )
             .build()
     }
 }
+
+private val DROPPABLE_TEMPLATE_SCHEMA_VERSIONS = intArrayOf(1, 2, 3, 4)
