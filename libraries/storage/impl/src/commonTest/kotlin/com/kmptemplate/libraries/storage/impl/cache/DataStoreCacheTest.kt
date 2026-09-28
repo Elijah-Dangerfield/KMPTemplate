@@ -8,6 +8,7 @@ import com.kmptemplate.libraries.storage.FileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import okio.FileSystem
@@ -49,6 +50,31 @@ class DataStoreCacheTest {
         }
 
         assertEquals(Counters(a = WRITES, b = WRITES), cache.get())
+    }
+
+    @Test
+    fun clearResetsTheStoredValueToTheSerializerDefault() = runTest {
+        val cache = newCache("clear-get")
+        cache.set(Counters(a = 7, b = 9))
+
+        cache.clear()
+
+        assertEquals(Counters(), cache.get())
+    }
+
+    /**
+     * The half that correcting the file name would not have fixed: `DataStore`
+     * serves readers from memory, so a reader still on the old value is the
+     * symptom even once the file on disk is gone.
+     */
+    @Test
+    fun clearIsVisibleToAReaderOfUpdates() = runTest {
+        val cache = newCache("clear-updates")
+        cache.set(Counters(a = 7, b = 9))
+
+        cache.clear()
+
+        assertEquals(Counters(), cache.updates.first())
     }
 
     private fun newCache(name: String): Cache<Counters> =

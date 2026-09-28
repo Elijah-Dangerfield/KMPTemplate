@@ -82,7 +82,7 @@ class DataStoreCacheFactory (
 
         return DataStoreCache(
             dataStore,
-            deleteFile = { fileManager.deleteFile(name) }
+            defaultValue = { serializer.read(null) },
         )
     }
 
@@ -103,7 +103,7 @@ class DataStoreCacheFactory (
 
 private class DataStoreCache<T : Any>(
     private val dataStore: DataStore<T>,
-    private val deleteFile: () -> Unit,
+    private val defaultValue: suspend () -> T,
 ) : Cache<T> {
 
     override val updates: Flow<T> = dataStore.data
@@ -126,5 +126,27 @@ private class DataStoreCache<T : Any>(
      */
     override suspend fun update(transform: (T) -> T): T = dataStore.updateData(transform)
 
-    override suspend fun clear() { deleteFile() }
+    /**
+     * Writes the default back rather than deleting the file.
+     *
+     * Deleting was both wrong and invisible. Wrong because the path passed to
+     * `deleteFile` was `name` while the file is written as `"$name.json"`, so
+     * it removed nothing; invisible because `deleteRecursively()` on a path
+     * that does not exist returns false without throwing, so the
+     * `Catching {}.logOnFailure` inside the file manager never fired.
+     *
+     * Correcting the name would not have been enough either: `DataStore` holds
+     * the value in memory and serves readers from there, so even a
+     * correctly-named delete leaves every reader on the old value until the
+     * process dies. `updateData` is the only write path `DataStore` observes,
+     * which makes it the only one `clear` can use.
+     *
+     * This is the user-isolation mechanism. `UserScopedProfileCacheCleaner`
+     * calls it on a user change against a persistent cache, so a broken
+     * `clear` leaves the previous account's profile on a shared device.
+     */
+    override suspend fun clear() {
+        val fresh = defaultValue()
+        dataStore.updateData { fresh }
+    }
 }
