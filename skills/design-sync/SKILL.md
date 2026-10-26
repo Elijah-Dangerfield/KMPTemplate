@@ -1,5 +1,5 @@
 ---
-name: claude-design-sync
+name: design-sync
 description: Sync app screens with Claude Design in either direction. App to design means the app's real screens (every Compose @Preview rendered to a PNG) go to Claude Design so the design matches the app. Design to app means screens exported from Claude Design are compared side by side with the app's renders and the code is changed to match. Use when the user mentions Claude Design together with screens, previews, mockups or screenshots, or asks to sync, match, compare or update the design or the app from the other one. Works in Claude Code with the repo, and in Claude Design or claude.ai without one.
 ---
 

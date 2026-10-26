@@ -2,7 +2,7 @@
 
 Every `@Preview` in the project is also a screenshot. `:apps:screenshots`
 renders them to PNGs, and `scripts/design_sync.main.kts` moves those PNGs to
-and from Claude Design. The skill in `skills/claude-design-sync/` tells an
+and from Claude Design. The skill in `skills/design-sync/` tells an
 agent how to drive both, in Claude Code or in Claude Design.
 
 ## Rendering previews
