@@ -240,7 +240,7 @@ echo "==> Initializing a client-only project into $CLIENT_ONLY_DIR (--backend=no
   #   scripts/lib/setup_store.main.kts
   #                                the credential store is deliberately shared
   #                                across every project you generate, so it
-  #                                still carries Fly tokens for the ones that
+  #                                still carries the Fly org slug for the ones that
   #                                do have a backend.
   #   scripts/setup.main.kts       these two are shape-agnostic tools: every
   #   scripts/setup_supabase.main.kts

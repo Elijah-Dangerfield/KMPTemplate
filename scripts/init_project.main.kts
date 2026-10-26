@@ -1343,7 +1343,7 @@ fun stripServerFromSetupDoc(file: File) {
         """.trimIndent() to "",
         "Prove the observability + deploy story end to end while everything is fresh." to
             "Prove the observability story end to end while everything is fresh.",
-        "Sentry org + tokens, Supabase + Fly tokens and org slugs, Apple team" to
+        "Sentry org + tokens, Supabase token and org slug, Fly org slug, Apple team" to
             "Sentry org + tokens, Supabase token and org slug, Apple team",
         "belongs to your Sentry org, your Fly\naccount or your Apple team, and is" to
             "belongs to your Sentry org or your\nApple team, and is",
