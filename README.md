@@ -94,6 +94,7 @@ apps/ios/              # Swift/Xcode wrapper
 apps/server/           # Ktor + Postgres backend (Fly.io)
 apps/admin/            # Kotlin/JS remote-config admin console
 apps/integration/      # End-to-end harness (real client ↔ real server ↔ real DB)
+apps/screenshots/      # Every @Preview rendered to a PNG (Roborazzi)
 features/<name>/       # Routes and public API
 features/<name>/impl/  # Screens and ViewModels
 libraries/<name>/      # Interfaces
@@ -112,6 +113,7 @@ Architecture rules (enforced at Gradle configuration time), the ViewModel/DI/nav
 | [docs/practices/observability.md](docs/practices/observability.md) | The session_id pivot; finding one session across Sentry/Loki/Tempo |
 | [docs/practices/app-events.md](docs/practices/app-events.md) | The structured-event registry + `logEvent` discipline |
 | [docs/practices/outbox.md](docs/practices/outbox.md) | Offline writes that must not be lost |
+| [docs/practices/design-sync.md](docs/practices/design-sync.md) | Preview screenshots, screen ids, syncing screens with Claude Design |
 | [apps/server/DEPLOY.md](apps/server/DEPLOY.md) | Fly.io two-environment deployment |
 | [apps/admin/README.md](apps/admin/README.md) | The remote-config admin console |
 | [docs/swift-kotlin-communication-patterns.md](docs/swift-kotlin-communication-patterns.md) | Exposing Kotlin to Swift and vice versa |

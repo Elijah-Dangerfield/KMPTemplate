@@ -345,6 +345,18 @@ fun designScreens(source: File): Map<String, File> {
     return fromManifest + pngs.filter { it !in claimed }.associateBy { it.nameWithoutExtension }
 }
 
+/** Design id → the designer's `title` / `notes`, when the export's manifest has them. */
+fun designNotes(): Map<String, String> {
+    val manifest = File(designDir, "manifest.json").takeIf { it.exists() } ?: return emptyMap()
+    return parseJson(manifest.readText())["screens"].items.mapNotNull { screen ->
+        val id = screen["id"].text ?: return@mapNotNull null
+        listOfNotNull(screen["title"].text, screen["notes"].text)
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.let { id to it.joinToString(": ") }
+    }.toMap()
+}
+
 data class ScreenPair(val id: String, val app: AppScreen, val designId: String, val design: File, val exact: Boolean)
 
 fun scaledToHeight(image: BufferedImage, height: Int): BufferedImage {
@@ -479,6 +491,13 @@ fun writeCompareReadme(
             pairs.forEach { p ->
                 appendLine("| `${p.id}` | [${p.id}.png](${p.id}.png) | `app/${p.app.file}` | `design/${p.designId}.png` | ${if (p.exact) "exact" else "loose (`${p.designId}`)"} | `${p.app.preview}` in `${p.app.module}` |")
             }
+        }
+        val notes = designNotes()
+        if (notes.isNotEmpty()) {
+            appendLine()
+            appendLine("## Designer notes")
+            appendLine()
+            notes.toSortedMap().forEach { (id, note) -> appendLine("- `$id`: $note") }
         }
         appendLine()
         appendLine("## Design screens with no app screen (${unmatchedDesign.size})")
