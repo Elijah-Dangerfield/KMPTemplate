@@ -393,6 +393,10 @@ fun copyTemplate(source: File, dest: File) {
         // Machine-specific (Android SDK path etc.) — the IDE regenerates it.
         if (file.parentFile?.canonicalPath == source.canonicalPath &&
             file.name == "local.properties") return@forEach
+        // scripts/design_sync.main.kts output (gitignored): the template's own
+        // screen renders and imported designs, which mean nothing to a new app.
+        if (file.parentFile?.canonicalPath == source.canonicalPath &&
+            file.isDirectory && file.name == "design-sync") return@forEach
         val target = File(dest, file.name)
         if (file.isDirectory) {
             copyTemplate(file, target)
@@ -436,6 +440,7 @@ fun ensureExecutableBits(projectDir: File) {
         "scripts/setup_sentry_ci.sh",
         "scripts/cleanup.sh",
         "scripts/create_module.main.kts",
+        "scripts/design_sync.main.kts",
         "scripts/dev/drive.py",
         "scripts/setup.main.kts",
         "scripts/setup_sentry.main.kts",

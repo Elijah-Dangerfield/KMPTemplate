@@ -122,6 +122,11 @@ class PreviewScreenshotTest(private val screen: Screen) {
                 .excludeIfAnnotatedWithAnyOf(NoScreenshot::class.java)
                 .getPreviews()
                 .sortedWith(compareBy({ it.declaringClass }, { it.methodName }, { it.previewIndex ?: -1 }))
+            // Zero is never a real answer for this project, and it is what a wrong package root
+            // (say, a rename that missed the line above) looks like: a green run with nothing in it.
+            check(previews.isNotEmpty()) {
+                "No @Preview functions found under the scanned package. Is the package root above still this project's?"
+            }
 
             val ids = ScreenIds()
             return previews.map { preview ->

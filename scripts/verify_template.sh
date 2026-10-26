@@ -137,7 +137,7 @@ if grep -rIn --exclude-dir=.git 'This template' docs SETUP.md >/tmp/verify_templ
 fi
 
 # 4. Executable bits survived the copy.
-for f in gradlew scripts/install_hooks.sh scripts/dev/drive.py .githooks/commit-msg .githooks/post-commit; do
+for f in gradlew scripts/install_hooks.sh scripts/dev/drive.py scripts/design_sync.main.kts .githooks/commit-msg .githooks/post-commit; do
   [ -x "$f" ] || fail "$f is not executable"
 done
 if [ -f .githooks/pre-push ] && [ ! -x .githooks/pre-push ]; then
@@ -307,6 +307,27 @@ if [ -z "${ANDROID_HOME:-}" ] && [ -f "$ROOT/local.properties" ]; then
   cp "$ROOT/local.properties" local.properties
 fi
 ./gradlew --no-daemon :apps:compose:compileDebugKotlinAndroid testDebugUnitTest
+
+# Preview screenshots and the design-sync export. A plain testDebugUnitTest
+# skips the screenshot tier, so render explicitly. The scanner's package root is
+# a literal the rename pass rewrites; if that ever misses, the scan finds no
+# previews and the test fails saying so. The manifest check covers the script's
+# half: that it finds the renders and the rewritten app name.
+echo "==> Rendering previews and exporting design-sync"
+./gradlew --no-daemon :apps:screenshots:recordRoborazziDebug
+./scripts/design_sync.main.kts export --skip-render
+python3 - <<'PYEOF' || { echo "FAIL: design-sync export is wrong (see above)" >&2; exit 1; }
+import json, sys
+m = json.load(open("design-sync/app/manifest.json"))
+screens = m["screens"]
+rendered = [s for s in screens if s["file"]]
+failed = [s for s in screens if s["failure"]]
+print(f"design-sync: {len(rendered)} rendered, {len(failed)} failed, app={m['app']}")
+for s in failed:
+    print(f"  {s['id']}: {s['failure']}", file=sys.stderr)
+if not rendered or failed or m["app"] != "SmokeTestApp":
+    sys.exit(1)
+PYEOF
 
 run_server_tests() {
   if docker info >/dev/null 2>&1; then
