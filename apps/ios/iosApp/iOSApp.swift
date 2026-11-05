@@ -24,6 +24,7 @@ struct iOSApp: App {
         // Construct every @AutoInit singleton up front — resolving the set is
         // what forces construction (AppEventDispatcher's lifecycle attach etc.).
         _ = iOSAppComponent.autoInits
+        ShakeWindow.install()
     }
     
     var body: some Scene {
@@ -61,9 +62,16 @@ struct ComposeView: UIViewControllerRepresentable {
     let nativeViewFactory: KMPTemplateNativeViewFactory
 
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController(
-            appComponent: appComponent
-        )
+        // iOS 26 gets the system's Liquid Glass tab bar over Compose (hidden until Kotlin renders
+        // tabs into it); before it, an app with tabs draws its own in Compose.
+        if #available(iOS 26, *) {
+            let shell = GlassShellController()
+            shell.setContent(
+                MainViewControllerKt.MainViewController(appComponent: appComponent, systemTabBar: shell)
+            )
+            return shell
+        }
+        return MainViewControllerKt.MainViewController(appComponent: appComponent, systemTabBar: nil)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

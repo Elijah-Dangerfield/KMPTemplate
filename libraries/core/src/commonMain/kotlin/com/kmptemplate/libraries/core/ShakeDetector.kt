@@ -3,7 +3,9 @@ package com.kmptemplate.libraries.core
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Turns the accelerometer into a stream of shakes.
+ * A stream of shakes: [ShakeRecognizer] over the accelerometer on Android,
+ * UIKit's own shake gesture on iOS (`IosShakeDetector`). UIKit says nothing
+ * about how hard, so an iOS shake is always [ShakeIntensity.NORMAL].
  *
  * [start] and [stop] are foreground-scoped, not composition-scoped: a detector
  * left running while the app is backgrounded keeps sampling a phone in a

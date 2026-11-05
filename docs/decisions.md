@@ -6,6 +6,26 @@ the decision, alternatives considered, and *why*. Newest first.
 
 ---
 
+## 2026-11-04: On iOS a shake is UIKit's shake gesture, not our accelerometer reading
+
+**Decision:** iOS shake detection listens for UIKit's shake (`motionEnded` on `UIWindow`,
+`ShakeWindow.swift`, handed to `IosShakeDetector` as a notification). Android keeps
+`ShakeRecognizer` over the accelerometer. Ported from Opson, where the CoreMotion path never
+fired on a real iPhone.
+
+**Alternatives:** keep CoreMotion and retune `ShakeRecognizer` for iPhone; run both sources.
+
+**Why:** the simulator has no accelerometer, so nothing short of a device could check a retune.
+UIKit's gesture is the one iOS people know from shake to undo, works under Device › Shake in the
+simulator, and leaves no thresholds of ours to get wrong. The window is the hook because a shake
+starts at the first responder, which in a Compose app is Compose's or nobody's, and every shake
+reaches the window. The hook wraps the window's implementation at launch rather than overriding
+it in an `extension UIWindow`, because Wiretap already has such an override in debug builds and
+the runtime keeps only one of the two. UIKit reports no strength, so an iOS shake is always
+`ShakeIntensity.NORMAL`.
+
+---
+
 ## 2026-09-21: One Grafana stack for every project, separated by service_name
 
 **Decision:** every app generated from this template sends to the same Grafana
