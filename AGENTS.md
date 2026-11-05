@@ -297,6 +297,8 @@ Each of these cost a downstream app real time. They are cheap to avoid and expen
 - iOS framework compiled from `apps/compose`, embedded as `ComposeApp.xcframework`
 - Swift types passed to Kotlin via `IosAppComponentFactory.create(...)`
 - Reference `apps/compose/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework/Headers/ComposeApp.h` for generated Swift interfaces
+- **On iOS 26 a tab bar can be native** (`GlassShellController` in Swift, Liquid Glass with an optional + beside it). Kotlin drives it through `LocalSystemTabBar` (`SystemTabBar.kt`): render a `SystemTabBarState` and listen for taps; it is null on Android and before iOS 26, where the app draws a Compose bar. It stays hidden until rendered visible. It sits over Compose and reaches it as extra bottom safe area, so a tab root must put its bottom inset in its list's content padding, or the rows stop above the glass instead of running under it. It also sits above every Compose sheet and dialog, so render it hidden while one is up.
+- **Shake on iOS is UIKit's shake gesture**, wrapped onto `UIWindow.motionEnded` at launch (`ShakeWindow.swift`) and posted to `IosShakeDetector`. Not an `extension UIWindow` override: Wiretap has one in debug builds, and with two the runtime keeps only one.
 - **Use `@ObjCName("TypeName", exact = true)` on Kotlin types used from Swift** to give stable names that won't change when project is renamed:
   ```kotlin
   @file:OptIn(ExperimentalObjCName::class)

@@ -13,6 +13,8 @@ import kotlin.math.sqrt
  * `CMAccelerometerData` — which is why a baseline bug in this logic survived as
  * long as it did. Feed it plain numbers instead, and the rules become assertions.
  *
+ * Android only now: iOS takes UIKit's shake gesture instead (`IosShakeDetector` says why).
+ *
  * Callers hand it accelerometer samples in **m/s², including gravity** — the
  * unit conversion is the platform's job. It tracks the change between
  * consecutive samples, so a constant gravity vector cancels out and only

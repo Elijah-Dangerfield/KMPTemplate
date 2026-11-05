@@ -1,30 +1,39 @@
+@file:OptIn(ExperimentalObjCName::class)
+
 package com.kmptemplate.libraries.core
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import me.tatarka.inject.annotations.Inject
-import platform.CoreMotion.CMMotionManager
 import platform.Foundation.NSDate
-import platform.Foundation.NSOperationQueue
-import platform.Foundation.NSTimeInterval
+import platform.Foundation.NSNotification
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.timeIntervalSince1970
+import platform.darwin.NSObjectProtocol
 import software.amazon.lastmile.kotlin.inject.anvil.AppScope
 import software.amazon.lastmile.kotlin.inject.anvil.ContributesBinding
 import software.amazon.lastmile.kotlin.inject.anvil.SingleIn
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 
-@OptIn(ExperimentalForeignApi::class)
+/**
+ * Shakes as UIKit recognizes them: the app's `UIWindow` hears the system shake gesture and calls
+ * [SystemShake.post] (`ShakeWindow.swift`).
+ *
+ * This used to run [ShakeRecognizer] over CoreMotion's accelerometer, which never fired on a
+ * real iPhone in an app built from here and can't run in the simulator at all (it has no
+ * accelerometer). UIKit's gesture is the one iOS people already know from shake to undo, works
+ * the same on a device and under Device › Shake in the simulator, and needs no sensor or tuning
+ * of ours.
+ */
 @Inject
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class IosShakeDetector : ShakeDetector {
 
-    private val motionManager = CMMotionManager()
-
-    private val recognizer = ShakeRecognizer()
+    private var observer: NSObjectProtocol? = null
 
     private val shakes = MutableSharedFlow<ShakeEvent>(
         extraBufferCapacity = 1,
@@ -33,41 +42,37 @@ class IosShakeDetector : ShakeDetector {
     override val shakeEvents: Flow<ShakeEvent> = shakes.asSharedFlow()
 
     override fun start() {
-        if (!motionManager.accelerometerAvailable) return
-
-        recognizer.reset()
-        motionManager.accelerometerUpdateInterval = UPDATE_INTERVAL
-        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.mainQueue) { data, _ ->
-            data?.acceleration?.useContents {
-                // CoreMotion reports multiples of gravity; the recognizer works
-                // in m/s². Skipping this conversion is what made iOS roughly
-                // twice as hard to shake as Android.
-                onSample(
-                    x = x * STANDARD_GRAVITY,
-                    y = y * STANDARD_GRAVITY,
-                    z = z * STANDARD_GRAVITY,
-                )
-            }
+        if (observer != null) return
+        observer = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = SystemShake.NOTIFICATION,
+            `object` = null,
+            // On the posting thread, which is main: UIKit delivers the shake there.
+            queue = null,
+        ) { _: NSNotification? ->
+            shakes.tryEmit(ShakeEvent(timestampMs = (NSDate().timeIntervalSince1970 * MILLIS_PER_SECOND).toLong()))
         }
     }
 
     override fun stop() {
-        motionManager.stopAccelerometerUpdates()
-        recognizer.reset()
-    }
-
-    private fun onSample(x: Double, y: Double, z: Double) {
-        val now = (NSDate().timeIntervalSince1970 * MILLIS_PER_SECOND).toLong()
-        if (recognizer.onSample(x, y, z, now)) {
-            shakes.tryEmit(ShakeEvent(now, recognizer.lastIntensity))
-        }
+        observer?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
+        observer = null
     }
 
     private companion object {
-        // Delivered faster than the recognizer's cadence so it, not CoreMotion,
-        // decides the sampling rate.
-        const val UPDATE_INTERVAL: NSTimeInterval = 0.05
-        const val STANDARD_GRAVITY = 9.80665
         const val MILLIS_PER_SECOND = 1000
+    }
+}
+
+/**
+ * The door Swift knocks on when UIKit recognizes a shake. A notification rather than a call into
+ * [IosShakeDetector], so the window needs no reference to the app's graph and a shake while the
+ * detector is stopped (backgrounded) reaches nobody.
+ */
+@ObjCName("SystemShake", exact = true)
+object SystemShake {
+    internal const val NOTIFICATION = "com.kmptemplate.systemShake"
+
+    fun post() {
+        NSNotificationCenter.defaultCenter.postNotificationName(NOTIFICATION, `object` = null)
     }
 }
